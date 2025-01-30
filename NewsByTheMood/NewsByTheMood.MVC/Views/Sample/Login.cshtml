@@ -1,0 +1,15 @@
+﻿@model SampleModel
+
+<div class="text-center">
+	<form asp-action="LoginProcess" asp-controller="Sample" method="post">
+		<div>
+			<label asp-for="Name">Name</label>
+			<input asp-for="Name" type="text"/>
+		</div>
+		<div>
+			<label asp-for="Email">Email</label>
+			<input asp-for="Email" type="email"/>
+		</div>	
+		<button type="submit">Отправить</button>
+	</form>
+</div>

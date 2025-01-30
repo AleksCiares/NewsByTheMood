@@ -1,0 +1,37 @@
+﻿@model NewsByTheMood.Services.DataProvider.DTO.ArticleDTO
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="article">
+    <div class="article_title">
+        <h5>@Model.Title</h5>
+    </div>
+    <div class="article_pdate">
+        <span>@Model.PublishDate.ToString()</span>
+    </div>
+    <div class="article_positivity">
+        <span>@Model.Positivity</span>
+    </div>
+    <div class="article_rating">
+        <span>@Model.Rating</span>
+    </div>
+    @if (Model.ArticleTags is not null)
+    {
+        <div class="article_tags">
+            @foreach (var tag in Model.ArticleTags)
+            {
+                <span>tag</span>
+            }
+        </div>
+    }
+    <div class="article_body">
+        <div>@Model.Body</div>
+    </div>
+    <div class="article_source">
+        <a href="@Model.Uri" target="_blank">@Model.SourceName</a>
+    </div>
+</div>
+
+
+

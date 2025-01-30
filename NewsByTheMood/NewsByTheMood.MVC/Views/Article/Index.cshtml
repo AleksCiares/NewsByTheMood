@@ -1,0 +1,29 @@
+﻿@model NewsByTheMood.Services.DataProvider.DTO.ArticlePreviewDTO[]
+@{
+    ViewData["Title"] = "Artciles";
+}
+
+<div class="articles">
+    @foreach (var article in Model)
+    {
+        <div class="article-preview">
+            <div class="article-preview_title">
+                <h5>@article.Title</h5>
+            </div>
+            <div class="article-preview_pdate">
+                <span>@article.PublishDate.ToString()</span>
+            </div>
+            <div class="article-preview_positivity">
+                <span>@article.Positivity</span>
+            </div>
+            <div class="article-preview_rating">
+                <span>@article.Rating</span>
+            </div>
+            <div class="article-preview_source">
+                <span>@article.SourceName</span>
+            </div>
+        </div>
+    }
+</div>
+
+
