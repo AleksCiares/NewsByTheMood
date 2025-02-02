@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NewsByTheMood.Data;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.DataProvider.Abstract;
-using NewsByTheMood.Services.DataProvider.DTO;
 
 namespace NewsByTheMood.Services.DataProvider.Implement
 {
@@ -22,13 +22,16 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         }
 
         // Get article by certain id
-        public async Task<ArticleDTO?> GetByIdAsync(Int64 id)
+        public async Task<Article?> GetByIdAsync(Int64 id)
         {
-            Contract.Requires<ArgumentException>(id >= 1);
+            if(id <= 0) return null;
             return await this._dbContext.Articles
                 .AsNoTracking()
                 .Where(a => a.Id == id)
-                .Select(a => new ArticleDTO
+                .Include(s => s.Source)
+                .Include(t => t.Source == null ? null : t.Source.Topic)
+                .Include(ta => ta.ArticleTags)
+                /*.Select(a => new ArticleDTO
                 {
                     Id = a.Id,
                     Uri = a.Uri,
@@ -38,34 +41,37 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                     Positivity = a.Positivity,
                     Rating = a.Rating,
                     SourceName = a.Source == null ? null : a.Source.Name,
+                    TopicName = a.Source == null ? null : a.Source.Topic == null ? null : a.Source.Topic.Name,
                     ArticleTags = a.ArticleTags.Select(a => a.Tag.Name).ToArray(),
-                })
+                })*/
                 .FirstOrDefaultAsync();
         }
 
         // Get article with full related properties
-        //public async Task<Article?> GetByIdFullPropAsync(Int64 id)
-        //{
-        //    Contract.Requires<ArgumentException>(id >= 1);
-        //    return await this._dbContext.Articles
-        //        .AsNoTracking()
-        //        .Include(a => a.Source)
-        //        .Include(t => t.ArticleTags)
-        //        .Include(c => c.Comments)
-        //        .FirstOrDefaultAsync(a => a.Id.Equals(id));
-        //}
+        /*public async Task<Article?> GetByIdFullPropAsync(Int64 id)
+        {
+            Contract.Requires<ArgumentException>(id >= 1);
+            return await this._dbContext.Articles
+                .AsNoTracking()
+                .Include(a => a.Source)
+                .Include(t => t.ArticleTags)
+                .Include(c => c.Comments)
+                .FirstOrDefaultAsync(a => a.Id.Equals(id));
+        }*/
 
         // Get range off articles preview
-        public async Task<ArticlePreviewDTO[]?> GetRangePreviewAsync(int pageSize, int pageNumber, short positivity = 0)
+        public async Task<Article[]?> GetRangePreviewAsync(int pageSize, int pageNumber, short positivity)
         {
-            Contract.Requires<ArgumentException>(pageSize >= 1 && pageNumber >= 1 && positivity >= 0);
+            if (pageSize <= 0 || pageNumber <= 0 || positivity <= 0) return null;
             return await this._dbContext.Articles
                 .AsNoTracking()
                 .Where(a => a.Positivity >= positivity)
+                .Include(a => a.Source)
+                .Include(t => t.Source == null ? null : t.Source.Topic)
                 .OrderByDescending(a => a.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                .Select(a => new ArticlePreviewDTO
+                /*.Select(a => new ArticlePreviewDTO
                 {
                     Id = a.Id,
                     Title = a.Title,
@@ -73,30 +79,43 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                     Positivity = a.Positivity,
                     Rating = a.Rating,
                     SourceName = a.Source == null ? null : a.Source.Name,
-                })
+                    TopicName = a.Source == null ? null : a.Source.Topic == null ? null : a.Source.Topic.Name 
+                })*/
                 .ToArrayAsync();
         }
 
-        // Get range off articles preview by Topic
-        // will problem with getting topic from source (maybe)
-        public async Task<ArticlePreviewDTO[]?> GetRangePreviewByTopicAsync(int pageSize, int pageNumber, string topic, short positivity = 0)
+        // Get range off articles preview by topicId
+        public async Task<Article[]?> GetRangePreviewByTopicAsync(int pageSize, int pageNumber, short positivity, string topicName)
         {
-            Contract.Requires<ArgumentException>(pageSize >= 1 && pageNumber >= 1 && topic != null && positivity >= 0);
+            if (pageSize <= 0 || pageNumber <= 0 || positivity <= 0 || topicName.IsNullOrEmpty()) return null;
+
+            var topicId = await this._dbContext.Topics
+                .Where(a => a.Name.Equals(topicName))
+                .FirstOrDefaultAsync();
+            if(topicId == null) return null;
+
             return await this._dbContext.Articles
                 .AsNoTracking()
                 .Where(a => a.Positivity >= positivity)
-                .Where(a => a.Source != null && a.Source.Topic.Name.Equals(topic))
+                .Include(a => a.Source)
+                .Include(t => t.Source == null ? null : t.Source.Topic)
+                .Where( a => ( 
+                a.Source != null && 
+                a.Source.Topic != null && 
+                a.Source.Topic.Id == topicId.Id))
                 .OrderByDescending(a => a.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                .Select(a => new ArticlePreviewDTO
+                /*.Select(a => new ArticlePreviewDTO
                 {
                     Id = a.Id,
+                    Title = a.Title,
                     PublishDate = a.PublishDate,
                     Positivity = a.Positivity,
                     Rating = a.Rating,
-                    SourceName = a.Source == null ? null : a.Source.Name,
-                })
+                    SourceName = a.Source!.Name,
+                    TopicName = a.Source!.Topic!.Name
+                })*/
                 .ToArrayAsync();
         }
     }

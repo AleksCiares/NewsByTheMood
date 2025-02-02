@@ -8,8 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using NewsByTheMood.Data;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.DataProvider.Abstract;
-using NewsByTheMood.Services.DataProvider.DTO;
-
 
 namespace NewsByTheMood.Services.DataProvider.Implement
 {
@@ -22,7 +20,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             this._dbContext = dbContext;
         }
 
-        // Get all topics in bd
+        // Get all article topics from db
         public async Task<Topic[]?> GetAll()
         {
             return await this._dbContext.Topics

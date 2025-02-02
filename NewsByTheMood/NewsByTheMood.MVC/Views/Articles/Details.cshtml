@@ -1,27 +1,31 @@
-﻿@model NewsByTheMood.Services.DataProvider.DTO.ArticleDTO
+﻿@model NewsByTheMood.MVC.Models.ArticleModel
 @{
     ViewData["Title"] = Model.Title;
 }
-
+@await Component.InvokeAsync("TopicsNavBar")
 <div class="article">
     <div class="article_title">
         <h5>@Model.Title</h5>
     </div>
-    <div class="article_pdate">
-        <span>@Model.PublishDate.ToString()</span>
-    </div>
     <div class="article_positivity">
-        <span>@Model.Positivity</span>
+        <span>positivity: @Model.Positivity</span>
     </div>
     <div class="article_rating">
-        <span>@Model.Rating</span>
+        <span>rating: @Model.Rating</span>
+    </div>
+    <div class="article_topic">
+        <span>topic: @Model.TopicName</span>
+    </div>
+    <div class="article_pdate">
+        <span>@Model.PublishDate</span>
     </div>
     @if (Model.ArticleTags is not null)
     {
         <div class="article_tags">
+            tags: 
             @foreach (var tag in Model.ArticleTags)
             {
-                <span>tag</span>
+                <span>@tag </span>
             }
         </div>
     }

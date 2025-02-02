@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NewsByTheMood.Data;
+using NewsByTheMood.Services.DataObfuscator.Abstract;
+using NewsByTheMood.Services.DataObfuscator.Implement;
 using NewsByTheMood.Services.DataProvider.Abstract;
 using NewsByTheMood.Services.DataProvider.Implement;
 
@@ -27,6 +29,8 @@ namespace NewsByTheMood.MVC
             builder.Services.AddScoped<ISourceService, SourceService>();
             // Topic service
             builder.Services.AddScoped<ITopicService, TopicService>();
+            // Obfuscation service
+            builder.Services.AddSingleton<IObfuscatorService, VerySimpleObfuscatorService>();
 
             var app = builder.Build();
 

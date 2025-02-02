@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using NewsByTheMood.Data;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.DataProvider.Abstract;
-using NewsByTheMood.Services.DataProvider.DTO;
 
 namespace NewsByTheMood.Services.DataProvider.Implement
 {
@@ -22,16 +21,16 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         }
 
         // Get comment for certain article loading as needed
-        public async Task<CommentDTO[]?> GetRangeAsync(Int64 articleId, int pageSize, int pageNumber)
+        public async Task<Comment[]?> GetRangeAsync(Int64 articleId, int pageSize, int pageNumber)
         {
-            Contract.Requires<ArgumentException>(articleId >= 0 && pageSize >= 1 && pageSize >= 1);
+            if(articleId <= 0 || pageSize <= 0 || pageSize <= 0) return null;
             return await this._dbContext.Comments
                 .AsNoTracking()
                 .Where(c => c.ArticleId == articleId)
                 .OrderByDescending(c => c.Position)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                .Select(a => new CommentDTO
+                /*.Select(a => new CommentDTO
                 {
                     Id = a.Id,
                     Text = a.Text,
@@ -39,7 +38,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                     UserName = a.User.UserName,
                     UserDisplayedName = a.User.DisplayedName,
                     AvatarUrl = a.User.AvatarUrl
-                })
+                })*/
                 .ToArrayAsync();
         }
     }

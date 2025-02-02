@@ -6,10 +6,10 @@ namespace NewsByTheMood.MVC.Controllers
     //[NonController]
     public class SampleController : Controller
     {
-        public IActionResult Index()
+        /*public IActionResult Index()
         {
             return View();
-        }
+        }*/
 
         //Non routed
         [NonAction]
@@ -31,6 +31,9 @@ namespace NewsByTheMood.MVC.Controllers
             return Ok();
         }
 
+        //The ChildActionOnly attribute ensures that an action method can be called only as a child method from within a view.
+        //Only in ASP.NET
+        //[ChildActionOnly]
         public string Hello(string name)
         {
             return string.IsNullOrWhiteSpace(name) ? "Hello world" : $"Hellow {name}";

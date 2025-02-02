@@ -1,13 +1,13 @@
-﻿using NewsByTheMood.Services.DataProvider.DTO;
+﻿using NewsByTheMood.Data.Entities;
 
 namespace NewsByTheMood.Services.DataProvider.Abstract
 {
+    // Interface of articles provider service
     public interface IArticleService
     {
-        public Task<ArticleDTO?> GetByIdAsync(Int64 id);
-        //public Task<Article?> GetByIdFullPropAsync(Int64 id);
-        public Task<ArticlePreviewDTO[]?> GetRangePreviewAsync(int pageSize, int pageNumber, short positivity = 0);
-        public Task<ArticlePreviewDTO[]?> GetRangePreviewByTopicAsync(int pageSize, int pageNumber, string topic, short positivity = 0);
+        public Task<Article?> GetByIdAsync(Int64 id);
+        public Task<Article[]?> GetRangePreviewAsync(int pageSize, int pageNumber, short positivity);
+        public Task<Article[]?> GetRangePreviewByTopicAsync(int pageSize, int pageNumber, short positivity, string topicName);
 
     }
 }

@@ -14,5 +14,6 @@ namespace NewsByTheMood.Services.DataProvider.DTO
         public short Positivity { get; set; }
         public int Rating { get; set; }
         public string? SourceName { get; set; }
+        public string? TopicName { get; set; }
     }
 }

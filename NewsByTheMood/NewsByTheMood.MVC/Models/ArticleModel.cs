@@ -1,12 +1,11 @@
-﻿namespace NewsByTheMood.Services.DataProvider.DTO
+﻿namespace NewsByTheMood.MVC.Models
 {
-    public class ArticleDTO
+    public class ArticleModel
     {
-        public Int64 Id { get; set; }
         public string Uri { get; set; }
         public string Title { get; set; }
         public string? Body { get; set; }
-        public DateTime? PublishDate { get; set; }
+        public string? PublishDate { get; set; }
         public short Positivity { get; set; }
         public int Rating { get; set; }
         public string? SourceName { get; set; }

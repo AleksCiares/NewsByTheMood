@@ -1,0 +1,17 @@
+﻿@model NewsByTheMood.MVC.Models.ArticlePreviewModel[]
+@{
+    ViewData["Title"] = Model[0].TopicName;
+}
+@await Component.InvokeAsync("TopicsNavBar")
+<div class="articles">
+    <div class="articles-topic">
+        <h3>
+            @Model[0].TopicName
+        </h3>
+    </div>
+    @{
+        await Html.RenderPartialAsync("_ArticlesPreview", Model);
+    }
+</div>
+
+

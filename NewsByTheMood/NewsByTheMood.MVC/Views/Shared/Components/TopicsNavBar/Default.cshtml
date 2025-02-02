@@ -1,0 +1,13 @@
+﻿@model NewsByTheMood.MVC.Models.TopicNavBarModel[]
+
+<div class="topics-navbar">
+	<ul>
+		@foreach (var topic in Model)
+		{
+			<li>
+				<a asp-controller="Articles" asp-action="Topic" asp-route-id="@topic.Name">@topic.Name</a>
+			</li>
+		}
+	</ul>
+</div>
+

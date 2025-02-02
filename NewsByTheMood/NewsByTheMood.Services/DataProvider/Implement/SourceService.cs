@@ -21,19 +21,20 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         }
 
         // Get full properties source item
-        public async Task<Source?> GetByIdFullPropAsync(Int64 id)
+        public async Task<Source?> GetByIdAsync(Int64 id)
         {
-            Contract.Requires<ArgumentException>(id >= 1);
+            if(id <= 0) return null;
             return await this._dbContext.Sources
                 .AsNoTracking()
+                .Where(s => s.Id == id)
                 .Include(s => s.Topic)
-                .FirstOrDefaultAsync(a => a.Id.Equals(id));
+                .FirstOrDefaultAsync();
         }
 
         // Get full properties source range 
-        public async Task<Source[]?> GetRangeFullPropAsync(int pageSize, int pageNumber)
+        public async Task<Source[]?> GetRangeAsync(int pageSize, int pageNumber)
         {
-            Contract.Requires<ArgumentException>(pageSize >= 1 && pageNumber >= 1);
+            if(pageSize <= 0 || pageNumber <= 0) return null;
             return await this._dbContext.Sources
                 .AsNoTracking()
                 .Include(s => s.Topic)
