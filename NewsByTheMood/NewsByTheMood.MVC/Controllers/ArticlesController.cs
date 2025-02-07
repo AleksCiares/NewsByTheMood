@@ -74,7 +74,7 @@ namespace NewsByTheMood.MVC.Controllers
                 id))? // replaced with mapper
                 .Select(a => new ArticlePreviewModel()
                 {
-                    Id = a.Id.ToString(),
+                    Id = this._obfuscatorService.Obfuscate(a.Id.ToString()),
                     Title = a.Title,
                     PublishDate = a.PublishDate.ToString(),
                     Positivity = a.Positivity,
@@ -90,7 +90,7 @@ namespace NewsByTheMood.MVC.Controllers
 
         // Get certain article
         [HttpGet]
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details([FromRoute]string id)
         {
             // temp validate input variable
             Int64 tempId = 0;

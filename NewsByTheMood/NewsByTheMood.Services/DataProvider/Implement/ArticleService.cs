@@ -30,7 +30,8 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .Where(a => a.Id == id)
                 .Include(s => s.Source)
                 .Include(t => t.Source == null ? null : t.Source.Topic)
-                .Include(ta => ta.ArticleTags)
+                .Include(at => at.ArticleTags)
+                .ThenInclude(atn => atn.Tag)
                 /*.Select(a => new ArticleDTO
                 {
                     Id = a.Id,
