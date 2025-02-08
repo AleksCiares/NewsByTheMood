@@ -30,6 +30,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .OrderByDescending(c => c.Position)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
+                .ToArrayAsync();
                 /*.Select(a => new CommentDTO
                 {
                     Id = a.Id,
@@ -39,7 +40,6 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                     UserDisplayedName = a.User.DisplayedName,
                     AvatarUrl = a.User.AvatarUrl
                 })*/
-                .ToArrayAsync();
         }
     }
 }

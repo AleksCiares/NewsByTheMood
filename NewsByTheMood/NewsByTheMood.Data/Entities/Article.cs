@@ -12,9 +12,9 @@
         public int Rating { get; set; }
 
         // FK
-        public Int64? SourceId { get; set; }
+        public Int64 SourceId { get; set; }
         // nav property
-        public Source? Source { get; set; }
+        public Source Source { get; set; }
         // nav property
         public List<ArticleTag> ArticleTags { get; set; }
         // nav property

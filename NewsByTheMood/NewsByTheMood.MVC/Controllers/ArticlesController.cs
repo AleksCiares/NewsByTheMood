@@ -45,8 +45,8 @@ namespace NewsByTheMood.MVC.Controllers
                     PublishDate = a.PublishDate.ToString(),
                     Positivity = a.Positivity,
                     Rating = a.Rating,
-                    SourceName = a.Source?.Name,
-                    TopicName = a.Source?.Topic?.Name
+                    SourceName = a.Source.Name,
+                    TopicName = a.Source.Topic.Name
                 })
                 .ToArray();
 
@@ -108,7 +108,7 @@ namespace NewsByTheMood.MVC.Controllers
                 Rating = article.Rating,
                 SourceName = article.Source?.Name,
                 TopicName = article.Source?.Topic?.Name,
-                //ArticleTags = article.ArticleTags.Select(t => t.Tag.Name).ToArray() // dont work
+                ArticleTags = article.ArticleTags.Select(t => t.Tag.Name).ToArray()
             };
             return View(model);
         }

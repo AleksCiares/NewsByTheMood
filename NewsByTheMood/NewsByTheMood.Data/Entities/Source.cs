@@ -17,9 +17,9 @@
         public string? ArticleTagPath { get; set; }
 
         // FK
-        public Int64? TopicId { get; set; }
+        public Int64 TopicId { get; set; }
         // nav property
-        public Topic? Topic { get; set; }
+        public Topic Topic { get; set; }
         // nav property
         public List<Article> Articles { get; set; }
     }

@@ -25,13 +25,15 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         public async Task<Article?> GetByIdAsync(Int64 id)
         {
             if(id <= 0) return null;
+
             return await this._dbContext.Articles
                 .AsNoTracking()
                 .Where(a => a.Id == id)
                 .Include(s => s.Source)
-                .Include(t => t.Source == null ? null : t.Source.Topic)
+                .Include(t => t.Source.Topic)
                 .Include(at => at.ArticleTags)
                 .ThenInclude(atn => atn.Tag)
+                .FirstOrDefaultAsync();
                 /*.Select(a => new ArticleDTO
                 {
                     Id = a.Id,
@@ -45,7 +47,6 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                     TopicName = a.Source == null ? null : a.Source.Topic == null ? null : a.Source.Topic.Name,
                     ArticleTags = a.ArticleTags.Select(a => a.Tag.Name).ToArray(),
                 })*/
-                .FirstOrDefaultAsync();
         }
 
         // Get article with full related properties
@@ -64,15 +65,17 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         public async Task<Article[]?> GetRangePreviewAsync(int pageSize, int pageNumber, short positivity)
         {
             if (pageSize <= 0 || pageNumber <= 0 || positivity <= 0) return null;
+
             return await this._dbContext.Articles
                 .AsNoTracking()
                 .Where(a => a.Positivity >= positivity)
-                .Include(a => a.Source)
-                .Include(t => t.Source == null ? null : t.Source.Topic)
+                .Include(s => s.Source)
+                .Include(t => t.Source.Topic)
                 .OrderByDescending(a => a.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                /*.Select(a => new ArticlePreviewDTO
+                .ToArrayAsync();
+                 /*.Select(a => new ArticlePreviewDTO
                 {
                     Id = a.Id,
                     Title = a.Title,
@@ -82,6 +85,26 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                     SourceName = a.Source == null ? null : a.Source.Name,
                     TopicName = a.Source == null ? null : a.Source.Topic == null ? null : a.Source.Topic.Name 
                 })*/
+        }
+
+        public async Task<Article[]?> GetRangePreviewByTagAsync(int pageSize, int pageNumber, short positivity, string tagName)
+        {
+            if (pageSize <= 0 || pageNumber <= 0 || positivity <= 0 || tagName.IsNullOrEmpty()) return null;
+
+            return await this._dbContext.ArticleTags
+                .AsNoTracking()
+                .Where(t => t.Tag.Name.Equals(tagName))
+                .Select(a => new Article
+                {
+                    Id = a.Article.Id,
+                    Uri = a.Article.Uri,
+                    Title = a.Article.Title,
+                    Body = a.Article.Body,
+                    PublishDate = a.Article.PublishDate,
+                    Positivity = a.Article.Positivity,
+                    Rating = a.Article.Rating,
+                    Source = a.Article.Source,
+                })
                 .ToArrayAsync();
         }
 
@@ -89,24 +112,16 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         public async Task<Article[]?> GetRangePreviewByTopicAsync(int pageSize, int pageNumber, short positivity, string topicName)
         {
             if (pageSize <= 0 || pageNumber <= 0 || positivity <= 0 || topicName.IsNullOrEmpty()) return null;
-
-            var topicId = await this._dbContext.Topics
-                .Where(a => a.Name.Equals(topicName))
-                .FirstOrDefaultAsync();
-            if(topicId == null) return null;
-
             return await this._dbContext.Articles
                 .AsNoTracking()
                 .Where(a => a.Positivity >= positivity)
                 .Include(a => a.Source)
-                .Include(t => t.Source == null ? null : t.Source.Topic)
-                .Where( a => ( 
-                a.Source != null && 
-                a.Source.Topic != null && 
-                a.Source.Topic.Id == topicId.Id))
+                .Include(t => t.Source.Topic)
+                .Where(t => t.Source.Topic.Name.Equals(topicName))
                 .OrderByDescending(a => a.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
+                .ToArrayAsync();
                 /*.Select(a => new ArticlePreviewDTO
                 {
                     Id = a.Id,
@@ -117,7 +132,6 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                     SourceName = a.Source!.Name,
                     TopicName = a.Source!.Topic!.Name
                 })*/
-                .ToArrayAsync();
         }
     }
 }
