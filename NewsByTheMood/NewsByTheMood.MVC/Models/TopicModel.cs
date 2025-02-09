@@ -1,13 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc;
 
 namespace NewsByTheMood.MVC.Models
 {
-    
+    // Topic display model
     public class TopicModel
     {
-        [Required]
-        [StringLength(100)]
-        public string TopicName {  get; set; }
+        public required string TopicName { get; set; }
     }
 }

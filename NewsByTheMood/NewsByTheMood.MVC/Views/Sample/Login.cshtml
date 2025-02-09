@@ -31,6 +31,7 @@
 	- View model best way to transfer data to View
 *@
 
+@*
 @model SampleModel
 
 <div class="text-center">
@@ -38,6 +39,7 @@
 		<div>
 			<label asp-for="Name">Name</label>
 			<input asp-for="Name" type="text"/>
+			<span asp-validation-for="Name"></span>
 		</div>
 		<div>
 			<label asp-for="Email">Email</label>
@@ -46,16 +48,20 @@
 		<button type="submit">Отправить</button>
 	</form>
 </div>
+*@
 
 @*
 	to add additional section that load to layout, need write @section sectionName{}
 	that render in the layout via @await RenderSectionAsync("sectionName", required: false)
 	Dont use a lot, bad pratice! 
 *@
+
+@*
 @section Scripts
 {
 	<div>Some Div</div>
 }
+*@
 
 @*
 	PartialView dont call Controler, works like static layout

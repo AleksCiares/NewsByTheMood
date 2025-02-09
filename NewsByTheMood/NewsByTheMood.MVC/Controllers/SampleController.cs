@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿/*using Microsoft.AspNetCore.Mvc;
 using NewsByTheMood.MVC.Models;
 
 namespace NewsByTheMood.MVC.Controllers
@@ -6,10 +6,10 @@ namespace NewsByTheMood.MVC.Controllers
     //[NonController]
     public class SampleController : Controller
     {
-        /*public IActionResult Index()
+        *//*public IActionResult Index()
         {
             return View();
-        }*/
+        }*//*
 
         //Non routed
         [NonAction]
@@ -77,3 +77,4 @@ namespace NewsByTheMood.MVC.Controllers
         }
     }
 }
+*/

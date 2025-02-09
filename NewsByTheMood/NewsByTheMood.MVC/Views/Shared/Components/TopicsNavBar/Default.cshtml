@@ -1,11 +1,11 @@
-﻿@model NewsByTheMood.MVC.Models.TopicNavBarModel[]
+﻿@model NewsByTheMood.MVC.Models.TopicModel[]
 
 <div class="topics-navbar">
 	<ul>
 		@foreach (var topic in Model)
 		{
 			<li>
-				<a asp-controller="Articles" asp-action="Topic" asp-route-id="@topic.Name">@topic.Name</a>
+				<a asp-controller="Articles" asp-action="Topic" asp-route-id="@topic.TopicName">@topic.TopicName</a>
 			</li>
 		}
 	</ul>

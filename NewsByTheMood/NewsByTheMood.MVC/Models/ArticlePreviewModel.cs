@@ -1,13 +1,16 @@
-﻿namespace NewsByTheMood.MVC.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace NewsByTheMood.MVC.Models
 {
+    // Article preview display model
     public class ArticlePreviewModel
     {
-        public string Id { get; set; }
-        public string Title { get; set; }
+        public required string Id { get; set; }
+        public required string Title { get; set; }
         public string? PublishDate { get; set; }
-        public short Positivity { get; set; }
-        public int Rating { get; set; }
-        public string? SourceName { get; set; }
-        public string? TopicName { get; set; }
+        public required short Positivity { get; set; }
+        public required int Rating { get; set; }
+        public required string SourceName { get; set; }
+        public required string TopicName { get; set; }
     }
 }

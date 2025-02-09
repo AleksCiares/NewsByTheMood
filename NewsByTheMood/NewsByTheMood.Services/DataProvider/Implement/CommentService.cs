@@ -21,7 +21,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         }
 
         // Get comment for certain article loading as needed
-        public async Task<Comment[]?> GetRangeAsync(Int64 articleId, int pageSize, int pageNumber)
+        public async Task<Comment[]?> GetRangeAsync(Int64 articleId, int pageNumber, int pageSize)
         {
             if(articleId <= 0 || pageSize <= 0 || pageSize <= 0) return null;
             return await this._dbContext.Comments

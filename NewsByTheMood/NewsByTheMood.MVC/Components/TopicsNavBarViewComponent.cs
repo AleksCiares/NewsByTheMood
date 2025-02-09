@@ -18,9 +18,9 @@ namespace NewsByTheMood.MVC.Components
         public async Task<IViewComponentResult> InvokeAsync()
         {
             var topics = (await this._topicService.GetAll())? // replaced with mapper
-                .Select(t => new TopicNavBarModel()
+                .Select(t => new TopicModel()
                 {
-                    Name = t.Name
+                    TopicName = t.Name
                 })
                 .ToArray();
             return View(topics);

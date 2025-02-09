@@ -1,17 +1,16 @@
-﻿@model NewsByTheMood.MVC.Models.ArticlePreviewModel[]
+﻿@model NewsByTheMood.MVC.Models.ArticleCollectionModel
 @{
-    ViewData["Title"] = Model[0].TopicName;
+    ViewData["Title"] = Model.ArticlePreviews[0].TopicName;
 }
 @await Component.InvokeAsync("TopicsNavBar")
 <div class="articles">
     <div class="articles-topic">
         <h3>
-            @Model[0].TopicName
+            @Model.ArticlePreviews[0].TopicName
         </h3>
     </div>
-    @{
-        await Html.RenderPartialAsync("_ArticlesPreview", Model);
-    }
+    <partial name="_ArticlesPreviewPartial" model="@Model.ArticlePreviews" />
 </div>
-
+@* <pagination page-action="Topic" page-info="@Model.PageInfo"/> *@
+<pagination page-action="Topic" page-info="@Model.PageInfo"></pagination>
 

@@ -62,9 +62,9 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         }*/
 
         // Get range off articles preview
-        public async Task<Article[]?> GetRangePreviewAsync(int pageSize, int pageNumber, short positivity)
+        public async Task<Article[]?> GetRangePreviewAsync(int pageNumber, int pageSize, short positivity)
         {
-            if (pageSize <= 0 || pageNumber <= 0 || positivity <= 0) return null;
+            if (pageNumber <= 0 || pageSize <= 0 || positivity <= 0) return null;
 
             return await this._dbContext.Articles
                 .AsNoTracking()
@@ -87,31 +87,11 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 })*/
         }
 
-        public async Task<Article[]?> GetRangePreviewByTagAsync(int pageSize, int pageNumber, short positivity, string tagName)
+        // Get range off articles preview by topicName
+        public async Task<Article[]?> GetRangePreviewByTopicAsync(int pageNumber, int pageSize, short positivity, string topicName)
         {
-            if (pageSize <= 0 || pageNumber <= 0 || positivity <= 0 || tagName.IsNullOrEmpty()) return null;
+            if (pageNumber <= 0 || pageSize <= 0 || positivity <= 0 || topicName.IsNullOrEmpty()) return null;
 
-            return await this._dbContext.ArticleTags
-                .AsNoTracking()
-                .Where(t => t.Tag.Name.Equals(tagName))
-                .Select(a => new Article
-                {
-                    Id = a.Article.Id,
-                    Uri = a.Article.Uri,
-                    Title = a.Article.Title,
-                    Body = a.Article.Body,
-                    PublishDate = a.Article.PublishDate,
-                    Positivity = a.Article.Positivity,
-                    Rating = a.Article.Rating,
-                    Source = a.Article.Source,
-                })
-                .ToArrayAsync();
-        }
-
-        // Get range off articles preview by topicId
-        public async Task<Article[]?> GetRangePreviewByTopicAsync(int pageSize, int pageNumber, short positivity, string topicName)
-        {
-            if (pageSize <= 0 || pageNumber <= 0 || positivity <= 0 || topicName.IsNullOrEmpty()) return null;
             return await this._dbContext.Articles
                 .AsNoTracking()
                 .Where(a => a.Positivity >= positivity)
@@ -133,5 +113,50 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                     TopicName = a.Source!.Topic!.Name
                 })*/
         }
+
+        //Get article count with positivity
+        public async Task<int> CountAsync(short positivity)
+        {
+            if(positivity <= 0) return 0;
+
+            return await this._dbContext.Articles
+                .AsNoTracking()
+                .Where(a => a.Positivity >= positivity)
+                .CountAsync();
+        }
+
+        //Get article count with certain positivity and topic
+        public async Task<int> CountAsync(short positivity, string topicName)
+        {
+            if (positivity <= 0 || topicName.IsNullOrEmpty()) return 0;
+
+            return await this._dbContext.Articles
+                .AsNoTracking()
+                .Where(a => a.Positivity >= positivity)
+                .Where(a => a.Source.Topic.Name.Equals(topicName))
+                .CountAsync();
+        }
+
+        // Get range off articles preview by tagName
+        /*public async Task<Article[]?> GetRangePreviewByTagAsync(int pageSize, int pageNumber, short positivity, string tagName)
+        {
+            if (pageSize <= 0 || pageNumber <= 0 || positivity <= 0 || tagName.IsNullOrEmpty()) return null;
+
+            return await this._dbContext.ArticleTags
+                .AsNoTracking()
+                .Where(t => t.Tag.Name.Equals(tagName))
+                .Select(a => new Article
+                {
+                    Id = a.Article.Id,
+                    Uri = a.Article.Uri,
+                    Title = a.Article.Title,
+                    Body = a.Article.Body,
+                    PublishDate = a.Article.PublishDate,
+                    Positivity = a.Article.Positivity,
+                    Rating = a.Article.Rating,
+                    Source = a.Article.Source,
+                })
+                .ToArrayAsync();
+        }*/
     }
 }

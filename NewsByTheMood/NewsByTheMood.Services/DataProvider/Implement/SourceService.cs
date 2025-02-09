@@ -32,7 +32,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         }
 
         // Get full properties source range 
-        public async Task<Source[]?> GetRangeAsync(int pageSize, int pageNumber)
+        public async Task<Source[]?> GetRangeAsync(int pageNumber, int pageSize)
         {
             if(pageSize <= 0 || pageNumber <= 0) return null;
             return await this._dbContext.Sources
