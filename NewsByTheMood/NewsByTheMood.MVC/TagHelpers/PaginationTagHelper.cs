@@ -26,34 +26,25 @@ namespace NewsByTheMood.MVC.TagHelpers
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             var urlHelper = this._urlHelperFactory.GetUrlHelper(ViewContext);
-            var tag = new TagBuilder("div");
-            tag.AddCssClass("btn-group");
+            var mainTag = new TagBuilder("div");
+            mainTag.AddCssClass("btn-group");
 
             for (int i = 1; i <= this.PageInfo.TotalPages; i++)
             {
                 var innerTag = new TagBuilder("a");
                 innerTag.AddCssClass("btn");
-                var innerTagHtml = i.ToString();
 
-
-                if (int.TryParse(this.ViewContext.HttpContext.Request.Query["page"], out var currentPage))
-                {
-                    if (currentPage == i) innerTag.AddCssClass("active");
-                }
-                else
-                {
-                    if(i == 1)  innerTag.AddCssClass("active");
-                }
-
+                if (PageInfo.Page == i) innerTag.AddCssClass("active");
                 innerTag.Attributes["href"] = urlHelper.Action(PageAction, new { page = i });
-                innerTag.InnerHtml.AppendHtml(innerTagHtml);
-                tag.InnerHtml.AppendHtml(innerTag);
+                innerTag.InnerHtml.AppendHtml(i.ToString());
+
+                mainTag.InnerHtml.AppendHtml(innerTag);
             }
 
             output.TagName = "div";
             output.AddClass("pagination", HtmlEncoder.Default);
             //output.TagMode = TagMode.SelfClosing;
-            output.Content.AppendHtml(tag);
+            output.Content.AppendHtml(mainTag);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace NewsByTheMood.MVC
 
             // Db provider service
             builder.Services.AddDbContext<NewsByTheMoodDbContext>(
-                opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+                opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default1")));
 
             // Data provider services
             // Article service
@@ -29,6 +29,10 @@ namespace NewsByTheMood.MVC
             builder.Services.AddScoped<ISourceService, SourceService>();
             // Topic service
             builder.Services.AddScoped<ITopicService, TopicService>();
+            // User service
+            builder.Services.AddScoped<IUserService, UserService>();
+
+            // Other services
             // Obfuscation service
             builder.Services.AddSingleton<IObfuscatorService, VerySimpleObfuscatorService>();
 
