@@ -13,4 +13,4 @@ Main feature include:
 ## Project structure
 [NewsByTheMood](https://github.com/AleksCiares/NewsByTheMood/tree/master/NewsByTheMood "NewsByTheMood") the project itself is located.
 [Documents](https://github.com/AleksCiares/NewsByTheMood/tree/master/docs "NewsByTheMood") the necessary project documentation is here.
-[Diagrams](https://github.com/AleksCiares/NewsByTheMood/tree/master/docs "NewsByTheMood") here are the necessary product diagrams.
+[Diagrams](https://github.com/AleksCiares/NewsByTheMood/tree/master/docs/diagrams "NewsByTheMood") here are the necessary product diagrams.

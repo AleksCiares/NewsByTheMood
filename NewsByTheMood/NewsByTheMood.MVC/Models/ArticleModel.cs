@@ -13,6 +13,6 @@ namespace NewsByTheMood.MVC.Models
         public required int Rating { get; set; }
         public required string SourceName { get; set; }
         public required string TopicName { get; set; }
-        public string[]? ArticleTags { get; set; }
+        public required string[] ArticleTags { get; set; }
     }
 }

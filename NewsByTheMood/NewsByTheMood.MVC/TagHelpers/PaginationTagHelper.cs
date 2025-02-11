@@ -12,11 +12,11 @@ namespace NewsByTheMood.MVC.TagHelpers
     public class PaginationTagHelper : TagHelper
     {
         private readonly IUrlHelperFactory _urlHelperFactory;
-        public PageInfoModel PageInfo { get; set; }
-        public string PageAction { get; set; }
+        public required PageInfoModel PageInfo { get; set; }
+        public required string PageAction { get; set; }
         [ViewContext]
         [HtmlAttributeNotBound]
-        public ViewContext ViewContext { get; set; }
+        public required ViewContext ViewContext { get; set; }
 
         public PaginationTagHelper(IUrlHelperFactory urlHelperFactory)
         {

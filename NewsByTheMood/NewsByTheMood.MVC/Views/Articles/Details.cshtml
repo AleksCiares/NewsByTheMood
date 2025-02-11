@@ -19,16 +19,13 @@
     <div class="article_pdate">
         <span>@Model.PublishDate</span>
     </div>
-    @if (Model.ArticleTags is not null)
-    {
-        <div class="article_tags">
-            tags: 
-            @foreach (var tag in Model.ArticleTags)
-            {
-                <span>@tag </span>
-            }
-        </div>
-    }
+    <div class="article_tags">
+        tags: 
+        @foreach (var tag in Model.ArticleTags)
+        {
+            <span>@tag</span>
+        }
+    </div>
     <div class="article_body">
         <div>@Model.Body</div>
     </div>

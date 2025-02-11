@@ -20,24 +20,26 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             this._dbContext = dbContext;
         }
 
-        // Get full properties source item
+        // Get source item by id
         public async Task<Source?> GetByIdAsync(Int64 id)
         {
             if(id <= 0) return null;
+
             return await this._dbContext.Sources
                 .AsNoTracking()
-                .Where(s => s.Id == id)
-                .Include(s => s.Topic)
-                .FirstOrDefaultAsync();
+                .Where(source => source.Id == id)
+                .Include(source => source.Topic)
+                .SingleOrDefaultAsync();
         }
 
-        // Get full properties source range 
-        public async Task<Source[]?> GetRangeAsync(int pageNumber, int pageSize)
+        // Get source range
+        public async Task<Source[]> GetRangeAsync(int pageNumber, int pageSize)
         {
-            if(pageSize <= 0 || pageNumber <= 0) return null;
+            if(pageSize <= 0 || pageNumber <= 0) return Array.Empty<Source>();
+
             return await this._dbContext.Sources
                 .AsNoTracking()
-                .Include(s => s.Topic)
+                .Include(source => source.Topic)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToArrayAsync();

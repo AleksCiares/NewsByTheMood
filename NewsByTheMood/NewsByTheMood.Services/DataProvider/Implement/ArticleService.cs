@@ -28,12 +28,12 @@ namespace NewsByTheMood.Services.DataProvider.Implement
 
             return await this._dbContext.Articles
                 .AsNoTracking()
-                .Where(a => a.Id == id)
-                .Include(s => s.Source)
-                .Include(t => t.Source.Topic)
-                .Include(at => at.ArticleTags)
-                .ThenInclude(atn => atn.Tag)
-                .FirstOrDefaultAsync();
+                .Where(article => article.Id == id)
+                .Include(article => article.Source)
+                .ThenInclude(source => source.Topic)
+                .Include(article => article.ArticleTags)
+                .ThenInclude(articleTags => articleTags.Tag)
+                .SingleOrDefaultAsync();
                 /*.Select(a => new ArticleDTO
                 {
                     Id = a.Id,
@@ -49,29 +49,18 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 })*/
         }
 
-        // Get article with full related properties
-        /*public async Task<Article?> GetByIdFullPropAsync(Int64 id)
+        // Get range off articles preview with certain positivity
+        public async Task<Article[]> GetRangePreviewAsync(int pageNumber, int pageSize, short positivity)
         {
-            Contract.Requires<ArgumentException>(id >= 1);
-            return await this._dbContext.Articles
-                .AsNoTracking()
-                .Include(a => a.Source)
-                .Include(t => t.ArticleTags)
-                .Include(c => c.Comments)
-                .FirstOrDefaultAsync(a => a.Id.Equals(id));
-        }*/
-
-        // Get range off articles preview
-        public async Task<Article[]?> GetRangePreviewAsync(int pageNumber, int pageSize, short positivity)
-        {
-            if (pageNumber <= 0 || pageSize <= 0 || positivity <= 0) return null;
+            if (pageNumber <= 0 || pageSize <= 0 || positivity <= 0) 
+                return Array.Empty<Article>();
 
             return await this._dbContext.Articles
                 .AsNoTracking()
-                .Where(a => a.Positivity >= positivity)
-                .Include(s => s.Source)
-                .Include(t => t.Source.Topic)
-                .OrderByDescending(a => a.Id)
+                .Where(article => article.Positivity >= positivity)
+                .Include(article => article.Source)
+                .ThenInclude(source => source.Topic)
+                .OrderByDescending(article => article.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToArrayAsync();
@@ -87,17 +76,18 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 })*/
         }
 
-        // Get range off articles preview by topicName
-        public async Task<Article[]?> GetRangePreviewByTopicAsync(int pageNumber, int pageSize, short positivity, string topicName)
+        // Get range off articles preview with certain positivity and topic
+        public async Task<Article[]> GetRangePreviewAsync(int pageNumber, int pageSize, short positivity, string topicName)
         {
-            if (pageNumber <= 0 || pageSize <= 0 || positivity <= 0 || topicName.IsNullOrEmpty()) return null;
+            if (pageNumber <= 0 || pageSize <= 0 || positivity <= 0 || topicName.IsNullOrEmpty()) 
+                return Array.Empty<Article>();
 
             return await this._dbContext.Articles
                 .AsNoTracking()
-                .Where(a => a.Positivity >= positivity)
-                .Include(a => a.Source)
-                .Include(t => t.Source.Topic)
-                .Where(t => t.Source.Topic.Name.Equals(topicName))
+                .Where(article => article.Positivity >= positivity)
+                .Include(article => article.Source)
+                .ThenInclude(source => source.Topic)
+                .Where(article => article.Source.Topic.Name.Equals(topicName))
                 .OrderByDescending(a => a.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
@@ -114,14 +104,14 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 })*/
         }
 
-        //Get article count with positivity
+        //Get article count with certain positivity
         public async Task<int> CountAsync(short positivity)
         {
             if(positivity <= 0) return 0;
 
             return await this._dbContext.Articles
                 .AsNoTracking()
-                .Where(a => a.Positivity >= positivity)
+                .Where(article => article.Positivity >= positivity)
                 .CountAsync();
         }
 
@@ -132,8 +122,8 @@ namespace NewsByTheMood.Services.DataProvider.Implement
 
             return await this._dbContext.Articles
                 .AsNoTracking()
-                .Where(a => a.Positivity >= positivity)
-                .Where(a => a.Source.Topic.Name.Equals(topicName))
+                .Where(article => article.Positivity >= positivity)
+                .Where(article => article.Source.Topic.Name.Equals(topicName))
                 .CountAsync();
         }
 

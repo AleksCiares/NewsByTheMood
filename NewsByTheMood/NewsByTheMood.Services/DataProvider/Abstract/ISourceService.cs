@@ -6,6 +6,6 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
     public interface ISourceService
     {
         public Task<Source?> GetByIdAsync(Int64 id);
-        public Task<Source[]?> GetRangeAsync(int pageNumber, int pageSize);
+        public Task<Source[]> GetRangeAsync(int pageNumber, int pageSize);
     }
 }

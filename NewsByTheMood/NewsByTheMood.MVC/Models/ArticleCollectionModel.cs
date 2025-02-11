@@ -7,5 +7,6 @@ namespace NewsByTheMood.MVC.Models
     {
         public required ArticlePreviewModel[] ArticlePreviews { get; set; }
         public required PageInfoModel PageInfo { get; set; }
+        public required string Title { get; set; }
     }
 }

@@ -20,14 +20,16 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             this._dbContext = dbContext;
         }
 
-        // Get comment for certain article loading as needed
-        public async Task<Comment[]?> GetRangeAsync(Int64 articleId, int pageNumber, int pageSize)
+        // Get range of comments for certain article
+        public async Task<Comment[]> GetRangeAsync(Int64 articleId, int pageNumber, int pageSize)
         {
-            if(articleId <= 0 || pageSize <= 0 || pageSize <= 0) return null;
+            if(articleId <= 0 || pageSize <= 0 || pageSize <= 0) 
+                return Array.Empty<Comment>();
+            
             return await this._dbContext.Comments
                 .AsNoTracking()
-                .Where(c => c.ArticleId == articleId)
-                .OrderByDescending(c => c.Position)
+                .Where(comment => comment.ArticleId == articleId)
+                .OrderByDescending(comment => comment.Position)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToArrayAsync();

@@ -11,9 +11,9 @@ using NewsByTheMood.Services.DataProvider.Abstract;
 
 namespace NewsByTheMood.Services.DataProvider.Implement
 {
+    // Service for provide article topics
     public class TopicService : ITopicService
     {
-        // Service for provide article topics
         private readonly NewsByTheMoodDbContext _dbContext;
         public TopicService(NewsByTheMoodDbContext dbContext)
         {
@@ -21,7 +21,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         }
 
         // Get all article topics from db
-        public async Task<Topic[]?> GetAll()
+        public async Task<Topic[]> GetAll()
         {
             return await this._dbContext.Topics
                 .AsNoTracking()

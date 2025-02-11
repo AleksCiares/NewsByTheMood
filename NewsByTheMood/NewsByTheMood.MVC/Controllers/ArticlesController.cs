@@ -13,7 +13,7 @@ namespace NewsByTheMood.MVC.Controllers
         private readonly IArticleService _articleService;
         // Uri obfuscation
         private readonly IObfuscatorService _obfuscatorService;
-        
+
         // Temp variable for article positivity
         private readonly short _articlePositivity = 1;
 
@@ -32,50 +32,46 @@ namespace NewsByTheMood.MVC.Controllers
 
             var articles = (await this._articleService.GetRangePreviewAsync(
                 pagination.Page,
-                pagination.PageSize, 
+                pagination.PageSize,
                 this._articlePositivity))? // replaced with mapper
-                .Select(a => new ArticlePreviewModel()
+                .Select(article => new ArticlePreviewModel()
                 {
-                    Id = this._obfuscatorService.Obfuscate(a.Id.ToString()),
-                    Title = a.Title,
-                    PublishDate = a.PublishDate.ToString(),
-                    Positivity = a.Positivity,
-                    Rating = a.Rating,
-                    SourceName = a.Source.Name,
-                    TopicName = a.Source.Topic.Name
+                    Id = this._obfuscatorService.Obfuscate(article.Id.ToString()),
+                    Title = article.Title,
+                    PublishDate = article.PublishDate.ToString(),
+                    Positivity = article.Positivity,
+                    Rating = article.Rating,
+                    SourceName = article.Source.Name,
+                    TopicName = article.Source.Topic.Name
                 })
                 .ToArray();
-            if (articles is null) return NotFound();
-
             var totalArticles = await this._articleService.CountAsync(this._articlePositivity);
-            
-            return View(new ArticleCollectionModel() 
+
+            return View(new ArticleCollectionModel()
             {
-                ArticlePreviews = articles,
+                ArticlePreviews = articles!,
                 PageInfo = new PageInfoModel()
                 {
                     Page = pagination.Page,
                     PageSize = pagination.PageSize,
                     TotalItems = totalArticles,
-                }
+                },
+                Title = "Articles"
             });
         }
 
         // Get range of articles privew by topic
-        [HttpGet]
-        public async Task<IActionResult> Topic([FromRoute]string id, [FromQuery]PaginationModel pagination)
+        [HttpGet("{Controller}/{Action}/{topic:required:alpha}")]
+        public async Task<IActionResult> Topic([FromRoute]string topic, [FromQuery]PaginationModel pagination)
         {
             // Validation pagination model
             if (!ModelState.IsValid) return BadRequest("Bad parameters");
 
-            // And add validate id
-            // here
-
-            var articles = (await this._articleService.GetRangePreviewByTopicAsync(
+            var articles = (await this._articleService.GetRangePreviewAsync(
                 pagination.Page,
                 pagination.PageSize,
                 this._articlePositivity,
-                id))? // replaced with mapper
+                topic))? // replaced with mapper
                 .Select(a => new ArticlePreviewModel()
                 {
                     Id = this._obfuscatorService.Obfuscate(a.Id.ToString()),
@@ -87,19 +83,18 @@ namespace NewsByTheMood.MVC.Controllers
                     TopicName = a.Source.Topic.Name
                 })
                 .ToArray();
-            if (articles is null) return NotFound();
-
-            var totalArticles = await this._articleService.CountAsync(this._articlePositivity, id);
-
+            var totalArticles = await this._articleService.CountAsync(this._articlePositivity, topic);
+            // problem with no articles with certain topic and no certain topic
             return View(new ArticleCollectionModel()
             {
-                ArticlePreviews = articles,
+                ArticlePreviews = articles!,
                 PageInfo = new PageInfoModel()
                 {
                     Page = pagination.Page,
                     PageSize = pagination.PageSize,
                     TotalItems = totalArticles,
-                }
+                },
+                Title = topic,
             });
         }
 

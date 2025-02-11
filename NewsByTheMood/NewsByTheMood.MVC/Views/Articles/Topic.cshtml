@@ -1,16 +1,15 @@
 ﻿@model NewsByTheMood.MVC.Models.ArticleCollectionModel
 @{
-    ViewData["Title"] = Model.ArticlePreviews[0].TopicName;
+    ViewData["Title"] = Model.Title;
 }
 @await Component.InvokeAsync("TopicsNavBar")
 <div class="articles">
     <div class="articles-topic">
         <h3>
-            @Model.ArticlePreviews[0].TopicName
+            @Model.Title
         </h3>
     </div>
     <partial name="_ArticlesPreviewPartial" model="@Model.ArticlePreviews" />
 </div>
-@* <pagination page-action="Topic" page-info="@Model.PageInfo"/> *@
 <pagination page-action="Topic" page-info="@Model.PageInfo"></pagination>
 
