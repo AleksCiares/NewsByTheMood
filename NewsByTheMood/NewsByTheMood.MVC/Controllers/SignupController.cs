@@ -23,14 +23,9 @@ namespace NewsByTheMood.MVC.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Index([FromForm]SignupModel signup)
+        public  IActionResult Index([FromForm]SignupModel signup)
         {
-            var isUsernameExists = true;
-            var isEmailExists = true;
-
-            if (!ModelState.IsValid ||
-                (isUsernameExists = await this._userService.IsUserNameExists(signup.Username)) ||
-                (isEmailExists = await this._userService.IsEmailExists(signup.Email)))
+            if (!ModelState.IsValid)
             {
                 return View(signup);
             }
@@ -41,17 +36,17 @@ namespace NewsByTheMood.MVC.Controllers
         }
 
         // Check on existing username in db
-        [NonAction]
-        private async Task<IActionResult> CheckUserName(string username) 
+        [HttpPost]
+        public async Task<IActionResult> CheckUserName(string username) 
         {
-            return Json(!await this._userService.IsUserNameExists(username));
+            return Json(!await this._userService.IsUserNameExistsAsync(username));
         }
 
         // Check on existing email in db
-        [NonAction]
-        private async Task<IActionResult> CheckEmail(string email)
+        [HttpPost]
+        public async Task<IActionResult> CheckEmail(string email)
         {
-            return Json(!await this._userService.IsUserNameExists(email));
+            return Json(!await this._userService.IsUserNameExistsAsync(email));
         }
     }
 }

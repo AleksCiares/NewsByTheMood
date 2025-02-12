@@ -71,7 +71,7 @@ namespace NewsByTheMood.MVC.Controllers
         public async Task<IActionResult> Topic([FromRoute]string topic, [FromQuery]PaginationModel pagination)
         {
             // Validation pagination model
-            if (!ModelState.IsValid || !await this._topicService.IsTopicExist(topic)) return BadRequest();
+            if (!ModelState.IsValid || !await this._topicService.IsTopicExistsAsync(topic)) return NotFound();
 
             var totalArticles = await this._articleService.CountAsync(this._articlePositivity, topic);
             var articles = Array.Empty<ArticlePreviewModel>();

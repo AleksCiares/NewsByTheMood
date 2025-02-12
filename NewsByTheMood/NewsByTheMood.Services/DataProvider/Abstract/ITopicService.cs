@@ -6,6 +6,6 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
     public interface ITopicService
     {
         public Task<Topic[]> GetAllAsync();
-        public Task<bool> IsTopicExistAsync(string topicName);
+        public Task<bool> IsTopicExistsAsync(string topicName);
     }
 }

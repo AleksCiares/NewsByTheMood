@@ -9,13 +9,13 @@ namespace NewsByTheMood.MVC.Models
         [Required]
         [StringLength(39, MinimumLength = 6, ErrorMessage = "Username is too small or long (maximum is 39 characters)")]
         [RegularExpression(@"^[a-zA-Z0-9]*$", ErrorMessage = "Username may only contain letters and numbers")]
-        //[Remote(action:"CheckUserName", controller: "Signup", HttpMethod = "Post", ErrorMessage = "Username is not available")]
+        [Remote(action:"CheckUserName", controller: "Signup", HttpMethod = "Post", ErrorMessage = "Username is not available")]
         public required string Username { get; set; }
 
         [Required]
         [RegularExpression(@"^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$", 
             ErrorMessage = "Email is invalid or already taken")]
-        //[Remote(action: "CheckEmail", controller: "Signup", HttpMethod = "Post", ErrorMessage = "Email is invalid or already taken")]
+        [Remote(action: "CheckEmail", controller: "Signup", HttpMethod = "Post", ErrorMessage = "Email is invalid or already taken")]
         public required string Email { get; set; }
 
         [Required]

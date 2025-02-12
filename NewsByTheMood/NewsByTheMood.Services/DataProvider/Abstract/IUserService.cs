@@ -9,7 +9,7 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
     // Interface of users provider service
     public interface IUserService
     {
-        public bool IsEmailExists(string email);
-        public bool IsUserNameExists(string username);
+        public Task<bool> IsEmailExistsAsync(string email);
+        public Task<bool> IsUserNameExistsAsync(string username);
     }
 }

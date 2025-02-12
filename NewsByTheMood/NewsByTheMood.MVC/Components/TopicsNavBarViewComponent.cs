@@ -17,7 +17,7 @@ namespace NewsByTheMood.MVC.Components
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var topics = (await this._topicService.GetAll())? // replaced with mapper
+            var topics = (await this._topicService.GetAllAsync())? // replaced with mapper
                 .Select(t => new TopicModel()
                 {
                     TopicName = t.Name

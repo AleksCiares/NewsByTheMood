@@ -30,7 +30,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         }
 
         // Is Topic exist
-        public async Task<bool> IsTopicExistAsync(string topicName)
+        public async Task<bool> IsTopicExistsAsync(string topicName)
         {
             if(topicName.IsNullOrEmpty()) return false;
 
