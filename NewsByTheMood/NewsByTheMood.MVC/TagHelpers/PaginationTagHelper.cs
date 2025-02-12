@@ -35,7 +35,7 @@ namespace NewsByTheMood.MVC.TagHelpers
                 innerTag.AddCssClass("btn");
 
                 if (PageInfo.Page == i) innerTag.AddCssClass("active");
-                innerTag.Attributes["href"] = urlHelper.Action(PageAction, new { page = i });
+                innerTag.Attributes["href"] = urlHelper.Action(PageAction, new { page = i })?.ToLower();
                 innerTag.InnerHtml.AppendHtml(i.ToString());
 
                 mainTag.InnerHtml.AppendHtml(innerTag);

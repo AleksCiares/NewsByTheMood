@@ -9,7 +9,7 @@
             @Model.Title
         </h3>
     </div>
-    <partial name="_ArticlesPreviewPartial" model="@Model.ArticlePreviews" />
+    <partial name="~/Views/Shared/PartialViews/_ArticlesPreviewPartial.cshtml" model="@Model.ArticlePreviews" />
 </div>
-<pagination page-action="Topic" page-info="@Model.PageInfo"></pagination>
+<pagination page-action="topic" page-info="@Model.PageInfo"></pagination>
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using NewsByTheMood.Data.Entities;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataObfuscator.Abstract;
 using NewsByTheMood.Services.DataProvider.Abstract;
@@ -11,15 +12,16 @@ namespace NewsByTheMood.MVC.Controllers
     public class ArticlesController : Controller
     {
         private readonly IArticleService _articleService;
-        // Uri obfuscation
+        private readonly ITopicService _topicService;
         private readonly IObfuscatorService _obfuscatorService;
 
         // Temp variable for article positivity
         private readonly short _articlePositivity = 1;
 
-        public ArticlesController(IArticleService articleService, IObfuscatorService obfuscatorService)
+        public ArticlesController(IArticleService articleService, ITopicService topicService,IObfuscatorService obfuscatorService)
         {
             this._articleService = articleService;
+            this._topicService = topicService;
             this._obfuscatorService = obfuscatorService;
         }
 
@@ -28,25 +30,29 @@ namespace NewsByTheMood.MVC.Controllers
         public async Task<IActionResult> Index([FromQuery]PaginationModel pagination)
         {
             // Validation pagination model
-            if (!ModelState.IsValid) return BadRequest("Bad parameters");
+            if (!ModelState.IsValid) return BadRequest();
 
-            var articles = (await this._articleService.GetRangePreviewAsync(
-                pagination.Page,
-                pagination.PageSize,
-                this._articlePositivity))? // replaced with mapper
-                .Select(article => new ArticlePreviewModel()
-                {
-                    Id = this._obfuscatorService.Obfuscate(article.Id.ToString()),
-                    Title = article.Title,
-                    PublishDate = article.PublishDate.ToString(),
-                    Positivity = article.Positivity,
-                    Rating = article.Rating,
-                    SourceName = article.Source.Name,
-                    TopicName = article.Source.Topic.Name
-                })
-                .ToArray();
             var totalArticles = await this._articleService.CountAsync(this._articlePositivity);
-
+            var articles = Array.Empty<ArticlePreviewModel>();
+            if (totalArticles > 0)
+            {
+                articles = (await this._articleService.GetRangePreviewAsync(
+                    pagination.Page,
+                    pagination.PageSize,
+                    this._articlePositivity))? // replaced with mapper
+                    .Select(article => new ArticlePreviewModel()
+                    {
+                        Id = this._obfuscatorService.Obfuscate(article.Id.ToString()),
+                        Title = article.Title,
+                        PublishDate = article.PublishDate.ToString(),
+                        Positivity = article.Positivity,
+                        Rating = article.Rating,
+                        SourceName = article.Source.Name,
+                        TopicName = article.Source.Topic.Name
+                    })
+                    .ToArray();
+            }
+            
             return View(new ArticleCollectionModel()
             {
                 ArticlePreviews = articles!,
@@ -65,26 +71,30 @@ namespace NewsByTheMood.MVC.Controllers
         public async Task<IActionResult> Topic([FromRoute]string topic, [FromQuery]PaginationModel pagination)
         {
             // Validation pagination model
-            if (!ModelState.IsValid) return BadRequest("Bad parameters");
+            if (!ModelState.IsValid || !await this._topicService.IsTopicExist(topic)) return BadRequest();
 
-            var articles = (await this._articleService.GetRangePreviewAsync(
-                pagination.Page,
-                pagination.PageSize,
-                this._articlePositivity,
-                topic))? // replaced with mapper
-                .Select(a => new ArticlePreviewModel()
-                {
-                    Id = this._obfuscatorService.Obfuscate(a.Id.ToString()),
-                    Title = a.Title,
-                    PublishDate = a.PublishDate.ToString(),
-                    Positivity = a.Positivity,
-                    Rating = a.Rating,
-                    SourceName = a.Source.Name,
-                    TopicName = a.Source.Topic.Name
-                })
-                .ToArray();
             var totalArticles = await this._articleService.CountAsync(this._articlePositivity, topic);
-            // problem with no articles with certain topic and no certain topic
+            var articles = Array.Empty<ArticlePreviewModel>();
+            if (totalArticles > 0)
+            {
+                articles = (await this._articleService.GetRangePreviewAsync(
+                    pagination.Page,
+                    pagination.PageSize,
+                    this._articlePositivity,
+                    topic))? // replaced with mapper
+                    .Select(a => new ArticlePreviewModel()
+                    {
+                        Id = this._obfuscatorService.Obfuscate(a.Id.ToString()),
+                        Title = a.Title,
+                        PublishDate = a.PublishDate.ToString(),
+                        Positivity = a.Positivity,
+                        Rating = a.Rating,
+                        SourceName = a.Source.Name,
+                        TopicName = a.Source.Topic.Name
+                    })
+                    .ToArray();
+            }
+            
             return View(new ArticleCollectionModel()
             {
                 ArticlePreviews = articles!,

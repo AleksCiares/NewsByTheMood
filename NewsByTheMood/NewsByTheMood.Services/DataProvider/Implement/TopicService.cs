@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NewsByTheMood.Data;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.DataProvider.Abstract;
@@ -21,11 +22,21 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         }
 
         // Get all article topics from db
-        public async Task<Topic[]> GetAll()
+        public async Task<Topic[]> GetAllAsync()
         {
             return await this._dbContext.Topics
                 .AsNoTracking()
                 .ToArrayAsync();
+        }
+
+        // Is Topic exist
+        public async Task<bool> IsTopicExistAsync(string topicName)
+        {
+            if(topicName.IsNullOrEmpty()) return false;
+
+            return await this._dbContext.Topics
+                .Where(topic => topic.Name.Equals(topicName))
+                .AnyAsync();
         }
     }
 }

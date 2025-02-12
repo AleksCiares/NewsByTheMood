@@ -21,25 +21,25 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         }
 
         // Is email exists in db
-        public async Task<bool> IsEmailExists(string email)
+        public bool IsEmailExists(string email)
         {
             if (email.IsNullOrEmpty()) return false;
 
-            return await this._dbContext.Users
+            return this._dbContext.Users
                 .AsNoTracking()
                 .Where(u => u.Email.Equals(email))
-                .AnyAsync();
+                .Any();
         }
 
         // Is username exists in db
-        public async Task<bool> IsUserNameExists(string username)
+        public  bool IsUserNameExists(string username)
         {
             if (username.IsNullOrEmpty()) return false;
 
-            return await this._dbContext.Users
+            return this._dbContext.Users
                 .AsNoTracking()
                 .Where(u => u.UserName.Equals(username))
-                .AnyAsync();
+                .Any();
         }
     }
 }

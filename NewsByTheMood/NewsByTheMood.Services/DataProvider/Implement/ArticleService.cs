@@ -104,6 +104,33 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 })*/
         }
 
+        public async Task<Article[]> GetRangePreviewAsync(int pageNumber, int pageSize, short positivity, int rating)
+        {
+            if (pageNumber <= 0 || pageSize <= 0 || positivity <= 0)
+                return Array.Empty<Article>();
+
+            return await this._dbContext.Articles
+                .AsNoTracking()
+                .Where(article => article.Positivity >= positivity)
+                .Where(article => article.Rating >= rating)
+                .Include(article => article.Source)
+                .ThenInclude(source => source.Topic)
+                .OrderByDescending(a => a.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToArrayAsync();
+                /*.Select(a => new ArticlePreviewDTO
+                {
+                    Id = a.Id,
+                    Title = a.Title,
+                    PublishDate = a.PublishDate,
+                    Positivity = a.Positivity,
+                    Rating = a.Rating,
+                    SourceName = a.Source!.Name,
+                    TopicName = a.Source!.Topic!.Name
+                })*/
+        }
+
         //Get article count with certain positivity
         public async Task<int> CountAsync(short positivity)
         {
@@ -126,27 +153,5 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .Where(article => article.Source.Topic.Name.Equals(topicName))
                 .CountAsync();
         }
-
-        // Get range off articles preview by tagName
-        /*public async Task<Article[]?> GetRangePreviewByTagAsync(int pageSize, int pageNumber, short positivity, string tagName)
-        {
-            if (pageSize <= 0 || pageNumber <= 0 || positivity <= 0 || tagName.IsNullOrEmpty()) return null;
-
-            return await this._dbContext.ArticleTags
-                .AsNoTracking()
-                .Where(t => t.Tag.Name.Equals(tagName))
-                .Select(a => new Article
-                {
-                    Id = a.Article.Id,
-                    Uri = a.Article.Uri,
-                    Title = a.Article.Title,
-                    Body = a.Article.Body,
-                    PublishDate = a.Article.PublishDate,
-                    Positivity = a.Article.Positivity,
-                    Rating = a.Article.Rating,
-                    Source = a.Article.Source,
-                })
-                .ToArrayAsync();
-        }*/
     }
 }

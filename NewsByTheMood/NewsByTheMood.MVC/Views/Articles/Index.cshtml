@@ -4,8 +4,8 @@
 }
 @await Component.InvokeAsync("TopicsNavBar")
 <div class="articles">
-    <partial name="_ArticlesPreviewPartial" model="@Model.ArticlePreviews"/>
+    <partial name="~/Views/Shared/PartialViews/_ArticlesPreviewPartial.cshtml" model="@Model.ArticlePreviews" />
 </div>
-<pagination page-action="Index" page-info="@Model.PageInfo"></pagination>
+<pagination page-action="index" page-info="@Model.PageInfo"></pagination>
 
 

@@ -13,7 +13,7 @@ namespace NewsByTheMood.MVC.Models
         public int PageSize { get; set; } = 10;
         // Total number of items
         [Range(0, Int32.MaxValue)]
-        public int TotalItems { get; set; }
+        public required int TotalItems { get; set; }
         // Number of pages required to display all the elements
         [Range(0, Int32.MaxValue)]
         public int TotalPages => (int)Math.Ceiling((double)TotalItems / PageSize);

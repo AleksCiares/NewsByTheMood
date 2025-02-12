@@ -17,39 +17,39 @@ namespace NewsByTheMood.MVC.Controllers
         }
         
         [HttpGet]
-        public IActionResult Signup()
+        public IActionResult Index()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Signup([FromForm]SignupModel signup)
+        public async Task<IActionResult> Index([FromForm]SignupModel signup)
         {
-            if(!ModelState.IsValid)
+            var isUsernameExists = true;
+            var isEmailExists = true;
+
+            if (!ModelState.IsValid ||
+                (isUsernameExists = await this._userService.IsUserNameExists(signup.Username)) ||
+                (isEmailExists = await this._userService.IsEmailExists(signup.Email)))
             {
                 return View(signup);
             }
 
-            var isUsernameExists = await this._userService.IsUserNameExists(signup.Username);
-            var isEmailExists= await this._userService.IsEmailExists(signup.Email);
-            if (isUsernameExists || isEmailExists)
-            {
-                return View(signup);
-            }
+            // add user to databse
 
             return RedirectToAction("Index", "Home");
         }
 
         // Check on existing username in db
-        [HttpPost]
-        public async Task<IActionResult> CheckUserName([FromForm]string username) 
+        [NonAction]
+        private async Task<IActionResult> CheckUserName(string username) 
         {
             return Json(!await this._userService.IsUserNameExists(username));
         }
 
         // Check on existing email in db
-        [HttpPost]
-        public async Task<IActionResult> CheckEmail([FromForm]string email)
+        [NonAction]
+        private async Task<IActionResult> CheckEmail(string email)
         {
             return Json(!await this._userService.IsUserNameExists(email));
         }

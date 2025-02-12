@@ -1,21 +1,48 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using NewsByTheMood.MVC.Models;
+using NewsByTheMood.Services.DataObfuscator.Abstract;
+using NewsByTheMood.Services.DataProvider.Abstract;
 
 namespace NewsByTheMood.MVC.Controllers
 {
+    // Home controller
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IArticleService _articleService;
+        private readonly IObfuscatorService _obfuscatorService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IArticleService articleService, IObfuscatorService obfuscatorService)
         {
-            _logger = logger;
+            this._articleService = articleService;
+            this._obfuscatorService = obfuscatorService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var page = 1;
+            var size = 10;
+            short positivity = 7;
+            var rating = 0;
+
+            var articles = (await this._articleService.GetRangePreviewAsync(
+                page,
+                size,
+                positivity,
+                rating))? // replaced with mapper
+                .Select(article => new ArticlePreviewModel()
+                {
+                    Id = this._obfuscatorService.Obfuscate(article.Id.ToString()),
+                    Title = article.Title,
+                    PublishDate = article.PublishDate.ToString(),
+                    Positivity = article.Positivity,
+                    Rating = article.Rating,
+                    SourceName = article.Source.Name,
+                    TopicName = article.Source.Topic.Name
+                })
+                .ToArray();
+
+            return View(articles);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -8,7 +8,7 @@
 		<h2>Sing up</h2>
 	</div>
 	<div class="singup-form">
-		<form asp-action="Signup" asp-controller="Auth" method="post">
+		<form asp-action="index" asp-controller="signup" method="post">
 			<div class="singup-form_username">
 				<label asp-for="@Model.Username">Username</label>
 				<input asp-for="@Model.Username" type="text"/>
