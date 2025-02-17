@@ -5,8 +5,7 @@ namespace NewsByTheMood.Services.DataObfuscator.Implement
 {
     public class VerySimpleObfuscatorService : IObfuscatorService
     {
-        // its temporary value, will replace to constructor and configure
-        private readonly string _obfuscatorSecret = "64486";
+        private readonly string _secret;
         public string Obfuscate(string plainValue, string? secret = null)
         {
             if (secret == null) secret = _obfuscatorSecret;
