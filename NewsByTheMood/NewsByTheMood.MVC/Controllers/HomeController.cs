@@ -10,12 +10,10 @@ namespace NewsByTheMood.MVC.Controllers
     public class HomeController : Controller
     {
         private readonly IArticleService _articleService;
-        private readonly IObfuscatorService _obfuscatorService;
 
-        public HomeController(IArticleService articleService, IObfuscatorService obfuscatorService)
+        public HomeController(IArticleService articleService)
         {
             this._articleService = articleService;
-            this._obfuscatorService = obfuscatorService;
         }
 
         public async Task<IActionResult> Index()
@@ -32,7 +30,7 @@ namespace NewsByTheMood.MVC.Controllers
                 rating))? // replaced with mapper
                 .Select(article => new ArticlePreviewModel()
                 {
-                    Id = this._obfuscatorService.Obfuscate(article.Id.ToString()),
+                    Id = article.Id.ToString(),
                     Title = article.Title,
                     PublishDate = article.PublishDate.ToString(),
                     Positivity = article.Positivity,

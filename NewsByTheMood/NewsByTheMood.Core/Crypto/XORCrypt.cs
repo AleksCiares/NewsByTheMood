@@ -9,23 +9,28 @@
             if (secret.Count() <= 0) 
                 throw new ArgumentNullException("secret", "Parameter secret cannot be null or empty string");
 
-            var rate = Math.Ceiling((decimal)plaintext.Length / secret.Length);
-            var result = new byte[plaintext.Length >= secret.Length ? plaintext.Length : secret.Length];
-                
-            for (var i = result.Length; i > 0; i--)
+            //var rate = Math.Ceiling((decimal)plaintext.Length / secret.Length);
+               
+            for (var i = 0; i < plaintext.Length; i++)
             {
-                result[result.Length - i] = plaintext[i] ^ secret[];
+                plaintext[i] = (byte)(plaintext[i] ^ secret[(i % secret.Length)]);
             }
 
-            return (result);
+            return (plaintext);
         }
-        public static string Decrypt(string chipervalue, string secret)
+        public static byte[] Decrypt(byte[] chipervalue, byte[] secret)
         {
-            if (string.IsNullOrEmpty(chipervalue)) 
-                throw new ArgumentNullException(chipervalue, "Parameter chipervalue cannot be null or empty string");
-            if (string.IsNullOrEmpty(secret)) 
-                throw new ArgumentNullException(secret, "Parameter secret cannot be null or empty string");
-            return (Int64.Parse(chipervalue) ^ Int64.Parse(secret)).ToString();
+            if (chipervalue.Count() <= 0)
+                throw new ArgumentNullException("plaintext", "Parameter chipervalue cannot be null or empty string");
+            if (secret.Count() <= 0)
+                throw new ArgumentNullException("secret", "Parameter secret cannot be null or empty string");
+
+            for (var i = 0; i < chipervalue.Length; i++)
+            {
+                chipervalue[i] = (byte)(chipervalue[i] ^ secret[(i % secret.Length)]);
+            }
+
+            return (chipervalue);
         }
     }
 }

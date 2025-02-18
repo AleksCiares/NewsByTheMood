@@ -34,7 +34,7 @@ namespace NewsByTheMood.MVC
 
             // Other services
             // Obfuscation service
-            builder.Services.AddSingleton<IObfuscatorService, VerySimpleObfuscatorService>();
+            //builder.Services.AddSingleton<IObfuscatorService, VerySimpleObfuscatorService>();
 
             var app = builder.Build();
 

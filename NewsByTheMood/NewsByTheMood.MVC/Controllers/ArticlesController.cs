@@ -13,16 +13,14 @@ namespace NewsByTheMood.MVC.Controllers
     {
         private readonly IArticleService _articleService;
         private readonly ITopicService _topicService;
-        private readonly IObfuscatorService _obfuscatorService;
 
         // Temp variable for article positivity
         private readonly short _articlePositivity = 1;
 
-        public ArticlesController(IArticleService articleService, ITopicService topicService,IObfuscatorService obfuscatorService)
+        public ArticlesController(IArticleService articleService, ITopicService topicService)
         {
             this._articleService = articleService;
             this._topicService = topicService;
-            this._obfuscatorService = obfuscatorService;
         }
 
         // Get range of articles privew
@@ -42,7 +40,7 @@ namespace NewsByTheMood.MVC.Controllers
                     this._articlePositivity))? // replaced with mapper
                     .Select(article => new ArticlePreviewModel()
                     {
-                        Id = this._obfuscatorService.Obfuscate(article.Id.ToString()),
+                        Id = article.Id.ToString(),
                         Title = article.Title,
                         PublishDate = article.PublishDate.ToString(),
                         Positivity = article.Positivity,
@@ -84,7 +82,7 @@ namespace NewsByTheMood.MVC.Controllers
                     topic))? // replaced with mapper
                     .Select(a => new ArticlePreviewModel()
                     {
-                        Id = this._obfuscatorService.Obfuscate(a.Id.ToString()),
+                        Id = a.Id.ToString(),
                         Title = a.Title,
                         PublishDate = a.PublishDate.ToString(),
                         Positivity = a.Positivity,
@@ -109,15 +107,10 @@ namespace NewsByTheMood.MVC.Controllers
         }
 
         // Get certain article
-        [HttpGet]
-        public async Task<IActionResult> Details([FromRoute]string id)
+        [HttpGet("{Controller}/{Action}/{id:required:long:min(0)}")]
+        public async Task<IActionResult> Details([FromRoute]long id)
         {
-            // Temp validate input variable
-            Int64 tempId = 0;
-            if (id.IsNullOrEmpty() || !Int64.TryParse(id, out tempId)) return BadRequest();
-
-            var article = await this._articleService.GetByIdAsync(
-                Int64.Parse(this._obfuscatorService.Deobfuscate(id)));
+            var article = await this._articleService.GetByIdAsync(id);
 
             if(article is null) return NotFound();
 
