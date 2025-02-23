@@ -9,6 +9,7 @@ using NewsByTheMood.MVC.Models;
 
 namespace NewsByTheMood.MVC.TagHelpers
 {
+    // Tag helper for pagination of elements on page
     public class PaginationTagHelper : TagHelper
     {
         private readonly IUrlHelperFactory _urlHelperFactory;

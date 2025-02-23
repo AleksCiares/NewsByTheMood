@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using NewsByTheMood.Data.Entities;
+using NewsByTheMood.MVC.Filters;
 using NewsByTheMood.MVC.Models;
-using NewsByTheMood.Services.DataObfuscator.Abstract;
 using NewsByTheMood.Services.DataProvider.Abstract;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace NewsByTheMood.MVC.Controllers
 {
     // Articles controller
+    [ValidateModelFilter]
     public class ArticlesController : Controller
     {
         private readonly IArticleService _articleService;
@@ -24,12 +24,10 @@ namespace NewsByTheMood.MVC.Controllers
         }
 
         // Get range of articles privew
+        [SpoofStringModelPropertyFilter(true, "Id", "qwertyuiopasdf")]
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery]PaginationModel pagination)
         {
-            // Validation pagination model
-            if (!ModelState.IsValid) return BadRequest();
-
             var totalArticles = await this._articleService.CountAsync(this._articlePositivity);
             var articles = Array.Empty<ArticlePreviewModel>();
             if (totalArticles > 0)
@@ -60,7 +58,7 @@ namespace NewsByTheMood.MVC.Controllers
                     PageSize = pagination.PageSize,
                     TotalItems = totalArticles,
                 },
-                Title = "Articles"
+                PageTitle = "Articles"
             });
         }
 
@@ -68,9 +66,6 @@ namespace NewsByTheMood.MVC.Controllers
         [HttpGet("{Controller}/{Action}/{topic:required:alpha}")]
         public async Task<IActionResult> Topic([FromRoute]string topic, [FromQuery]PaginationModel pagination)
         {
-            // Validation pagination model
-            if (!ModelState.IsValid || !await this._topicService.IsTopicExistsAsync(topic)) return NotFound();
-
             var totalArticles = await this._articleService.CountAsync(this._articlePositivity, topic);
             var articles = Array.Empty<ArticlePreviewModel>();
             if (totalArticles > 0)
@@ -102,16 +97,16 @@ namespace NewsByTheMood.MVC.Controllers
                     PageSize = pagination.PageSize,
                     TotalItems = totalArticles,
                 },
-                Title = topic,
+                PageTitle = topic,
             });
         }
 
         // Get certain article
-        [HttpGet("{Controller}/{Action}/{id:required:long:min(0)}")]
-        public async Task<IActionResult> Details([FromRoute]long id)
+        [UnspoofStringQueryParameterFilter(true, nameof(id), "qwertyuiopasdf")]
+        [HttpGet("{Controller}/{Action}/{id:required}")]
+        public async Task<IActionResult> Details([FromRoute]string id)
         {
-            var article = await this._articleService.GetByIdAsync(id);
-
+            var article = await this._articleService.GetByIdAsync(Int64.Parse(id));
             if(article is null) return NotFound();
 
             var model = new ArticleModel()

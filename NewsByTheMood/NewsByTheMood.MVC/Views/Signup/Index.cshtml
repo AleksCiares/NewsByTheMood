@@ -1,13 +1,13 @@
 ﻿@model SignupModel
 @{
-	ViewData["Title"] = "Sign up";
+	ViewData["PageTitle"] = "Sign up";
 }
 
 <div class="signup">
-	<div class="signup-title">
+	<div class="signup_title">
 		<h2>Sing up</h2>
 	</div>
-	<div class="singup-form">
+	<div class="singup_form">
 		<form asp-action="index" asp-controller="signup" method="post">
 			<div class="singup-form_username">
 				<label asp-for="@Model.Username">Username</label>

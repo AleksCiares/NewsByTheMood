@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NewsByTheMood.Core\NewsByTheMood.Core.csproj" />
     <ProjectReference Include="..\NewsByTheMood.Data\NewsByTheMood.Data.csproj" />
     <ProjectReference Include="..\NewsByTheMood.Services\NewsByTheMood.Services.csproj" />
   </ItemGroup>
