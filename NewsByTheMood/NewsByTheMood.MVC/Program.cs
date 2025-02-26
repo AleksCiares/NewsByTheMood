@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using NewsByTheMood.Data;
-using NewsByTheMood.Services.DataObfuscator.Abstract;
-using NewsByTheMood.Services.DataObfuscator.Implement;
+using NewsByTheMood.MVC.Options;
 using NewsByTheMood.Services.DataProvider.Abstract;
 using NewsByTheMood.Services.DataProvider.Implement;
 
@@ -18,7 +17,11 @@ namespace NewsByTheMood.MVC
 
             // Db provider service
             builder.Services.AddDbContext<NewsByTheMoodDbContext>(
-                opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+                opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default1")));
+
+            // Configuration
+            builder.Services.Configure<SpoofOptions>(
+                builder.Configuration.GetSection(SpoofOptions.Position));
 
             // Data provider services
             // Article service
@@ -31,10 +34,6 @@ namespace NewsByTheMood.MVC
             builder.Services.AddScoped<ITopicService, TopicService>();
             // User service
             builder.Services.AddScoped<IUserService, UserService>();
-
-            // Other services
-            // Obfuscation service
-            //builder.Services.AddSingleton<IObfuscatorService, VerySimpleObfuscatorService>();
 
             var app = builder.Build();
 

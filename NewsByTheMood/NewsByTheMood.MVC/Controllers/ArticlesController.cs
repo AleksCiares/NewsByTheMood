@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Configuration;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.MVC.Filters;
@@ -9,6 +10,7 @@ namespace NewsByTheMood.MVC.Controllers
 {
     // Articles controller
     [ValidateModelFilter]
+    [TypeFilter(typeof(SpoofModelPropertyFilter), Arguments = new object[] { "ArticlePreviews.Id" })]
     public class ArticlesController : Controller
     {
         private readonly IArticleService _articleService;
@@ -24,7 +26,6 @@ namespace NewsByTheMood.MVC.Controllers
         }
 
         // Get range of articles privew
-        [SpoofStringModelPropertyFilter(true, "Id", "qwertyuiopasdf")]
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery]PaginationModel pagination)
         {
@@ -102,7 +103,7 @@ namespace NewsByTheMood.MVC.Controllers
         }
 
         // Get certain article
-        [UnspoofStringQueryParameterFilter(true, nameof(id), "qwertyuiopasdf")]
+        [ValidateStringToIntQueryParameterFilter(nameof(id))]
         [HttpGet("{Controller}/{Action}/{id:required}")]
         public async Task<IActionResult> Details([FromRoute]string id)
         {

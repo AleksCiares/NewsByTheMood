@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
-namespace EFCoreSampleApp
+﻿namespace NewsByTheMood.Core.Crypto
 {
     public sealed class AlphabetCrypt
     {
@@ -26,13 +19,13 @@ namespace EFCoreSampleApp
                 temp = temp.Remove(0, 1);
                 if (temp.Contains(symbol))
                 {
-                    throw new ArgumentException ("AlphabetCrypt. The secret must not contain repeated characters..");
+                    throw new ArgumentException ("AlphabetCrypt. The secret must not contain repeated characters.");
                 }
             } while (temp.Length > 0);
             this._secret = secret;
         }
 
-        public string Obfuscate(string plaintext)
+        public string Crypt(string plaintext)
         {
             List<char> encryptedText = new List<char>();
             int rate = this._secret.Length-1;
@@ -64,7 +57,7 @@ namespace EFCoreSampleApp
             return new string(encryptedText.ToArray());
         }
 
-        public string Deobfuscate(string chipertext)
+        public string Encrypt(string chipertext)
         {
             var chipertextArray = chipertext.ToCharArray();
             int rate = this._secret.Length - 1;
