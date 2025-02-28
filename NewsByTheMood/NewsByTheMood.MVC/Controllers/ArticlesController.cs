@@ -14,23 +14,21 @@ namespace NewsByTheMood.MVC.Controllers
     public class ArticlesController : Controller
     {
         private readonly IArticleService _articleService;
-        private readonly ITopicService _topicService;
-
         // Temp variable for article positivity
         private readonly short _articlePositivity = 1;
 
-        public ArticlesController(IArticleService articleService, ITopicService topicService)
+        public ArticlesController(IArticleService articleService)
         {
             this._articleService = articleService;
-            this._topicService = topicService;
         }
 
-        // Get range of articles privew
+        // Get range of articles previews
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery]PaginationModel pagination)
         {
             var totalArticles = await this._articleService.CountAsync(this._articlePositivity);
             var articles = Array.Empty<ArticlePreviewModel>();
+
             if (totalArticles > 0)
             {
                 articles = (await this._articleService.GetRangePreviewAsync(
@@ -69,6 +67,7 @@ namespace NewsByTheMood.MVC.Controllers
         {
             var totalArticles = await this._articleService.CountAsync(this._articlePositivity, topic);
             var articles = Array.Empty<ArticlePreviewModel>();
+
             if (totalArticles > 0)
             {
                 articles = (await this._articleService.GetRangePreviewAsync(
@@ -98,19 +97,22 @@ namespace NewsByTheMood.MVC.Controllers
                     PageSize = pagination.PageSize,
                     TotalItems = totalArticles,
                 },
-                PageTitle = topic,
+                PageTitle = totalArticles > 0 ? topic : "",
             });
         }
 
         // Get certain article
-        [ValidateStringToIntQueryParameterFilter(nameof(id))]
         [HttpGet("{Controller}/{Action}/{id:required}")]
+        [ValidateStringToIntQueryParameterFilter(nameof(id))]
         public async Task<IActionResult> Details([FromRoute]string id)
         {
             var article = await this._articleService.GetByIdAsync(Int64.Parse(id));
-            if(article is null) return NotFound();
+            if (article == null)
+            {
+                return BadRequest();
+            } 
 
-            var model = new ArticleModel()
+            return View(new ArticleModel()
             {
                 Uri = article.Uri,
                 Title = article.Title,
@@ -121,8 +123,7 @@ namespace NewsByTheMood.MVC.Controllers
                 SourceName = article.Source.Name,
                 TopicName = article.Source.Topic.Name,
                 ArticleTags = article.ArticleTags.Select(t => t.Tag.Name).ToArray()
-            };
-            return View(model);
+            });
         }
     }
 }

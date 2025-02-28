@@ -34,19 +34,6 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .Include(article => article.ArticleTags)
                 .ThenInclude(articleTags => articleTags.Tag)
                 .SingleOrDefaultAsync();
-                /*.Select(a => new ArticleDTO
-                {
-                    Id = a.Id,
-                    Uri = a.Uri,
-                    Title = a.Title,
-                    Body = a.Body,
-                    PublishDate = a.PublishDate,
-                    Positivity = a.Positivity,
-                    Rating = a.Rating,
-                    SourceName = a.Source == null ? null : a.Source.Name,
-                    TopicName = a.Source == null ? null : a.Source.Topic == null ? null : a.Source.Topic.Name,
-                    ArticleTags = a.ArticleTags.Select(a => a.Tag.Name).ToArray(),
-                })*/
         }
 
         // Get range off articles preview with certain positivity
@@ -64,16 +51,6 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToArrayAsync();
-                 /*.Select(a => new ArticlePreviewDTO
-                {
-                    Id = a.Id,
-                    Title = a.Title,
-                    PublishDate = a.PublishDate,
-                    Positivity = a.Positivity,
-                    Rating = a.Rating,
-                    SourceName = a.Source == null ? null : a.Source.Name,
-                    TopicName = a.Source == null ? null : a.Source.Topic == null ? null : a.Source.Topic.Name 
-                })*/
         }
 
         // Get range off articles preview with certain positivity and topic
@@ -92,16 +69,6 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToArrayAsync();
-                /*.Select(a => new ArticlePreviewDTO
-                {
-                    Id = a.Id,
-                    Title = a.Title,
-                    PublishDate = a.PublishDate,
-                    Positivity = a.Positivity,
-                    Rating = a.Rating,
-                    SourceName = a.Source!.Name,
-                    TopicName = a.Source!.Topic!.Name
-                })*/
         }
 
         public async Task<Article[]> GetRangePreviewAsync(int pageNumber, int pageSize, short positivity, int rating)
@@ -119,16 +86,6 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToArrayAsync();
-                /*.Select(a => new ArticlePreviewDTO
-                {
-                    Id = a.Id,
-                    Title = a.Title,
-                    PublishDate = a.PublishDate,
-                    Positivity = a.Positivity,
-                    Rating = a.Rating,
-                    SourceName = a.Source!.Name,
-                    TopicName = a.Source!.Topic!.Name
-                })*/
         }
 
         //Get article count with certain positivity

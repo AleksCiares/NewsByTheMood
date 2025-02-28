@@ -1,0 +1,22 @@
+﻿@model TopicEditModel
+@{
+	ViewData["Title"] = "Adding a topic";
+}
+
+<div class="topic">
+	<div class="topic__form">
+		<form asp-controller="topics" asp-action="add" asp-antiforgery="true" method="post">
+			<div class="name">
+				<label asp-for="@Model.Topic.Name">Topic name</label>
+				<input asp-for="@Model.Topic.Name" type="text"/>
+				<span class="field-error" asp-validation-for="@Model.Topic.Name"></span>
+				<span class="field-tip">Topic name</span>
+			</div>
+		</form>
+	</div>
+</div>
+
+@section Scripts
+{
+	<partial name="~/Views/Shared/PartialViews/_ValidationScriptsPartial.cshtml" />
+}

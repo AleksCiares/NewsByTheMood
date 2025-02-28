@@ -1,0 +1,35 @@
+﻿@model SourceCollectionModel
+@{
+	ViewData["PageTitle"] = "Editing sources";
+}
+
+<div class="sources">
+    <div class="sources__panel">
+        <div class="add">
+            <a asp-controller="sources" asp-action="add">Add source</a>
+        </div>
+    </div>
+    <div class="sources__container">
+        @foreach (var sourcePreview in Model.SourcePreviews)
+        {
+            <div class="source-preview">
+                <div class="name">
+                        <a asp-controller="sources" asp-action="edit" asp-route-id="@sourcePreview.Id" target="_parent">
+                            @sourcePreview.Name
+                        </a>
+                </div>
+                <div class="topic">
+                    <span>Topic: @sourcePreview.Topic</span>
+                </div>
+                <div class="url">
+                    <span>Url: @sourcePreview.Url</span>
+                </div>
+                <div class="articles-ammount">
+                    <span>ArticleAmmount: @sourcePreview.ArticleAmmount</span>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<pagination page-action="index" page-info="@Model.PageInfo"></pagination>

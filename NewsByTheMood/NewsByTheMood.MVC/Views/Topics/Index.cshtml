@@ -1,0 +1,24 @@
+﻿@model TopicCollectionModel
+@{
+	ViewData["Title"] = "Editing topics";
+}
+
+<div class="topics">
+	<div class="topics__panel">
+		<div class="add">
+			<a asp-controller="topics" asp-action="add">Add topic</a>
+		</div>
+	</div>
+	<div class="topics__container">
+		@foreach (var topic in Model.Topics)
+		{
+			<div class="topics__preview">
+				<div class="name">
+					<a asp-controller="topics" asp-action="edit" asp-route-id="@topic.Id">@topic.Name</a>
+				</div>
+			</div>
+		}
+	</div>
+</div>
+
+<pagination page-action="index" page-info="@Model.PageInfo"></pagination>

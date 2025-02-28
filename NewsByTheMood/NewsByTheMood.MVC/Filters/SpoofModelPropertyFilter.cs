@@ -7,8 +7,6 @@ using NewsByTheMood.MVC.Options;
 
 namespace NewsByTheMood.MVC.Filters
 {
-    
-
     // Filter for spoofing certian HttpContext Model
     public class SpoofModelPropertyFilter : IActionFilter
     {

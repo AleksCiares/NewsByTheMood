@@ -20,7 +20,8 @@ namespace NewsByTheMood.MVC.Components
             var topics = (await this._topicService.GetAllAsync())? // replaced with mapper
                 .Select(t => new TopicModel()
                 {
-                    TopicName = t.Name
+                    Id = t.Id.ToString(),
+                    Name = t.Name
                 })
                 .ToArray();
             return View(topics);

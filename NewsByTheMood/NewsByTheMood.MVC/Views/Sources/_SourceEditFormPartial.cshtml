@@ -1,0 +1,100 @@
+﻿@model SourceEditModel
+@{
+	var source = Model.Source; 
+}
+
+<section class="source-form__source-settings">
+	<div class="name">
+		<label asp-for="@source.Name">Source name</label>
+		<input asp-for="@source.Name" type="text" />
+		<span class="field-error" asp-validation-for="@source.Name"></span>
+		<span class="field-tip">Name may only contain from 1 to 100 symbols</span>
+	</div>
+	<div class="url">
+		<label asp-for="@source.Url">Source url</label>
+		<input asp-for="@source.Url" type="url" />
+		<span class="field-error" asp-validation-for="@source.Url"></span>
+		<span class="field-tip">Only http/https link formats are supported</span>
+	</div>
+	<div class="survey-period">
+		<label asp-for="@source.SurveyPeriod">Survey period</label>
+		<input asp-for="@source.SurveyPeriod" type="number" />
+		<span class="field-error" asp-validation-for="@source.SurveyPeriod"></span>
+		<span class="field-tip">Source polling period(in minutes) Minimum 10 minutes</span>
+	</div>
+	<div class="is-random-period">
+		<label asp-for="@source.IsRandomPeriod">Randomize the period</label>
+		<input asp-for="@source.IsRandomPeriod" type="checkbox" />
+		<span class="field-error" asp-validation-for="@source.IsRandomPeriod"></span>
+		<span class="field-tip">The survey period will be randomized from 10 to <strong>Survey period</strong> minutes</span>
+	</div>
+	<div class="article-ammount">
+		<label asp-for="@source.ArticleAmmount">Article ammount</label>
+		<span>@source.ArticleAmmount</span>
+	</div>
+</section>
+<section class="source-from__article-list-settings">
+	<div class="list-path">
+		<label asp-for="@source.ArticleListPath">Article list path</label>
+		<input asp-for="@source.ArticleListPath" type="text" />
+		<span class="field-error" asp-validation-for="@source.ArticleListPath"></span>
+		<span class="field-tip">Css path to html element that contain list of articles previews (links)</span>
+	</div>
+	<div class="item-path">
+		<label asp-for="@source.ArticleItemPath">Article item path</label>
+		<input asp-for="@source.ArticleItemPath" type="text" />
+		<span class="field-error" asp-validation-for="@source.ArticleItemPath"></span>
+		<span class="field-tip">
+			Сss path to the html element that stores the description of the articles preview (link),
+			the path relative to the articles container (Article list path)
+		</span>
+	</div>
+	<div class="uri-path">
+		<label asp-for="@source.ArticleUriPath">Article uri path</label>
+		<input asp-for="@source.ArticleUriPath" type="text" />
+		<span class="field-error" asp-validation-for="@source.ArticleUriPath"></span>
+		<span class="field-tip">
+			Css path to the html element that stores a link to the article,
+			the path relative to the article container (Article item path)
+		</span>
+	</div>
+</section>
+<section class="source-form__article-item-setting">
+	<div class="title-path">
+		<label asp-for="@source.ArticleTitlePath">Article title path</label>
+		<input asp-for="@source.ArticleTitlePath" type="text" />
+		<span class="field-error" asp-validation-for="@source.ArticleTitlePath"></span>
+		<span class="field-tip">
+			Css path to the html element that stores a title of the article,
+			the path relative to page of the certain article 
+		</span>
+	</div>
+	<div class="body-path">
+		<label asp-for="@source.ArticleBodyPath">Article body path</label>
+		<input asp-for="@source.ArticleBodyPath" type="text" />
+		<span class="field-error" asp-validation-for="@source.ArticleBodyPath"></span>
+		<span class="field-tip">
+			Css path to the html element that stores a body of the article,
+			the path relative to page of the certain article
+		</span>
+	</div>
+	<div class="pdate-path">
+		<label asp-for="@source.ArticlePdatePath">Article publish date path</label>
+		<input asp-for="@source.ArticlePdatePath" type="text" />
+		<span class="field-error" asp-validation-for="@source.ArticlePdatePath"></span>
+		<span class="field-tip">
+			Css path to the html element that stores a publish date of the article (if available),
+			the path relative to page of the certain article
+		</span>
+	</div>
+	<div class="tag-path">
+		<label asp-for="@source.ArticleTagPath">Article publish date path</label>
+		<input asp-for="@source.ArticleTagPath" type="text" />
+		<span class="field-error" asp-validation-for="@source.ArticleTagPath"></span>
+		<span class="field-tip">
+			Css path to the html element that stores a tags of the article (if available),
+			the path relative to page of the certain article
+		</span>
+	</div>
+</section>
+

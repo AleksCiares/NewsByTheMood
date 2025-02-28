@@ -2,7 +2,6 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using NewsByTheMood.MVC.Filters;
 using NewsByTheMood.MVC.Models;
-using NewsByTheMood.Services.DataObfuscator.Abstract;
 using NewsByTheMood.Services.DataProvider.Abstract;
 
 namespace NewsByTheMood.MVC.Controllers

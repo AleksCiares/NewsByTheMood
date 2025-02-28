@@ -1,0 +1,47 @@
+﻿@model TopicEditModel
+@{
+	ViewData["Title"] = $"{Model.Topic.Name} - Editing";
+}
+
+<div class="topic">
+	<div class="topic__panel">
+		<div class="delete">
+			<a asp-controller="topics" asp-action="delete" asp-route-id="@Model.Topic.Id">Delete topic</a>
+		</div>
+	</div>
+	<div class="topic__form">
+		<form asp-controller="topics" asp-action="add" asp-antiforgery="true" method="post">
+			<div class="name">
+				<label asp-for="@Model.Topic.Name">Topic name</label>
+				<input asp-for="@Model.Topic.Name" type="text" />
+				<span class="field-error" asp-validation-for="@Model.Topic.Name"></span>
+				<span class="field-tip">Topic name</span>
+			</div>
+		</form>
+	</div>
+	<div class="topic__related-sources">
+		<label asp-for="@Model.RelatedSources">Related sources</label>
+		<span class="field-error" asp-validation-for="@Model.RelatedSources"></span>
+		@foreach (var source in Model.RelatedSources)
+		{
+			<div class="source-preview">
+				<div class="name">
+					<a asp-controller="sources" asp-action="edit" asp-route-id="@source.Id" target="_parent">
+						@source.Name
+					</a>
+				</div>
+				<div class="url">
+					<span>Url: @source.Url</span>
+				</div>
+				<div class="articles-ammount">
+					<span>ArticleAmmount: @source.ArticleAmmount</span>
+				</div>
+			</div>
+		}
+	</div>
+</div>
+
+@section Scripts
+{
+	<partial name="~/Views/Shared/PartialViews/_ValidationScriptsPartial.cshtml" />
+}
