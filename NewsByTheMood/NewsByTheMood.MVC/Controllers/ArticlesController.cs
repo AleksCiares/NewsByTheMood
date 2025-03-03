@@ -10,12 +10,10 @@ namespace NewsByTheMood.MVC.Controllers
 {
     // Articles controller
     [ValidateModelFilter]
-    [TypeFilter(typeof(SpoofModelPropertyFilter), Arguments = new object[] { "ArticlePreviews.Id" })]
     public class ArticlesController : Controller
     {
         private readonly IArticleService _articleService;
-        // Temp variable for article positivity
-        private readonly short _articlePositivity = 1;
+        private readonly short _defaultPositivity = 1;
 
         public ArticlesController(IArticleService articleService)
         {
@@ -26,7 +24,7 @@ namespace NewsByTheMood.MVC.Controllers
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery]PaginationModel pagination)
         {
-            var totalArticles = await this._articleService.CountAsync(this._articlePositivity);
+            var totalArticles = await this._articleService.CountAsync(this._defaultPositivity);
             var articles = Array.Empty<ArticlePreviewModel>();
 
             if (totalArticles > 0)
@@ -34,11 +32,12 @@ namespace NewsByTheMood.MVC.Controllers
                 articles = (await this._articleService.GetRangePreviewAsync(
                     pagination.Page,
                     pagination.PageSize,
-                    this._articlePositivity))? // replaced with mapper
+                    this._defaultPositivity)) // replaced with mapper
                     .Select(article => new ArticlePreviewModel()
                     {
                         Id = article.Id.ToString(),
                         Title = article.Title,
+                        PreviewImgUrl = article.PreviewImgUrl,
                         PublishDate = article.PublishDate.ToString(),
                         Positivity = article.Positivity,
                         Rating = article.Rating,
@@ -65,7 +64,7 @@ namespace NewsByTheMood.MVC.Controllers
         [HttpGet("{Controller}/{Action}/{topic:required:alpha}")]
         public async Task<IActionResult> Topic([FromRoute]string topic, [FromQuery]PaginationModel pagination)
         {
-            var totalArticles = await this._articleService.CountAsync(this._articlePositivity, topic);
+            var totalArticles = await this._articleService.CountAsync(this._defaultPositivity, topic);
             var articles = Array.Empty<ArticlePreviewModel>();
 
             if (totalArticles > 0)
@@ -73,12 +72,13 @@ namespace NewsByTheMood.MVC.Controllers
                 articles = (await this._articleService.GetRangePreviewAsync(
                     pagination.Page,
                     pagination.PageSize,
-                    this._articlePositivity,
-                    topic))? // replaced with mapper
+                    this._defaultPositivity,
+                    topic)) // replaced with mapper
                     .Select(a => new ArticlePreviewModel()
                     {
                         Id = a.Id.ToString(),
                         Title = a.Title,
+                        PreviewImgUrl = a.PreviewImgUrl,
                         PublishDate = a.PublishDate.ToString(),
                         Positivity = a.Positivity,
                         Rating = a.Rating,
@@ -114,8 +114,9 @@ namespace NewsByTheMood.MVC.Controllers
 
             return View(new ArticleModel()
             {
-                Uri = article.Uri,
+                Url = article.Url,
                 Title = article.Title,
+                PreviewImgUrl = article.PreviewImgUrl,
                 Body = article.Body,
                 PublishDate = article.PublishDate.ToString(),
                 Positivity = article.Positivity,

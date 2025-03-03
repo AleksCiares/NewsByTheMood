@@ -1,31 +1,31 @@
 ﻿@model SourceCollectionModel
 @{
-	ViewData["PageTitle"] = "Editing sources";
+	ViewData["PageTitle"] = "Sources";
 }
 
-<div class="sources">
-    <div class="sources__panel">
-        <div class="add">
-            <a asp-controller="sources" asp-action="add">Add source</a>
-        </div>
+<div class="sources container">
+    <div class="sources__panel row align-items-start justify-content-start">
+        <nav class="nav">
+            <button type="button" class="btn btn-primary">
+                <a class="nav-link" asp-controller="sources" asp-action="add">Add</a>
+            </button>
+        </nav>
     </div>
-    <div class="sources__container">
+    <div class="sources__container row align-items-start justify-content-start">
         @foreach (var sourcePreview in Model.SourcePreviews)
         {
-            <div class="source-preview">
-                <div class="name">
-                        <a asp-controller="sources" asp-action="edit" asp-route-id="@sourcePreview.Id" target="_parent">
-                            @sourcePreview.Name
-                        </a>
+            <div class="source-preview card" style="width: 18rem;">
+                <div class="card-body">
+                    <div class="name card-title">@sourcePreview.Name</div>
+                    <div class="topic card-subtitle text-muted">@sourcePreview.Topic</div>
+                    <div class="url card-link">@sourcePreview.Url</div>
+                    <a class="btn btn-primary" asp-controller="sources" asp-action="edit" asp-route-id="@sourcePreview.Id" target="_parent">
+                       Edit
+                    </a>
                 </div>
-                <div class="topic">
-                    <span>Topic: @sourcePreview.Topic</span>
-                </div>
-                <div class="url">
-                    <span>Url: @sourcePreview.Url</span>
-                </div>
-                <div class="articles-ammount">
-                    <span>ArticleAmmount: @sourcePreview.ArticleAmmount</span>
+                <div class="articles-ammount card-footer text-muted">
+                    <span>related articles </span>
+                    <span class="badge bg-primary rounded-pill">@sourcePreview.ArticleAmmount</span>
                 </div>
             </div>
         }

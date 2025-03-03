@@ -3,52 +3,40 @@
 	ViewData["PageTitle"] = $"{Model.Source.Name} - Editing";
 }
 
-<div class="source">
-	<div class="source__panel">
-		<div class="delete">
-			<a asp-controller="topics" asp-action="delete" asp-route-id="@Model.Source.Id">Delete source</a>
-		</div>
+<div class="source container">
+	<div class="source__panel row align-items-start justify-content-start">
+		<nav class="nav">
+            <button type="button" class="btn btn-danger">
+				<a asp-controller="topics" asp-action="delete" asp-route-id="@Model.Source.Id">Delete</a>
+			</button>
+		</nav>
 	</div>
-	<div class="source__form">
-		<form asp-controller="source" asp-action="edit" asp-antiforgery="true" method="post">
-			<label asp-for="@Model.Source.TopicId">Topic</label>
-			<select class="topic" asp-for="@Model.Source.TopicId" asp-items="@(new SelectList(
-				Model.Topics,
-				nameof(TopicModel.Id),
-				nameof(TopicModel.Name),
-				Model.Source.TopicId))">
-			</select>
+	<div class="source__form row align-items-start justify-content-start">
+		<form asp-controller="sources" asp-action="edit" asp-antiforgery="true" method="post">
 			<partial name="_SourceEditFormPartial" model="@Model" />
-			<div class="submit">
-				<input type="submit" value="Save" />
-			</div>
-			<div class="cancel">
-				<button>
-					<a asp-controller="sources" asp-action="details">Cancel</a>
-				</button>
-			</div>
 		</form>
 	</div>
-	<div class="source__related-articles">
+    <hr class="hr" />
+	<div class="source__related-articles row align-items-start justify-content-start">
 		<label asp-for="@Model.RelatedArticles">Related articles</label>
-		<span class="field-error" asp-validation-for="@Model.RelatedArticles"></span>
-		@foreach (var article in Model.RelatedArticles)
-		{
-			<div class="source-preview">
-				<div class="title">
-					<a asp-controller="articles" asp-action="edit" asp-route-id="@article.Id" target="_parent">
-						@article.Title
-					</a>
+        <div class="alert alert-danger" role="alert">
+			<span class="field-error" asp-validation-for="@Model.RelatedArticles"></span>
+		</div>
+		<div class="list-group">
+			@foreach (var article in Model.RelatedArticles)
+			{
+				<div class="article-preview list-group-item list-group-item-action">
+					<div class="title">
+						<a asp-controller="articles" asp-action="edit" asp-route-id="@article.Id" target="_parent">
+							@article.Title
+						</a>
+					</div>
+					<div class="publish-date">
+						<span>@article.PublishDate</span>
+					</div>
 				</div>
-				<div class="publish-date">
-					<span>Publish Date: @article.PublishDate</span>
-				</div>
-			</div>
-		}
+			}
+
+		</div>
 	</div>
 </div>
-
-@section Scripts
-{
-	<partial name="~/Views/Shared/PartialViews/_ValidationScriptsPartial.cshtml" />
-}

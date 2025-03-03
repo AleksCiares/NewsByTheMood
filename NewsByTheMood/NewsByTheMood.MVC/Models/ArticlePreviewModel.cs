@@ -7,6 +7,7 @@ namespace NewsByTheMood.MVC.Models
     {
         public required string Id { get; set; }
         public required string Title { get; set; }
+        public string? PreviewImgUrl { get; set; }
         public string? PublishDate { get; set; }
         public required short Positivity { get; set; }
         public required int Rating { get; set; }

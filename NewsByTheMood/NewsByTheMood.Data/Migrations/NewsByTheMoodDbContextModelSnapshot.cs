@@ -36,6 +36,9 @@ namespace NewsByTheMood.Data.Migrations
                     b.Property<short>("Positivity")
                         .HasColumnType("smallint");
 
+                    b.Property<string>("PreviewImgUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("PublishDate")
                         .HasColumnType("datetime2");
 
@@ -49,7 +52,7 @@ namespace NewsByTheMood.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Uri")
+                    b.Property<string>("Url")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -138,7 +141,18 @@ namespace NewsByTheMood.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("ArticleBodyPath")
+                    b.Property<bool>("AcceptInsecureCerts")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ArticleBodyCollectionsPath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ArticleBodyItemPath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ArticleCollectionsPath")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -146,11 +160,10 @@ namespace NewsByTheMood.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ArticleListPath")
-                        .IsRequired()
+                    b.Property<string>("ArticlePdatePath")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ArticlePdatePath")
+                    b.Property<string>("ArticlePreviewImgPath")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ArticleTagPath")
@@ -160,9 +173,12 @@ namespace NewsByTheMood.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ArticleUriPath")
+                    b.Property<string>("ArticleUrlPath")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ElementLoadTimeout")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsRandomPeriod")
                         .HasColumnType("bit");
@@ -170,6 +186,13 @@ namespace NewsByTheMood.Data.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PageElementLoaded")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PageLoadTimeout")
+                        .HasColumnType("int");
 
                     b.Property<int>("SurveyPeriod")
                         .HasColumnType("int");
@@ -245,12 +268,12 @@ namespace NewsByTheMood.Data.Migrations
                     b.Property<bool>("IsVerified")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Password")
+                    b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<byte>("PreferPositivity")
-                        .HasColumnType("tinyint");
+                    b.Property<short>("PreferedPositivity")
+                        .HasColumnType("smallint");
 
                     b.Property<DateTime>("RegDate")
                         .HasColumnType("datetime2");

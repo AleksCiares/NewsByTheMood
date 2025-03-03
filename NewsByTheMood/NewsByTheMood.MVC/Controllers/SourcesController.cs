@@ -91,31 +91,23 @@ namespace NewsByTheMood.MVC.Controllers
                 return View(sourceEdit);
             }
 
-            /*var topics = (await this._topicService.GetAllAsync())
-                   .Select(topic => new TopicModel()
-                   {
-                       Id = topic.Id.ToString(),
-                       Name = topic.Name,
-                   })
-                   .ToArray();
-            var sourceEditModel = new SourceEditModel()
-            {
-                Source = model,
-                Topics = topics
-            };
-            return View(sourceEditModel);*/
-
             await this._sourceService.AddAsync(new Source()
             {
                 Name = sourceEdit.Source.Name,
                 Url = sourceEdit.Source.Url,
                 SurveyPeriod = sourceEdit.Source.SurveyPeriod,
                 IsRandomPeriod = sourceEdit.Source.IsRandomPeriod,
-                ArticleListPath = sourceEdit.Source.ArticleListPath,
+                AcceptInsecureCerts = sourceEdit.Source.AcceptInsecureCerts,
+                PageElementLoaded = sourceEdit.Source.PageElementLoaded,
+                PageLoadTimeout = sourceEdit.Source.PageLoadTimeout,
+                ElementLoadTimeout = sourceEdit.Source.ElementLoadTimeout,
+                ArticleCollectionsPath = sourceEdit.Source.ArticleCollectionsPath,
                 ArticleItemPath = sourceEdit.Source.ArticleItemPath,
-                ArticleUriPath = sourceEdit.Source.ArticleUriPath,
+                ArticleUrlPath = sourceEdit.Source.ArticleUrlPath,
                 ArticleTitlePath = sourceEdit.Source.ArticleTitlePath,
-                ArticleBodyPath = sourceEdit.Source.ArticleBodyPath,
+                ArticlePreviewImgPath = sourceEdit.Source.ArticlePreviewImgPath,
+                ArticleBodyCollectionsPath = sourceEdit.Source.ArticleBodyCollectionsPath,
+                ArticleBodyItemPath = sourceEdit.Source.ArticleBodyItemPath,
                 ArticlePdatePath = sourceEdit.Source.ArticlePdatePath,
                 ArticleTagPath = sourceEdit.Source.ArticleTagPath,
                 TopicId = Int64.Parse(sourceEdit.Source.TopicId),
@@ -142,11 +134,17 @@ namespace NewsByTheMood.MVC.Controllers
                 Url = sourceEntity.Url,
                 SurveyPeriod = sourceEntity.SurveyPeriod,
                 IsRandomPeriod = sourceEntity.IsRandomPeriod,
-                ArticleListPath = sourceEntity.ArticleListPath,
+                AcceptInsecureCerts = sourceEntity.AcceptInsecureCerts,
+                PageElementLoaded = sourceEntity.PageElementLoaded,
+                PageLoadTimeout = sourceEntity.PageLoadTimeout,
+                ElementLoadTimeout = sourceEntity.ElementLoadTimeout,
+                ArticleCollectionsPath = sourceEntity.ArticleCollectionsPath,
                 ArticleItemPath = sourceEntity.ArticleItemPath,
-                ArticleUriPath = sourceEntity.ArticleUriPath,
+                ArticleUrlPath = sourceEntity.ArticleUrlPath,
                 ArticleTitlePath = sourceEntity.ArticleTitlePath,
-                ArticleBodyPath = sourceEntity.ArticleBodyPath,
+                ArticlePreviewImgPath = sourceEntity.ArticlePreviewImgPath,
+                ArticleBodyCollectionsPath = sourceEntity.ArticleBodyCollectionsPath,
+                ArticleBodyItemPath = sourceEntity.ArticleBodyItemPath,
                 ArticlePdatePath = sourceEntity.ArticlePdatePath,
                 ArticleTagPath = sourceEntity.ArticleTagPath,
                 TopicId = sourceEntity.TopicId.ToString(),
@@ -204,11 +202,17 @@ namespace NewsByTheMood.MVC.Controllers
                 Url = sourceEdit.Source.Url,
                 SurveyPeriod = sourceEdit.Source.SurveyPeriod,
                 IsRandomPeriod = sourceEdit.Source.IsRandomPeriod,
-                ArticleListPath = sourceEdit.Source.ArticleListPath,
+                AcceptInsecureCerts = sourceEdit.Source.AcceptInsecureCerts,
+                PageElementLoaded = sourceEdit.Source.PageElementLoaded,
+                PageLoadTimeout = sourceEdit.Source.PageLoadTimeout,
+                ElementLoadTimeout = sourceEdit.Source.ElementLoadTimeout,
+                ArticleCollectionsPath = sourceEdit.Source.ArticleCollectionsPath,
                 ArticleItemPath = sourceEdit.Source.ArticleItemPath,
-                ArticleUriPath = sourceEdit.Source.ArticleUriPath,
+                ArticleUrlPath = sourceEdit.Source.ArticleUrlPath,
                 ArticleTitlePath = sourceEdit.Source.ArticleTitlePath,
-                ArticleBodyPath = sourceEdit.Source.ArticleBodyPath,
+                ArticlePreviewImgPath = sourceEdit.Source.ArticlePreviewImgPath,
+                ArticleBodyCollectionsPath = sourceEdit.Source.ArticleBodyCollectionsPath,
+                ArticleBodyItemPath = sourceEdit.Source.ArticleBodyItemPath,
                 ArticlePdatePath = sourceEdit.Source.ArticlePdatePath,
                 ArticleTagPath = sourceEdit.Source.ArticleTagPath,
                 TopicId = Int64.Parse(sourceEdit.Source.TopicId),

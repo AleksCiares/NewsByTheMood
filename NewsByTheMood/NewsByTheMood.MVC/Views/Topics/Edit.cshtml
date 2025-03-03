@@ -1,47 +1,42 @@
 ﻿@model TopicEditModel
 @{
-	ViewData["Title"] = $"{Model.Topic.Name} - Editing";
+	ViewData["PageTitle"] = $"{Model.Topic.Name} - Editing";
 }
 
-<div class="topic">
-	<div class="topic__panel">
-		<div class="delete">
-			<a asp-controller="topics" asp-action="delete" asp-route-id="@Model.Topic.Id">Delete topic</a>
-		</div>
+<div class="topic container">
+	<div class="topic__panel row align-items-start justify-content-start">
+		<nav class="nav">
+			<button type="button" class="btn btn-danger">
+				<a asp-controller="topics" asp-action="delete" asp-route-id="@Model.Topic.Id">Delete</a>
+			</button>
+		</nav>
 	</div>
-	<div class="topic__form">
-		<form asp-controller="topics" asp-action="add" asp-antiforgery="true" method="post">
-			<div class="name">
-				<label asp-for="@Model.Topic.Name">Topic name</label>
-				<input asp-for="@Model.Topic.Name" type="text" />
-				<span class="field-error" asp-validation-for="@Model.Topic.Name"></span>
-				<span class="field-tip">Topic name</span>
-			</div>
+	<div class="topic__form row align-items-start justify-content-start">
+		<form asp-controller="topics" asp-action="edit" asp-antiforgery="true" method="post">
+			<partial name="_TopicEditFormPartial" model="@Model.Topic" />
 		</form>
 	</div>
-	<div class="topic__related-sources">
+	<hr class="hr" />
+	<div class="topic__related-sources row align-items-start justify-content-start">
 		<label asp-for="@Model.RelatedSources">Related sources</label>
-		<span class="field-error" asp-validation-for="@Model.RelatedSources"></span>
-		@foreach (var source in Model.RelatedSources)
-		{
-			<div class="source-preview">
-				<div class="name">
-					<a asp-controller="sources" asp-action="edit" asp-route-id="@source.Id" target="_parent">
-						@source.Name
-					</a>
-				</div>
-				<div class="url">
-					<span>Url: @source.Url</span>
-				</div>
-				<div class="articles-ammount">
-					<span>ArticleAmmount: @source.ArticleAmmount</span>
-				</div>
-			</div>
-		}
+		<div class="alert alert-danger" role="alert">
+			<span class="field-error" asp-validation-for="@Model.RelatedSources"></span>
+		</div>
+		<div class="list-group">
+			@foreach (var source in Model.RelatedSources)
+			{
+				<button class="source-preview list-group-item list-group-item-action">
+					<div class="name">
+						<a asp-controller="sources" asp-action="edit" asp-route-id="@source.Id" target="_parent">
+							@source.Name
+						</a>
+					</div>
+					<div class="articles-ammount">
+						<span>related articles </span>
+						<span class="badge bg-primary rounded-pill">@source.ArticleAmmount</span>
+					</div>
+				</button>
+			}
+		</div>
 	</div>
 </div>
-
-@section Scripts
-{
-	<partial name="~/Views/Shared/PartialViews/_ValidationScriptsPartial.cshtml" />
-}

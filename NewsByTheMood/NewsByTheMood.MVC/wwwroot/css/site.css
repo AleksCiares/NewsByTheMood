@@ -20,3 +20,12 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.aside-bar {
+    border-right: 1px solid #dee2e6;
+}
+
+    .aside-bar .nav-link,
+    .main-bar .nav-link {
+        color: black !important;
+    }

@@ -25,8 +25,23 @@ namespace NewsByTheMood.MVC.Models
         public required bool IsRandomPeriod { get; set; }
 
         [Required]
-        [StringLength(250, MinimumLength = 1, ErrorMessage = "ArticleListPath is too small or long (maximum is 250 characters)")]
-        public required string ArticleListPath { get; set; }
+        public required bool AcceptInsecureCerts { get; set; }
+
+        [Required]
+        [StringLength(100, MinimumLength = 1, ErrorMessage = "PageElementLoaded is too small or long (maximum is 100 characters)")]
+        public required string PageElementLoaded { get; set; }
+
+        [Required]
+        [Range(0, Int32.MaxValue)]
+        public required int PageLoadTimeout { get; set; }
+
+        [Required]
+        [Range(0, Int32.MaxValue)]
+        public required int ElementLoadTimeout { get; set; }
+
+        [Required]
+        [StringLength(250, MinimumLength = 1, ErrorMessage = "ArticleCollectionsPath is too small or long (maximum is 250 characters)")]
+        public required string ArticleCollectionsPath { get; set; }
 
         [Required]
         [StringLength(250, MinimumLength = 1, ErrorMessage = "ArticleItemPath is too small or long (maximum is 250 characters)")]
@@ -34,15 +49,22 @@ namespace NewsByTheMood.MVC.Models
 
         [Required]
         [StringLength(250, MinimumLength = 1, ErrorMessage = "ArticleUriPath is too small or long (maximum is 250 characters)")]
-        public required string ArticleUriPath { get; set; }
+        public required string ArticleUrlPath { get; set; }
 
         [Required]
         [StringLength(250, MinimumLength = 1, ErrorMessage = "ArticleTitlePath is too small or long (maximum is 250 characters)")]
         public required string ArticleTitlePath { get; set; }
 
+        [StringLength(250, MinimumLength = 1, ErrorMessage = "ArticlePreviewImgPath is too small or long (maximum is 250 characters)")]
+        public string? ArticlePreviewImgPath { get; set; }
+
         [Required]
-        [StringLength(250, MinimumLength = 1, ErrorMessage = "ArticleBodyPath is too small or long (maximum is 250 characters)")]
-        public required string ArticleBodyPath { get; set; }
+        [StringLength(250, MinimumLength = 1, ErrorMessage = "ArticleBodyCollectionsPath is too small or long (maximum is 250 characters)")]
+        public required string ArticleBodyCollectionsPath { get; set; }
+
+        [Required]
+        [StringLength(250, MinimumLength = 1, ErrorMessage = "ArticleBodyItemPath is too small or long (maximum is 250 characters)")]
+        public required string ArticleBodyItemPath { get; set; }
 
         [StringLength(250, ErrorMessage = "ArticlePdatePath is too long (maximum is 250 characters)")]
         public string? ArticlePdatePath { get; set; }

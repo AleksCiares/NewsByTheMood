@@ -59,8 +59,8 @@ namespace NewsByTheMood.Data.Migrations
                     UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DisplayedName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PreferPositivity = table.Column<byte>(type: "tinyint", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PreferedPositivity = table.Column<short>(type: "smallint", nullable: false),
                     RegDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsVerified = table.Column<bool>(type: "bit", nullable: false),
                     AvatarUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -88,14 +88,20 @@ namespace NewsByTheMood.Data.Migrations
                     Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SurveyPeriod = table.Column<int>(type: "int", nullable: false),
                     IsRandomPeriod = table.Column<bool>(type: "bit", nullable: false),
-                    ArticleListPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AcceptInsecureCerts = table.Column<bool>(type: "bit", nullable: false),
+                    PageElementLoaded = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PageLoadTimeout = table.Column<int>(type: "int", nullable: false),
+                    ElementLoadTimeout = table.Column<int>(type: "int", nullable: false),
+                    ArticleCollectionsPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ArticleItemPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ArticleUriPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ArticleUrlPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ArticleTitlePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ArticleBodyPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ArticlePreviewImgPath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ArticleBodyCollectionsPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ArticleBodyItemPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ArticlePdatePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ArticleTagPath = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TopicId = table.Column<long>(type: "bigint", nullable: true)
+                    TopicId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -126,14 +132,14 @@ namespace NewsByTheMood.Data.Migrations
                         column: x => x.TopicId,
                         principalTable: "Topics",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade,
+                        onDelete: ReferentialAction.Restrict, 
                         onUpdate: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserTopics_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade,
+                        onDelete: ReferentialAction.Restrict, 
                         onUpdate: ReferentialAction.Cascade);
                 });
 
@@ -143,13 +149,14 @@ namespace NewsByTheMood.Data.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Uri = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PreviewImgUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Body = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PublishDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Positivity = table.Column<short>(type: "smallint", nullable: false),
                     Rating = table.Column<int>(type: "int", nullable: false),
-                    SourceId = table.Column<long>(type: "bigint", nullable: true)
+                    SourceId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -159,7 +166,7 @@ namespace NewsByTheMood.Data.Migrations
                         column: x => x.SourceId,
                         principalTable: "Sources",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict,
+                        onDelete: ReferentialAction.Restrict, 
                         onUpdate: ReferentialAction.Cascade);
                 });
 
@@ -180,14 +187,14 @@ namespace NewsByTheMood.Data.Migrations
                         column: x => x.ArticleId,
                         principalTable: "Articles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade,
+                        onDelete: ReferentialAction.Restrict, 
                         onUpdate: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ArticleTags_Tags_TagId",
                         column: x => x.TagId,
                         principalTable: "Tags",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade,
+                        onDelete: ReferentialAction.Restrict, 
                         onUpdate: ReferentialAction.Cascade);
                 });
 
@@ -210,14 +217,14 @@ namespace NewsByTheMood.Data.Migrations
                         column: x => x.ArticleId,
                         principalTable: "Articles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade,
+                        onDelete: ReferentialAction.Restrict, 
                         onUpdate: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Comments_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade,
+                        onDelete: ReferentialAction.Restrict, 
                         onUpdate: ReferentialAction.Cascade);
                 });
 

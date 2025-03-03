@@ -3,23 +3,10 @@
 	ViewData["PageTitle"] = "Adding a source";
 }
 
-<div class="source">
-	<div class="source__form">
+<div class="source container">
+	<div class="source__form row align-items-start justify-content-start">
 		<form asp-controller="sources" asp-action="add" asp-antiforgery="true" method="post">
 			<partial name="_SourceEditFormPartial" model="@Model" />
-			<div class="submit">
-				<input type="submit" value="Save" />
-			</div>
-			<div class="cancel">
-				<button>
-					<a asp-controller="sources" asp-action="index">Cancel</a>
-				</button>
-			</div>
 		</form>
 	</div>
 </div>
-
-@section Scripts
-{
-	<partial name="~/Views/Shared/PartialViews/_ValidationScriptsPartial.cshtml"/>
-}

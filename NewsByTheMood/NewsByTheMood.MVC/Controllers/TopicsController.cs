@@ -36,13 +36,7 @@ namespace NewsByTheMood.MVC.Controllers
 
             return View(new TopicCollectionModel()
             {
-                Topics = topics,
-                PageInfo = new PageInfoModel()
-                {
-                    Page = pagination.Page,
-                    PageSize = pagination.PageSize,
-                    TotalItems = totalTopics
-                }
+                Topics = topics
             });
         }
 
@@ -55,22 +49,22 @@ namespace NewsByTheMood.MVC.Controllers
 
         // Add topic item processing
         [HttpPost]
-        public async Task<IActionResult> Add([FromForm]TopicEditModel topicEdit)
+        public async Task<IActionResult> Add([FromForm]TopicModel topic)
         {
             if (!ModelState.IsValid)
             {
-                return View(topicEdit);
+                return View(topic);
             }
 
-            if (await this._topicService.IsExistsAsync(topicEdit.Topic.Name))
+            if (await this._topicService.IsExistsAsync(topic.Name))
             {
                 ModelState.AddModelError("Topic.Name", "A topic with the same name already exists");
-                return View(topicEdit);
+                return View(topic);
             }
 
             await this._topicService.AddAsync(new Topic()
             {
-                Name = topicEdit.Topic.Name,
+                Name = topic.Name,
             });
 
             return View("Index");

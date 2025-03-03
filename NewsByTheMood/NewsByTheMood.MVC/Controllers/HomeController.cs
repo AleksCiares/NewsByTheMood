@@ -16,7 +16,6 @@ namespace NewsByTheMood.MVC.Controllers
             this._articleService = articleService;
         }
 
-        [TypeFilter(typeof(SpoofModelPropertyFilter), Arguments = new object[] { "Id" })]
         public async Task<IActionResult> Index()
         {
             var page = 1;
@@ -28,11 +27,12 @@ namespace NewsByTheMood.MVC.Controllers
                 page,
                 size,
                 positivity,
-                rating))? // replaced with mapper
+                rating)) // replaced with mapper
                 .Select(article => new ArticlePreviewModel()
                 {
                     Id = article.Id.ToString(),
                     Title = article.Title,
+                    PreviewImgUrl = article.PreviewImgUrl,
                     PublishDate = article.PublishDate.ToString(),
                     Positivity = article.Positivity,
                     Rating = article.Rating,

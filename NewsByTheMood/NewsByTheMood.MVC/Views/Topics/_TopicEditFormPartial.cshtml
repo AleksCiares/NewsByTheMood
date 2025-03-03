@@ -1,0 +1,10 @@
+﻿@model TopicModel
+
+<div class="name mb-3">
+	<label class="form-label" asp-for="@Model.Name">Topic name</label>
+	<input class="form-control" asp-for="@Model.Name" type="text" />
+	<div class="alert alert-danger" role="alert">
+		<span class="field-error" asp-validation-for="@Model.Name"></span>
+	</div>
+</div>
+<button class="submit btn btn-primary" type="submit">Submit</button>
