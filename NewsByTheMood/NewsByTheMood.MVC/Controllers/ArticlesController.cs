@@ -64,16 +64,16 @@ namespace NewsByTheMood.MVC.Controllers
         [HttpGet("{Controller}/{Action}/{topic:required:alpha}")]
         public async Task<IActionResult> Topic([FromRoute]string topic, [FromQuery]PaginationModel pagination)
         {
-            var totalArticles = await this._articleService.CountAsync(this._defaultPositivity, topic);
+            var totalArticles = await this._articleService.CountAsync(this._defaultPositivity, Int64.Parse(topic));
             var articles = Array.Empty<ArticlePreviewModel>();
 
             if (totalArticles > 0)
             {
-                articles = (await this._articleService.GetRangePreviewAsync(
+                articles = (await this._articleService.GetRangePreviewByTopicAsync(
                     pagination.Page,
                     pagination.PageSize,
                     this._defaultPositivity,
-                    topic)) // replaced with mapper
+                    Int64.Parse(topic))) // replaced with mapper
                     .Select(a => new ArticlePreviewModel()
                     {
                         Id = a.Id.ToString(),

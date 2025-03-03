@@ -1,8 +1,12 @@
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using NewsByTheMood.Data;
 using NewsByTheMood.MVC.Options;
 using NewsByTheMood.Services.DataProvider.Abstract;
 using NewsByTheMood.Services.DataProvider.Implement;
+using NewsByTheMood.Services.FileProvider.Abstract;
+using NewsByTheMood.Services.FileProvider.Implement;
 
 namespace NewsByTheMood.MVC
 {
@@ -17,11 +21,12 @@ namespace NewsByTheMood.MVC
 
             // Db provider service
             builder.Services.AddDbContext<NewsByTheMoodDbContext>(
-                opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+                opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default1")));
 
             // Configuration
             builder.Services.Configure<SpoofOptions>(
                 builder.Configuration.GetSection(SpoofOptions.Position));
+
 
             // Data provider services
             // Article service
@@ -34,6 +39,15 @@ namespace NewsByTheMood.MVC
             builder.Services.AddScoped<ITopicService, TopicService>();
             // User service
             builder.Services.AddScoped<IUserService, UserService>();
+
+            // File provider services
+            // Icons service
+            if (builder.Configuration.GetValue<bool>("UseUserIcons"))
+            {
+                builder.Services.Configure<UserIconsOptions>(
+                    builder.Configuration.GetSection(UserIconsOptions.Position));
+                builder.Services.AddSingleton<IiconsService, LocalIconsService>();
+            }
 
             var app = builder.Build();
 

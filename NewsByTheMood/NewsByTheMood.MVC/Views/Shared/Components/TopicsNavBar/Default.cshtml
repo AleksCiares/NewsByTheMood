@@ -5,7 +5,7 @@
 		@foreach (var topic in Model)
 		{
 			<li>
-				<a asp-controller="articles" asp-action="topic" asp-route-id="@topic.Name">@topic.Name</a>
+				<a asp-controller="articles" asp-action="topic" asp-route-id="@topic.Id">@topic.Name</a>
 			</li>
 		}
 	</ul>

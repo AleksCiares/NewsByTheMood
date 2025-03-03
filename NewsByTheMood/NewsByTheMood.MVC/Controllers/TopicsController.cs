@@ -17,13 +17,11 @@ namespace NewsByTheMood.MVC.Controllers
 
         // Get range of sources previews
         [HttpGet]
-        public async Task<IActionResult> Index([FromQuery]PaginationModel pagination)
+        public async Task<IActionResult> Index()
         {
-            var totalTopics = await this._topicService.CountAsync();
             var topics = Array.Empty<TopicModel>();
 
-            // TODO: переделать для отображения постраничного списка
-            if (totalTopics > 0)
+            if (await this._topicService.CountAsync() > 0)
             {
                 topics = (await this._topicService.GetAllAsync())
                     .Select(topic => new TopicModel()
@@ -34,10 +32,7 @@ namespace NewsByTheMood.MVC.Controllers
                     .ToArray();
             }
 
-            return View(new TopicCollectionModel()
-            {
-                Topics = topics
-            });
+            return View(topics);
         }
 
         // Add topic item
@@ -67,7 +62,7 @@ namespace NewsByTheMood.MVC.Controllers
                 Name = topic.Name,
             });
 
-            return View("Index");
+            return RedirectToAction("Index");
         }
 
         // Edit topic item

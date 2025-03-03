@@ -14,15 +14,15 @@ namespace NewsByTheMood.MVC.Filters
         private readonly string[]? _pathToProperty = null;
         private readonly AlphabetCrypt? _alphabetCrypt = null;
 
-        public SpoofModelPropertyFilter(IOptions<SpoofOptions> configuration, string pathToProperty) 
+        public SpoofModelPropertyFilter(IOptions<SpoofOptions> options, string pathToProperty) 
         {
-            if (this._isSpoof = configuration.Value.SpoofRealId)
+            if (this._isSpoof = options.Value.SpoofRealId)
             {
                 if (this._isSpoof &&
                     !string.IsNullOrEmpty(pathToProperty))
                 {
                     this._pathToProperty = pathToProperty.Split('.');
-                    this._alphabetCrypt = new AlphabetCrypt(configuration.Value.SpoofSecret);
+                    this._alphabetCrypt = new AlphabetCrypt(options.Value.SpoofSecret);
                 }
                 else
                 {

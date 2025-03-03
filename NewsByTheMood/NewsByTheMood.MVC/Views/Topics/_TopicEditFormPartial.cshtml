@@ -1,10 +1,9 @@
 ﻿@model TopicModel
 
-<div class="name mb-3">
-	<label class="form-label" asp-for="@Model.Name">Topic name</label>
-	<input class="form-control" asp-for="@Model.Name" type="text" />
-	<div class="alert alert-danger" role="alert">
-		<span class="field-error" asp-validation-for="@Model.Name"></span>
-	</div>
+<div class="name form-floating mb-3">
+	<input asp-for="@Model.Name" type="text" class="form-control" placeholder="@nameof(Model.Name)" />
+	<label asp-for="@Model.Name" class="form-label">Topic name</label>
+	<span asp-validation-for="@Model.Name" class="error-feedback alert alert-danger" role="alert"></span>
 </div>
+@await Component.InvokeAsync("TopicsIcon")
 <button class="submit btn btn-primary" type="submit">Submit</button>

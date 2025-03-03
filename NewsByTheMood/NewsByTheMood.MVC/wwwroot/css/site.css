@@ -25,7 +25,28 @@ body {
     border-right: 1px solid #dee2e6;
 }
 
-    .aside-bar .nav-link,
-    .main-bar .nav-link {
-        color: black !important;
-    }
+.aside-bar .nav-link,
+.main-bar .nav-link {
+    color: black !important;
+}
+
+.error-feedback{
+    display: inline-block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    margin-top: 10px !important;
+}
+.error-feedback span{
+    margin: 20px 10px;
+}
+
+.icons-bar {
+    /* background gradient so that we can see the scrolling */
+/*    background: rgb(2, 0, 36);*/
+/*    background: linear-gradient(0deg, rgba(2, 0, 36, 1) 0%, rgba(9, 9, 121, 1) 17%, rgba(0, 212, 255, 1) 100%);*/
+    /* set height so that element is scrollable */
+    height: 70vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}

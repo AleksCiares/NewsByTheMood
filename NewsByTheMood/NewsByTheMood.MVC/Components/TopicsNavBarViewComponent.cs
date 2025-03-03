@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NewsByTheMood.Data.Entities;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
 
@@ -21,9 +20,11 @@ namespace NewsByTheMood.MVC.Components
                 .Select(t => new TopicModel()
                 {
                     Id = t.Id.ToString(),
-                    Name = t.Name
+                    Name = t.Name,
+                    IconCssClass = t.IconCssClass
                 })
                 .ToArray();
+
             return View(topics);
         }
     }

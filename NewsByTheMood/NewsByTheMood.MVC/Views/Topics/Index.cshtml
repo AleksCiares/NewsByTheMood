@@ -1,22 +1,24 @@
-﻿@model TopicCollectionModel
+﻿@model TopicModel[]
 @{
 	ViewData["PageTitle"] = "Topics";
 }
 
 <div class="topics container">
 	<div class="topics__panel row align-items-start justify-content-start">
-		<nav class="nav">
-			<button type="button" class="btn btn-primary">
-				<a  class="nav-link" asp-controller="topics" asp-action="add">Add</a>
-			</button>
-		</nav>
+		<div class="col-auto">
+			<a class="btn btn-outline-primary" asp-controller="topics" asp-action="add">Add</a>
+		</div>
 	</div>
 	<div class="topics__container row align-items-start justify-content-start">
-		@foreach (var topic in Model.Topics)
-		{
-			<button class="topics__preview btn btn-light" type="button">
-                <a asp-controller="topics" asp-action="edit" asp-route-id="@topic.Id">Edit</a>
-			</button>
-		}
+		<div class="col-auto">
+			@foreach (var topic in Model)
+			{
+				<div class="topics__preview">
+					<a asp-controller="topics" asp-action="edit" asp-route-id="@topic.Id">
+						<i class="fs-4 @topic.IconCssClass"></i> <span class="ms-1 d-none d-sm-inline">@topic.Name</span>
+					</a>
+				</div>
+			}
+		</div>
 	</div>
 </div>

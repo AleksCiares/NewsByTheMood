@@ -1,0 +1,37 @@
+﻿@model string[]
+
+<div class="icons-bar mb-3">
+	@* <label asp-for="@Model"  class="form-label">Icon</label> *@
+	@* <select  asp-for="@Model"  class="form-select row row-cols-3 row-cols-sm-4 row-cols-lg-6 row-cols-xl-8 list-unstyled list"> *@
+	@* 	@foreach (var iconClass in Model) *@
+	@* 	{ *@
+	@* 		<option value="@iconClass" class="col mb-4"> *@
+	@* 			<div class="card text-center rounded" style="width:10px"> *@
+	@* 				<div class="card-body"> *@
+	@* 					<i class="fs-4 @iconClass"></i> *@
+	@* 				</div> *@
+	@* 				<div class="card-footer text-muted"> *@
+	@* 					@iconClass *@
+	@* 				</div> *@
+	@* 			</div> *@
+	@* 		</option> *@
+	@* 	} *@
+	@* </select> *@
+
+	<div class="container-fluid">
+		<div class="row row-cols-10 row-cols-sm-12 list-unstyled list">
+			@foreach (var iconClass in Model)
+			{
+				<div class="col mb-4">
+					<div class="card text-center">
+						<div class="card-body">
+							<i class="fs-4 @iconClass"></i>
+						</div>
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+</div>
+
+

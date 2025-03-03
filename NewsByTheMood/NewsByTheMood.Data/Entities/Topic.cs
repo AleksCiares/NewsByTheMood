@@ -5,6 +5,7 @@
         // [Key]
         public Int64 Id { get; set; }
         public string Name { get; set; }
+        public string? IconCssClass { get; set; }
 
         // nav property
         public List<Source> Sources { get; set; }
