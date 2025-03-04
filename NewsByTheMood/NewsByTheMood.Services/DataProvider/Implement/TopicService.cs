@@ -76,8 +76,6 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .AsNoTracking()
                 .Where(topic => topic.Id == id)
                 .Include(topic => topic.Sources)
-                .ThenInclude(source => source.Topic)
-                .Include(topic => topic.Sources)
                 .ThenInclude(source => source.Articles)
                 .SingleOrDefaultAsync();
 

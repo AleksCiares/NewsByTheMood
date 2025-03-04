@@ -7,16 +7,24 @@
 	<div class="topic__header d-flex row mb-4">
 		<h4 class="mb-0">Edit a topic</h4>
 	</div>
-	<div class="topics__panel row align-items-start justify-content-start mb-4">
-		<div class="col-auto">
-			<a asp-controller="topics" asp-action="delete" asp-route-id="@Model.Topic.Id" class="btn btn-danger">Delete</a>
+	<form asp-controller="topics" asp-action="edit" asp-antiforgery="true" method="post">
+		<div class="form__panel row align-items-start justify-content-between mb-4">
+			<div class="col-auto">
+				<button class="btn btn-primary" type="submit">Submit</button>
+				<a asp-controller="topics" asp-action="index" class="btn btn-secondary" type="submit">Cancel</a>
+			</div>
+			<div class="col-auto">
+				<a asp-controller="topics" asp-action="delete" asp-route-id="@Model.Topic.Id" class="btn btn-danger">Delete</a>
+			</div>
 		</div>
-	</div>
-	<div class="topic__form row align-items-start justify-content-start">
-		<form asp-controller="topics" asp-action="edit" asp-antiforgery="true" method="post">
-			<partial name="_TopicEditFormPartial" model="@Model.Topic" />
-		</form>
-	</div>
+		<div class="form__body row align-items-start justify-content-start mb-4">
+			<div class="form__warp">
+				<partial name="_TopicEditFormPartial" model="@Model.Topic" />
+			</div>
+		</div>
+	</form>
+
+
 
 	@* <hr class="hr" /> *@
 	@* <div class="topic__related-sources row align-items-start justify-content-start"> *@

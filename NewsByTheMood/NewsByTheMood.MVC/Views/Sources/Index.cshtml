@@ -4,32 +4,36 @@
 }
 
 <div class="sources container">
-    <div class="sources__panel row align-items-start justify-content-start">
-        <nav class="nav">
-            <button type="button" class="btn btn-primary">
-                <a class="nav-link" asp-controller="sources" asp-action="add">Add</a>
-            </button>
-        </nav>
+    <div class="topic__header d-flex row mb-4">
+        <h4 class="mb-0">Sources</h4>
     </div>
-    <div class="sources__container row align-items-start justify-content-start">
+    <div class="topics__panel row align-items-start justify-content-start mb-4">
+        <div class="col-auto">
+            <a asp-controller="sources" asp-action="create" class="btn btn-outline-primary">Create</a>
+        </div>
+    </div>
+    <div class="sources__container row-cols-4 row-cols-sm-6 row-cols-md-8 row-cols-lg-10">
         @foreach (var sourcePreview in Model.SourcePreviews)
         {
-            <div class="source-preview card" style="width: 18rem;">
-                <div class="card-body">
-                    <div class="name card-title">@sourcePreview.Name</div>
-                    <div class="topic card-subtitle text-muted">@sourcePreview.Topic</div>
-                    <div class="url card-link">@sourcePreview.Url</div>
-                    <a class="btn btn-primary" asp-controller="sources" asp-action="edit" asp-route-id="@sourcePreview.Id" target="_parent">
-                       Edit
-                    </a>
-                </div>
-                <div class="articles-ammount card-footer text-muted">
-                    <span>related articles </span>
-                    <span class="badge bg-primary rounded-pill">@sourcePreview.ArticleAmmount</span>
+            <div class="source-preview col mb-4 rounded">
+                <div class="card text-center">
+                    <div class="card-header">
+                        @sourcePreview.Name
+                    </div>
+                    <div class="card-body">
+                        <div class="topic card-subtitle">@sourcePreview.Topic</div>
+                        <div class="url card-link">@sourcePreview.Url</div>
+                        <div class="articles-ammount">
+                            <span>related articles </span>
+                            <span class="badge bg-primary rounded-pill">@sourcePreview.ArticleAmmount</span>
+                        </div>
+                    </div>
+                    <div class="card-footer text-muted">
+                        <a asp-controller="sources" asp-action="edit" asp-route-id="@sourcePreview.Id" class="btn btn-primary">Edit</a>
+                    </div>
                 </div>
             </div>
         }
     </div>
 </div>
-
 <pagination page-action="index" page-info="@Model.PageInfo"></pagination>

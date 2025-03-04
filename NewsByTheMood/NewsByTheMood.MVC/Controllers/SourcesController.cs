@@ -54,7 +54,7 @@ namespace NewsByTheMood.MVC.Controllers
 
         // Create new item source
         [HttpGet]
-        public async Task<IActionResult> Add()
+        public async Task<IActionResult> Create()
         {
             var topics = (await this._topicService.GetAllAsync())
                 .Select(topic => new TopicModel()
@@ -78,7 +78,7 @@ namespace NewsByTheMood.MVC.Controllers
 
         // Create new item source proccessing
         [HttpPost]
-        public async Task<IActionResult> Add([FromForm]SourceEditModel sourceEdit) // нужна полная модель, сделать как в форме регистрации
+        public async Task<IActionResult> Create([FromForm]SourceEditModel sourceEdit) // нужна полная модель, сделать как в форме регистрации
         {
             if (!ModelState.IsValid)
             {

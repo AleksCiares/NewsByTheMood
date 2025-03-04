@@ -1,0 +1,23 @@
+﻿@model SourceEditModel
+@{
+	ViewData["PageTitle"] = "Create a source";
+}
+
+<div class="source container">
+	<div class="topic__header d-flex row mb-4">
+		<h4 class="mb-0">Create a source</h4>
+	</div>
+    <form asp-controller="sources" asp-action="create" asp-antiforgery="true" method="post">
+        <div class="form__panel row align-items-start justify-content-between mb-4">
+            <div class="col-auto">
+                <button class="btn btn-primary" type="submit">Submit</button>
+                <a asp-controller="sources" asp-action="index" class="btn btn-secondary" type="submit">Cancel</a>
+            </div>
+        </div>
+		<div class="form__body row align-items-start justify-content-start mb-4">
+			<div class="form__warp">
+				<partial name="_SourceEditFormPartial" model="@Model" />
+				</div>
+			</div>
+		</form>
+</div>

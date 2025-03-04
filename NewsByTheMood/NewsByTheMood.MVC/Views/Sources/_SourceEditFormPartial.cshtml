@@ -4,26 +4,25 @@
 }
 
 <section class="source-form__source-settings">
-	<div class="name mb-3">
-		<label class="form-label" asp-for="@source.Name">Source name</label>
-		<input class="form-control" asp-for="@source.Name" type="text" />
-		<div class="alert alert-danger" role="alert">
-			<span class="field-error" asp-validation-for="@source.Name"></span>
-		</div>
+	<div class="name form-floating mb-3">
+		<input asp-for="@source.Name" type="text" class="form-control" placeholder="@nameof(source.Name)"/>
+		<label asp-for="@source.Name" class="form-label">Source name</label>
+		<span asp-validation-for="@source.Name" class="error-feedback alert alert-dange" role="alert"></span>
 		<div class="field-tip form-text">Name may only contain from 1 to 100 symbols</div>
 	</div>
-	<div class="topic mb3">
-		<label class="form-label" asp-for="@Model.Source.TopicId">Topic</label>
-		<select class="topic form-select" asp-for="@Model.Source.TopicId" asp-items="@(new SelectList(
+	<div class="topic form-floating mb3">
+		<select class="topic form-select" placeholder="@nameof(source.TopicId)" asp-for="@source.TopicId" asp-items="@(new SelectList(
 				Model.Topics,
 				nameof(TopicModel.Id),
 				nameof(TopicModel.Name),
-				Model.Source.TopicId))">
+				source.TopicId))">
 		</select>
+		<label asp-for="@source.TopicId" class="form-label">Topic</label>
+		<span asp-validation-for="@source.TopicId" class="error-feedback alert alert-dange" role="alert"></span>
 	</div>
-	<div class="url mb-3">
+	<div class="url form-floating mb-3">
+		<input asp-for="@source.Url" type="url" class="form-control" />
 		<label class="form-label" asp-for="@source.Url">Source url</label>
-		<input class="form-control" asp-for="@source.Url" type="url" />
 		<div class="alert alert-danger" role="alert">
 			<span class="field-error" asp-validation-for="@source.Url"></span>
 		</div>
