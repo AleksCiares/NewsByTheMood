@@ -5,5 +5,10 @@
 	<label asp-for="@Model.Name" class="form-label">Topic name</label>
 	<span asp-validation-for="@Model.Name" class="error-feedback alert alert-danger" role="alert"></span>
 </div>
+<div class="icon form-floating mb-3">
+	<input asp-for="@Model.IconCssClass" type="text" class="form-control" placeholder="@nameof(Model.IconCssClass)" />
+	<label asp-for="@Model.IconCssClass" class="form-label">Icon css class</label>
+</div>
 @await Component.InvokeAsync("TopicsIcon")
-<button class="submit btn btn-primary" type="submit">Submit</button>
+<hr class="hr" />
+<button class="submit btn btn-primary mt-3" type="submit">Submit</button>

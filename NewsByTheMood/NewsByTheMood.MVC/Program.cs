@@ -48,6 +48,10 @@ namespace NewsByTheMood.MVC
                     builder.Configuration.GetSection(UserIconsOptions.Position));
                 builder.Services.AddSingleton<IiconsService, LocalIconsService>();
             }
+            else
+            {
+                builder.Services.AddSingleton<IiconsService, EmptyIconsService>();
+            }
 
             var app = builder.Build();
 

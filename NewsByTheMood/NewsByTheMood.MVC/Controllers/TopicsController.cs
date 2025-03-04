@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
@@ -28,6 +27,7 @@ namespace NewsByTheMood.MVC.Controllers
                     { 
                         Id = topic.Id.ToString(),
                         Name = topic.Name,
+                        IconCssClass = topic.IconCssClass,
                     })
                     .ToArray();
             }
@@ -37,14 +37,14 @@ namespace NewsByTheMood.MVC.Controllers
 
         // Add topic item
         [HttpGet]
-        public IActionResult Add()
+        public IActionResult Create()
         {
             return View();
         }
 
         // Add topic item processing
         [HttpPost]
-        public async Task<IActionResult> Add([FromForm]TopicModel topic)
+        public async Task<IActionResult> Create([FromForm]TopicModel topic)
         {
             if (!ModelState.IsValid)
             {
@@ -53,13 +53,14 @@ namespace NewsByTheMood.MVC.Controllers
 
             if (await this._topicService.IsExistsAsync(topic.Name))
             {
-                ModelState.AddModelError("Topic.Name", "A topic with the same name already exists");
+                ModelState.AddModelError(nameof(topic.Name), "A topic with the same name already exists");
                 return View(topic);
             }
 
             await this._topicService.AddAsync(new Topic()
             {
                 Name = topic.Name,
+                IconCssClass = topic.IconCssClass,
             });
 
             return RedirectToAction("Index");
@@ -75,77 +76,94 @@ namespace NewsByTheMood.MVC.Controllers
                 return BadRequest();
             }
 
-            var topic = new TopicModel()
-            {
-                Id = topicEntity.Id.ToString(),
-                Name = topicEntity.Name,
-            };
-            var relatedSources = (await this._topicService.GetRelatedSources(Int64.Parse(id)))!
+            /*var relatedSources = (await this._topicService.GetRelatedSources(Int64.Parse(id)))!
                 .Select(source => new SourcePreviewModel()
-                { 
+                {
                     Id = source.Id.ToString(),
                     Name = source.Name,
                     Topic = source.Topic.Name,
                     Url = source.Url,
                     ArticleAmmount = source.Articles.Count,
                 })
-                .ToArray();
+                .ToArray();*/
 
             return View(new TopicEditModel()
             { 
-                Topic = topic,
-                RelatedSources = relatedSources
+                Topic = new TopicModel()
+                {
+                    Id = id,
+                    Name = topicEntity.Name,
+                    IconCssClass = topicEntity.IconCssClass,
+                },
+                RelatedSources = Array.Empty<SourcePreviewModel>()
             });
         }
 
         // Edit topic item proccessing
         [HttpPost("{Controller}/{Action}/{id:required}")]
-        public async Task<IActionResult> Edit([FromRoute]string id, [FromForm]TopicEditModel topicEdit)
+        public async Task<IActionResult> Edit([FromRoute]string id, [FromForm]TopicModel topic)
         {
             if (!ModelState.IsValid)
             {
-                return View(topicEdit);
+                topic.Id = id;
+                return View(new TopicEditModel()
+                {
+                    Topic = topic,
+                    RelatedSources = Array.Empty<SourcePreviewModel>()
+                });
             }
 
-            if (await this._topicService.IsExistsAsync(topicEdit.Topic.Name))
+            var topicEntity = await this._topicService.GetByIdAsync(Int64.Parse(id));
+            if (topicEntity == null)
             {
-                ModelState.AddModelError("Topic.Name", "A topic with the same name already exists");
-                return View(topicEdit);
+                return BadRequest();
+            }
+
+            if (await this._topicService.IsExistsAsync(topic.Name) && !topic.Name.Equals(topicEntity.Name))
+            {
+                ModelState.AddModelError(nameof(Topic.Name), "A topic with the same name already exists");
+                topic.Id = id;
+                return View(new TopicEditModel()
+                {
+                    Topic = topic,
+                    RelatedSources = Array.Empty<SourcePreviewModel>()
+                });
             }
 
             await this._topicService.UpdateAsync(new Topic() 
             {
                 Id = Int64.Parse(id),
-                Name = topicEdit.Topic.Name,
+                Name = topic.Name,
+                IconCssClass = topic.IconCssClass,
             });
 
-            return View("Index");
+            return RedirectToAction("Index");
         }
 
         // Delete topic item
-        [HttpPost("{Controller}/{Action}/{id:required}")]
-        public async Task<IActionResult> Delete([FromRoute]string id, [FromForm]TopicEditModel topicEdit)
+        [HttpGet("{Controller}/{Action}/{id:required}")]
+        public async Task<IActionResult> Delete([FromRoute]string id, [FromForm]TopicModel topic)
         {
-            var relatedSourcesCount = (await this._topicService.GetRelatedSources(Int64.Parse(id)))?
-                .Count();
+            //var relatedSourcesCount = (await this._topicService.GetRelatedSources(Int64.Parse(id)))?
+            //    .Count();
 
-            if (relatedSourcesCount > 0)
-            {
-                ModelState.AddModelError("RelatedSources", "There are related sources. First of all delete all related sources or change topic of it");
-                return await Edit(id, topicEdit);
-            }
+            //if (relatedSourcesCount > 0)
+            //{
+            //    ModelState.AddModelError("RelatedSources", "There are related sources. First of all delete all related sources or change topic of it");
+            //    return await Edit(id, topic);
+            //}
 
-            if (relatedSourcesCount == null)
-            {
-                return BadRequest();
-            }
+            //if (relatedSourcesCount == null)
+            //{
+            //    return BadRequest();
+            //}
 
             await this._topicService.DeleteAsync(new Topic()
             {
                 Id = Int64.Parse(id),
             });
 
-            return View("Index");
+            return RedirectToAction("Index");
         }
     }
 }

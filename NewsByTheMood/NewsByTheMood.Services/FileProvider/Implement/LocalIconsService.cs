@@ -17,13 +17,13 @@ namespace NewsByTheMood.Services.FileProvider.Implement
         }
 
         // Get all icon css classes
-        public async Task<string[]?> GetIconsCssClasses()
+        public async Task<string[]> GetIconsCssClasses()
         {
             if (string.IsNullOrEmpty(this._options.CssFilePath) || 
                 string.IsNullOrEmpty(this._options.CssClassRegex) || 
                 !File.Exists(this._options.CssFilePath))
             {
-                return null;
+                throw new ArgumentException("LocalIconsService. Invalid icons service options");
             }
 
             FileStream? fstream = null;
@@ -65,6 +65,7 @@ namespace NewsByTheMood.Services.FileProvider.Implement
             }
             catch (Exception ex)
             {
+                iconsCss?.Clear();
                 throw new Exception(ex.Message);
             }
             finally

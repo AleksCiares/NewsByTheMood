@@ -1,0 +1,26 @@
+﻿@model TopicModel
+@{
+	ViewData["PageTitle"] = "Create a topic";
+}
+
+<div class="topic container">
+	<div class="topic__header d-flex row mb-4">
+		<h4 class="mb-0">Create a topic</h4>
+	</div>
+	<div class="topic__form row align-items-start justify-content-start">
+		<form asp-controller="topics" asp-action="create" asp-antiforgery="true" method="post">
+			<partial name="_TopicEditFormPartial" model="@Model" />
+		</form>
+	</div>
+</div>
+
+@section Scripts
+{
+	<script type="text/javascript" on-content-loaded="true">
+		console.log("sada");
+		$(document).on("click", ".icon-item", function(){
+			var clickedIconCssClass = $(this).attr("value");
+			$("#IconCssClass").attr("value", clickedIconCssClass)
+		})
+	</script>
+}

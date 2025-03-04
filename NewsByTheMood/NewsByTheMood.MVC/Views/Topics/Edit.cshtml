@@ -4,39 +4,53 @@
 }
 
 <div class="topic container">
-	<div class="topic__panel row align-items-start justify-content-start">
-		<nav class="nav">
-			<button type="button" class="btn btn-danger">
-				<a asp-controller="topics" asp-action="delete" asp-route-id="@Model.Topic.Id">Delete</a>
-			</button>
-		</nav>
+	<div class="topic__header d-flex row mb-4">
+		<h4 class="mb-0">Edit a topic</h4>
+	</div>
+	<div class="topics__panel row align-items-start justify-content-start mb-4">
+		<div class="col-auto">
+			<a asp-controller="topics" asp-action="delete" asp-route-id="@Model.Topic.Id" class="btn btn-danger">Delete</a>
+		</div>
 	</div>
 	<div class="topic__form row align-items-start justify-content-start">
 		<form asp-controller="topics" asp-action="edit" asp-antiforgery="true" method="post">
 			<partial name="_TopicEditFormPartial" model="@Model.Topic" />
 		</form>
 	</div>
-	<hr class="hr" />
-	<div class="topic__related-sources row align-items-start justify-content-start">
-		<label asp-for="@Model.RelatedSources">Related sources</label>
-		<div class="alert alert-danger" role="alert">
-			<span class="field-error" asp-validation-for="@Model.RelatedSources"></span>
-		</div>
-		<div class="list-group">
-			@foreach (var source in Model.RelatedSources)
-			{
-				<button class="source-preview list-group-item list-group-item-action">
-					<div class="name">
-						<a asp-controller="sources" asp-action="edit" asp-route-id="@source.Id" target="_parent">
-							@source.Name
-						</a>
-					</div>
-					<div class="articles-ammount">
-						<span>related articles </span>
-						<span class="badge bg-primary rounded-pill">@source.ArticleAmmount</span>
-					</div>
-				</button>
-			}
-		</div>
-	</div>
+
+	@* <hr class="hr" /> *@
+	@* <div class="topic__related-sources row align-items-start justify-content-start"> *@
+	@* 	<label asp-for="@Model.RelatedSources">Related sources</label> *@
+	@* 	<div class="alert alert-danger" role="alert"> *@
+	@* 		<span class="field-error" asp-validation-for="@Model.RelatedSources"></span> *@
+	@* 	</div> *@
+	@* 	<div class="list-group"> *@
+	@* 		@foreach (var source in Model.RelatedSources) *@
+	@* 		{ *@
+	@* 			<button class="source-preview list-group-item list-group-item-action"> *@
+	@* 				<div class="name"> *@
+	@* 					<a asp-controller="sources" asp-action="edit" asp-route-id="@source.Id" target="_parent"> *@
+	@* 						@source.Name *@
+	@* 					</a> *@
+	@* 				</div> *@
+	@* 				<div class="articles-ammount"> *@
+	@* 					<span>related articles </span> *@
+	@* 					<span class="badge bg-primary rounded-pill">@source.ArticleAmmount</span> *@
+	@* 				</div> *@
+	@* 			</button> *@
+	@* 		} *@
+	@* 	</div> *@
+	@* </div> *@
+
 </div>
+
+@section Scripts
+ {
+	<script type="text/javascript" on-content-loaded="true">
+		console.log("sada");
+		$(document).on("click", ".icon-item", function(){
+			var clickedIconCssClass = $(this).attr("value");
+			$("#IconCssClass").attr("value", clickedIconCssClass)
+		})
+	</script>
+}

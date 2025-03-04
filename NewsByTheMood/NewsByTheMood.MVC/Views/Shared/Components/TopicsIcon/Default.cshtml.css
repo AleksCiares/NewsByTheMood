@@ -1,0 +1,14 @@
+﻿.icons-bar {
+    /* background gradient so that we can see the scrolling */
+    /*    background: rgb(2, 0, 36);*/
+    /*    background: linear-gradient(0deg, rgba(2, 0, 36, 1) 0%, rgba(9, 9, 121, 1) 17%, rgba(0, 212, 255, 1) 100%);*/
+    /* set height so that element is scrollable */
+    padding-right: 0.5rem;
+    height: 50vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.icons-bar .icon-item:hover {
+    cursor: pointer
+}

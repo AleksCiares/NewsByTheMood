@@ -34,7 +34,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="col">
+                <div class="col mb-4">
                     @RenderBody()
                 </div>
             </div>
@@ -49,5 +49,6 @@
     <partial name="~/Views/Shared/PartialViews/_ValidationScriptsPartial.cshtml" />
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
