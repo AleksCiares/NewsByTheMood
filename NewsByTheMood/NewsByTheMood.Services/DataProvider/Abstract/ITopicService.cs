@@ -8,6 +8,9 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
         // Get all topics
         public Task<Topic[]> GetAllAsync();
 
+        // Get range topics
+        public Task<Topic[]> GetRangeAsync(int pageNumber, int pageSize);
+
         // Check if topic exist by name
         public Task<bool> IsExistsAsync(string topicName);
 

@@ -3,11 +3,11 @@ using NewsByTheMood.Services.FileProvider.Abstract;
 
 namespace NewsByTheMood.MVC.Components
 {
-    public class TopicsIconViewComponent : ViewComponent
+    public class TopicsIconsViewComponent : ViewComponent
     {
         private readonly IiconsService _iconsService;
 
-        public TopicsIconViewComponent(IiconsService iconsService)
+        public TopicsIconsViewComponent(IiconsService iconsService)
         {
             _iconsService = iconsService;
         }

@@ -1,114 +1,80 @@
-﻿@model SourceEditModel
-@{
-	var source = Model.Source; 
-}
+﻿@model SourceModel
 
-<section class="source-form__source-settings">
+ <section>
 	<div class="name form-floating mb-3">
-		<input asp-for="@source.Name" type="text" class="form-control" placeholder="@nameof(source.Name)"/>
-		<label asp-for="@source.Name" class="form-label">Source name</label>
-		<span asp-validation-for="@source.Name" class="error-feedback alert alert-dange" role="alert"></span>
-		<div class="field-tip form-text">Name may only contain from 1 to 100 symbols</div>
-	</div>
-	<div class="topic form-floating mb3">
-		<select class="topic form-select" placeholder="@nameof(source.TopicId)" asp-for="@source.TopicId" asp-items="@(new SelectList(
-				Model.Topics,
-				nameof(TopicModel.Id),
-				nameof(TopicModel.Name),
-				source.TopicId))">
-		</select>
-		<label asp-for="@source.TopicId" class="form-label">Topic</label>
-		<span asp-validation-for="@source.TopicId" class="error-feedback alert alert-dange" role="alert"></span>
+		<input asp-for="@Model.Name" type="text" class="form-control" placeholder="@nameof(Model.Name)"/>
+		<label asp-for="@Model.Name" class="form-label">Name</label>
+		<span asp-validation-for="@Model.Name" class="error-feedback alert alert-danger" role="alert"></span>
 	</div>
 	<div class="url form-floating mb-3">
-		<input asp-for="@source.Url" type="url" class="form-control" />
-		<label class="form-label" asp-for="@source.Url">Source url</label>
-		<div class="alert alert-danger" role="alert">
-			<span class="field-error" asp-validation-for="@source.Url"></span>
-		</div>
+		<input asp-for="@Model.Url" type="url" class="form-control" placeholder="@nameof(Model.Url)" />
+		<label asp-for="@Model.Url" class="form-label">Url</label>
+		<span asp-validation-for="@Model.Url" class="error-feedback alert alert-danger" role="alert"></span>
 		<span class="field-tip form-text">Only http/https link formats are supported</span>
 	</div>
-	<div class="survey-period mb-3">
-		<label class="form-label" asp-for="@source.SurveyPeriod">Survey period</label>
-		<input class="form-control" asp-for="@source.SurveyPeriod" type="number" />
-		<div class="alert alert-danger" role="alert">
-			<span class="field-error" asp-validation-for="@source.SurveyPeriod"></span>
-		</div>
-		<span class="field-tip form-text">Source polling period(in minutes) Minimum 10 minutes</span>
+	<div class="survey-period form-floating mb-3" data-mdb-input-init>
+		<input asp-for="@Model.SurveyPeriod" type="number" class="form-control" placeholder="@nameof(Model.SurveyPeriod)" />
+		<label asp-for="@Model.SurveyPeriod" class="form-label">Survey period</label>
+		<span asp-validation-for="@Model.SurveyPeriod" class="error-feedback alert alert-danger"></span>
+		<span class="field-tip form-text">Model polling period(in minutes) Minimum 10 minutes</span>
 	</div>
-	<div class="is-random-period mb-3">
-		<label class="form-label" asp-for="@source.IsRandomPeriod">Randomize the period</label>
-		<input class="form-control" asp-for="@source.IsRandomPeriod" type="checkbox" />
-		<div class="alert alert-danger" role="alert">
-			<span class="field-error" asp-validation-for="@source.IsRandomPeriod"></span>
-		</div>
+	<div class="is-random-period form-check mb-3">
+		<input asp-for="@Model.IsRandomPeriod" type="checkbox" class="form-check-input" />
+		<label asp-for="@Model.IsRandomPeriod" class="form-check-label">Randomize the period</label>
+		@* <span asp-validation-for="@Model.IsRandomPeriod" class="field-error alert alert-danger"></span> *@
 		<span class="field-tip form-text">The survey period will be randomized from 10 to <strong>Survey period</strong> minutes</span>
 	</div>
-	<div class="insecure-certs mb-3">
-		<label class="form-label" asp-for="@source.AcceptInsecureCerts">Accept insecure certs</label>
-		<input class="form-control" asp-for="@source.AcceptInsecureCerts" type="checkbox" />
-		<div class="alert alert-danger" role="alert">
-			<span class="field-error" asp-validation-for="@source.AcceptInsecureCerts"></span>
-		</div>
-		<div class="field-tip form-text">Сheck the box if the resource has an insecure certificate</div>
+	<div class="is-insecure-certs form-check mb-3">
+		<input asp-for="@Model.AcceptInsecureCerts" type="checkbox" class="form-check-input" />
+		<label asp-for="@Model.AcceptInsecureCerts" class="form-check-label">Accept insecure certs</label>
+		@* <span asp-validation-for="@Model.AcceptInsecureCerts" class="field-error alert alert-danger"></span> *@
+		<div class="field-tip form-text">Сheck the box if the reModel has an insecure certificate</div>
 	</div>
-	<div class="page-load-timeout mb-3">
-		<label class="form-label" asp-for="@source.PageLoadTimeout">Page load timeout</label>
-		<input class="form-control" asp-for="@source.PageLoadTimeout" type="number" />
-		<div class="alert alert-danger" role="alert">
-			<span class="field-error" asp-validation-for="@source.PageElementLoaded"></span>
-		</div>
-		<div class="field-tip form-text">Timeout for waiting for the loading of the page (in seconds)</div>
-	</div>
-	<div class="element-loaded mb-3">
-		<label class="form-label" asp-for="@source.PageElementLoaded">Page element loaded</label>
-		<input class="form-control" asp-for="@source.PageElementLoaded" type="text" placeholder="body" />
-		<div class="alert alert-danger" role="alert">
-			<span class="field-error" asp-validation-for="@source.PageElementLoaded"></span>
-		</div>
-		<div class="field-tip form-text">
+	<div class="element-loaded form-floating mb-3">
+		<input asp-for="@Model.PageElementLoaded" type="text" class="form-control" placeholder="@nameof(Model.PageElementLoaded)" />
+		<label asp-for="@Model.PageElementLoaded" class="form-label">Page element loaded</label>
+		<span asp-validation-for="@Model.PageElementLoaded" class="error-feedback alert alert-danger"></span>
+		<span class="field-tip form-text">
 			Css selector of an element, the loading of which signals the full loading of
 			the dynamic page (if the page is static, you can specify - body)
-		</div>
+		</span>
 	</div>
-    <div class="element-load-timeout mb-3">
-        <label class="form-label" asp-for="@source.ElementLoadTimeout">Element load timeout</label>
-        <input class="form-control" asp-for="@source.ElementLoadTimeout" type="number" />
-        <div class="alert alert-danger" role="alert">
-            <span class="field-error" asp-validation-for="@source.ElementLoadTimeout"></span>
-        </div>
-        <div class="field-tip form-text">
+	<div class="page-load-timeout form-floating mb-3" data-mdb-input-init>
+		<input asp-for="@Model.PageLoadTimeout" type="number" class="form-control" placeholder="@nameof(Model.PageLoadTimeout)"/>
+		<label asp-for="@Model.PageLoadTimeout" class="form-label">Page load timeout</label>
+		<span asp-validation-for="@Model.PageElementLoaded" class="error-feedback alert alert-danger"></span>
+		<span class="field-tip form-text">Timeout for waiting for the loading of the page (in seconds)</span>
+	</div>
+	<div class="element-load-timeout form-floating mb-3" data-mdb-input-init>
+		<input asp-for="@Model.ElementLoadTimeout" type="number" class="form-control" placeholder="@nameof(Model.ElementLoadTimeout)" />
+		<label asp-for="@Model.ElementLoadTimeout" class="form-label">Element load timeout</label>
+		<span asp-validation-for="@Model.ElementLoadTimeout" class="error-feedback alert alert-danger"></span>
+        <span class="field-tip form-text">
             Timeout for waiting for the loading of the element specified in the previous field (in seconds)
-		</div>
+		</span>
     </div>
 </section>
 <hr class="hr" />
-<section class="source-from__article-list-settings">
-	<div class="collection-path mb-3">
-		<label class="form-label" asp-for="@source.ArticleCollectionsPath">Article collection path</label>
-		<input class="form-control" asp-for="@source.ArticleCollectionsPath" type="text" />
-		<div class="alert alert-danger" role="alert">
-			<span class="field-error" asp-validation-for="@source.ArticleCollectionsPath"></span>
-        </div>
+<section>
+	<div class="collection-path form-floating mb-3">
+		<input asp-for="@Model.ArticleCollectionsPath" type="text" class="form-control" placeholder="@nameof(Model.ArticleCollectionsPath)" />
+		<label asp-for="@Model.ArticleCollectionsPath" class="form-label">Article collection path</label>
+		<span asp-validation-for="@Model.ArticleCollectionsPath" class="error-feedback alert alert-danger"></span>
 		<span class="field-tip form-text">Css path to html element(s) that contain collection of articles previews</span>
 	</div>
-	<div class="item-path mb-3">
-		<label class="form-label" asp-for="@source.ArticleItemPath">Article item path</label>
-		<input class="form-control" asp-for="@source.ArticleItemPath" type="text" />
-		<div class="alert alert-danger" role="alert">
-			<span class="field-error" asp-validation-for="@source.ArticleItemPath"></span>
-		</div>
+	<div class="item-path form-floating mb-3">
+		<input asp-for="@Model.ArticleItemPath" type="text" class="form-control" placeholder="@nameof(Model.ArticleItemPath)" />
+		<label asp-for="@Model.ArticleItemPath" class="form-label">Article collection path</label>
+		<span asp-validation-for="@Model.ArticleItemPath" class="error-feedback alert alert-danger"></span>
 		<span class="field-tip form-text">
 			Сss path to the html element that stores the description of the articles preview (link),
 			the path relative to the articles container (Article collection path)
 		</span>
 	</div>
-	<div class="url-path mb-3">
-		<label class="form-label" asp-for="@source.ArticleUrlPath">Article uri path</label>
-		<input class="form-control" asp-for="@source.ArticleUrlPath" type="text" />
-		<div class="alert alert-danger" role="alert">
-			<span class="field-error" asp-validation-for="@source.ArticleUrlPath"></span>
-		</div>
+	<div class="url-path form-floating mb-3">
+		<input asp-for="@Model.ArticleUrlPath" type="text" class="form-control" placeholder="@nameof(Model.ArticleUrlPath)" />
+		<label asp-for="@Model.ArticleUrlPath" class="form-label">Article collection path</label>
+		<span asp-validation-for="@Model.ArticleUrlPath" class="error-feedback alert alert-danger"></span>
 		<span class="field-tip form-text">
 			Css path to the html element that stores a link to the article,
 			the path relative to the article container (Article item path)
@@ -116,75 +82,62 @@
 	</div>
 </section>
 <hr class="hr" />
-<section class="source-form__article-item-setting">
-	<div class="title-path mb-3">
-		<label class="form-label" asp-for="@source.ArticleTitlePath">Article title path</label>
-		<input class="form-control" asp-for="@source.ArticleTitlePath" type="text" />
-		<div class="alert alert-danger" role="alert">
-			<span class="field-error" asp-validation-for="@source.ArticleTitlePath"></span>
-		</div>
+<section>
+	<div class="title-path form-floating mb-3">
+		<input asp-for="@Model.ArticleTitlePath" type="text" class="form-control" placeholder="@nameof(Model.ArticleTitlePath)" />
+		<label asp-for="@Model.ArticleTitlePath" class="form-label">Article title path</label>
+		<span asp-validation-for="@Model.ArticleTitlePath" class="error-feedback alert alert-danger"></span>
 		<span class="field-tip form-text">
 			Css path to the html element that stores a title of the article,
 			the path relative to page of the certain article 
 		</span>
 	</div>
-	<div class="preview-img-path mb-3">
-		<label class="form-label" asp-for="@source.ArticlePreviewImgPath">Article preview image path</label>
-		<input class="form-control" asp-for="@source.ArticlePreviewImgPath" type="text" />
-		<div class="alert alert-danger" role="alert">
-			<span class="field-error" asp-validation-for="@source.ArticlePreviewImgPath"></span>
-		</div>
+	<div class="preview-img-path form-floating mb-3">
+		<input asp-for="@Model.ArticlePreviewImgPath" type="text" class="form-control" placeholder="@nameof(Model.ArticlePreviewImgPath)" />
+		<label asp-for="@Model.ArticlePreviewImgPath" class="form-label">Article title path</label>
+		<span asp-validation-for="@Model.ArticlePreviewImgPath" class="error-feedback alert alert-danger"></span>
 		<span class="field-tip form-text">
 			Css path to the html element that stores a preview image of the article (if available),
 			the path relative to page of the certain article
 		</span>
 	</div>
-	<div class="body-collection-path mb-3">
-		<label class="form-label" asp-for="@source.ArticleBodyCollectionsPath">Article body collections path</label>
-		<input class="form-control" asp-for="@source.ArticleBodyCollectionsPath" type="text" />
-		<div class="alert alert-danger" role="alert">
-			<span class="field-error" asp-validation-for="@source.ArticleBodyCollectionsPath"></span>
-		</div>
+	<div class="body-collection-path form-floating mb-3">
+		<input asp-for="@Model.ArticleBodyCollectionsPath" type="text" class="form-control" placeholder="@nameof(Model.ArticleBodyCollectionsPath)" />
+		<label asp-for="@Model.ArticleBodyCollectionsPath" class="form-label">Article title path</label>
+		<span asp-validation-for="@Model.ArticleBodyCollectionsPath" class="error-feedback alert alert-danger"></span>
 		<span class="field-tip form-text">
 			Css path to html element(s) that contain collection of body article (main article content)
 		</span>
 	</div>
-	<div class="body-item-path mb-3">
-		<label class="form-label" asp-for="@source.ArticleBodyItemPath">Article body item path</label>
-		<input class="form-control" asp-for="@source.ArticleBodyItemPath" type="text" />
-		<div class="alert alert-danger" role="alert">
-			<span class="field-error" asp-validation-for="@source.ArticleBodyItemPath"></span>
-		</div>
+	<div class="body-item-path form-floating mb-3">
+		<input asp-for="@Model.ArticleBodyItemPath" type="text" class="form-control" placeholder="@nameof(Model.ArticleBodyItemPath)" />
+		<label asp-for="@Model.ArticleBodyItemPath" class="form-label">Article title path</label>
+		<span asp-validation-for="@Model.ArticleBodyItemPath" class="error-feedback alert alert-danger"></span>
 		<span class="field-tip form-text">
 			Сss path to the html element(s) that stores the main content of the article,
 			the path relative to the article body container (Article body collection path)
 		</span>
 	</div>
-	<div class="pdate-path mb-3">
-		<label class="form-label" asp-for="@source.ArticlePdatePath">Article publish date path</label>
-		<input class="form-control" asp-for="@source.ArticlePdatePath" type="text" />
-		<div class="alert alert-danger" role="alert">
-			<span class="field-error" asp-validation-for="@source.ArticlePdatePath"></span>
-        </div>
+	<div class="pdate-path form-floating mb-3">
+		<input asp-for="@Model.ArticlePdatePath" type="text" class="form-control" placeholder="@nameof(Model.ArticlePdatePath)" />
+		<label asp-for="@Model.ArticlePdatePath" class="form-label">Article title path</label>
+		<span asp-validation-for="@Model.ArticlePdatePath" class="error-feedback alert alert-danger"></span>
 		<span class="field-tip form-text">
 			Css path to the html element that stores a publish date of the article (if available),
 			the path relative to page of the certain article
 		</span>
 	</div>
-	<div class="tag-path mb-3">
-		<label class="form-label" asp-for="@source.ArticleTagPath">Article publish date path</label>
-		<input class="form-control" asp-for="@source.ArticleTagPath" type="text" />
-		<div class="alert alert-danger" role="alert">
-			<span class="field-error" asp-validation-for="@source.ArticleTagPath"></span>
-		</div>
+	<div class="tag-path form-floating mb-3">
+		<input asp-for="@Model.ArticleTagPath" type="text" class="form-control" placeholder="@nameof(Model.ArticleTagPath)" />
+		<label asp-for="@Model.ArticleTagPath" class="form-label">Article title path</label>
+		<span asp-validation-for="@Model.ArticleTagPath" class="error-feedback alert alert-danger"></span>
 		<span class="field-tip form-text">
 			Css path to the html element that stores a tags of the article (if available),
 			the path relative to page of the certain article
 		</span>
 	</div>
 </section>
-<hr class="hr" />
-<button class="submit btn btn-primary" type="submit">Submit</button>
-<button class="submit btn btn-secondary ">
-	<a asp-controller="sources" asp-action="index">Cancel</a>
-</button>
+<div class="id form-floating mb-3" style="display:none;">
+	<input asp-for="@Model.Id" type="number" value="@Model.Id" class="form-control" placeholder="@nameof(Model.Id)" />
+	<label asp-for="@Model.Id" class="form-label">Id</label>
+</div>

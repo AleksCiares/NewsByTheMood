@@ -5,51 +5,38 @@
 
 <div class="topic container">
 	<div class="topic__header d-flex row mb-4">
-		<h4 class="mb-0">Edit a topic</h4>
+		<h4 class="mb-0">Edit topic @Model.Topic.Name</h4>
 	</div>
-	<form asp-controller="topics" asp-action="edit" asp-antiforgery="true" method="post">
+	<form asp-antiforgery="true" method="post">
 		<div class="form__panel row align-items-start justify-content-between mb-4">
 			<div class="col-auto">
-				<button class="btn btn-primary" type="submit">Submit</button>
-				<a asp-controller="topics" asp-action="index" class="btn btn-secondary" type="submit">Cancel</a>
+				<button asp-controller="topics" asp-action="edit" asp-route-id="@Model.Topic.Id" type="submit" class="btn btn-primary">Submit</button>
+				<button asp-controller="topics" asp-action="index" class="btn btn-secondary">Cancel</button>
 			</div>
 			<div class="col-auto">
-				<a asp-controller="topics" asp-action="delete" asp-route-id="@Model.Topic.Id" class="btn btn-danger">Delete</a>
+				<button asp-controller="topics" asp-action="delete" asp-route-id="@Model.Topic.Id" type="submit" class="btn btn-danger">Delete</button>
 			</div>
 		</div>
 		<div class="form__body row align-items-start justify-content-start mb-4">
 			<div class="form__warp">
-				<partial name="_TopicEditFormPartial" model="@Model.Topic" />
+				<div class="id form-floating mb-3" style="display:none;">
+					<input asp-for="@Model.Topic.Id" type="text" value="@Model.Topic.Id" class="form-control" placeholder="@nameof(Model.Topic.Id)" />
+					<label asp-for="@Model.Topic.Id" class="form-label">Id</label>
+				</div>
+				<div class="name form-floating mb-3">
+					<input asp-for="@Model.Topic.Name" type="text" class="form-control" placeholder="@nameof(Model.Topic.Name)" />
+					<label asp-for="@Model.Topic.Name" class="form-label">Topic name</label>
+					<span asp-validation-for="@Model.Topic.Name" class="error-feedback alert alert-danger" role="alert"></span>
+				</div>
+				<div class="icon form-floating mb-3">
+					<input asp-for="@Model.Topic.IconCssClass" type="text" class="form-control" placeholder="@nameof(Model.Topic.IconCssClass)" />
+					<label asp-for="@Model.Topic.IconCssClass" class="form-label">Icon css class</label>
+					<span asp-validation-for="@Model.Topic.IconCssClass" class="error-feedback alert alert-danger" role="alert"></span>
+				</div>
+				@await Component.InvokeAsync("TopicsIcons")
 			</div>
 		</div>
 	</form>
-
-
-
-	@* <hr class="hr" /> *@
-	@* <div class="topic__related-sources row align-items-start justify-content-start"> *@
-	@* 	<label asp-for="@Model.RelatedSources">Related sources</label> *@
-	@* 	<div class="alert alert-danger" role="alert"> *@
-	@* 		<span class="field-error" asp-validation-for="@Model.RelatedSources"></span> *@
-	@* 	</div> *@
-	@* 	<div class="list-group"> *@
-	@* 		@foreach (var source in Model.RelatedSources) *@
-	@* 		{ *@
-	@* 			<button class="source-preview list-group-item list-group-item-action"> *@
-	@* 				<div class="name"> *@
-	@* 					<a asp-controller="sources" asp-action="edit" asp-route-id="@source.Id" target="_parent"> *@
-	@* 						@source.Name *@
-	@* 					</a> *@
-	@* 				</div> *@
-	@* 				<div class="articles-ammount"> *@
-	@* 					<span>related articles </span> *@
-	@* 					<span class="badge bg-primary rounded-pill">@source.ArticleAmmount</span> *@
-	@* 				</div> *@
-	@* 			</button> *@
-	@* 		} *@
-	@* 	</div> *@
-	@* </div> *@
-
 </div>
 
 @section Scripts
@@ -58,7 +45,31 @@
 		console.log("sada");
 		$(document).on("click", ".icon-item", function(){
 			var clickedIconCssClass = $(this).attr("value");
-			$("#IconCssClass").attr("value", clickedIconCssClass)
+			$("#Topic_IconCssClass").attr("value", clickedIconCssClass)
 		})
 	</script>
 }
+
+@* <hr class="hr" /> *@
+@* <div class="topic__related-sources row align-items-start justify-content-start"> *@
+@* 	<label asp-for="@Model.RelatedSources">Related sources</label> *@
+@* 	<div class="alert alert-danger" role="alert"> *@
+@* 		<span class="field-error" asp-validation-for="@Model.RelatedSources"></span> *@
+@* 	</div> *@
+@* 	<div class="list-group"> *@
+@* 		@foreach (var source in Model.RelatedSources) *@
+@* 		{ *@
+@* 			<button class="source-preview list-group-item list-group-item-action"> *@
+@* 				<div class="name"> *@
+@* 					<a asp-controller="sources" asp-action="edit" asp-route-id="@source.Id" target="_parent"> *@
+@* 						@source.Name *@
+@* 					</a> *@
+@* 				</div> *@
+@* 				<div class="articles-ammount"> *@
+@* 					<span>related articles </span> *@
+@* 					<span class="badge bg-primary rounded-pill">@source.ArticleAmmount</span> *@
+@* 				</div> *@
+@* 			</button> *@
+@* 		} *@
+@* 	</div> *@
+@* </div> *@

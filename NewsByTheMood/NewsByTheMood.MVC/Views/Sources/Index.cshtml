@@ -9,10 +9,10 @@
     </div>
     <div class="topics__panel row align-items-start justify-content-start mb-4">
         <div class="col-auto">
-            <a asp-controller="sources" asp-action="create" class="btn btn-outline-primary">Create</a>
+            <a asp-controller="sources" asp-action="create" class="btn btn-primary">Create</a>
         </div>
     </div>
-    <div class="sources__container row-cols-4 row-cols-sm-6 row-cols-md-8 row-cols-lg-10">
+    <div class="sources__list row row-cols-4 row-cols-sm-6 row-cols-md-8 row-cols-lg-10 mb-4">
         @foreach (var sourcePreview in Model.SourcePreviews)
         {
             <div class="source-preview col mb-4 rounded">
@@ -35,5 +35,12 @@
             </div>
         }
     </div>
+    @if (Model.PageInfo.TotalPages > 1)
+    {
+        <div class="topic__pagination row align-items-center justify-content-center mb-4">
+            <div class="col-auto">
+                <pagination page-action="index" page-info="@Model.PageInfo"></pagination>
+            </div>
+        </div>
+    }
 </div>
-<pagination page-action="index" page-info="@Model.PageInfo"></pagination>

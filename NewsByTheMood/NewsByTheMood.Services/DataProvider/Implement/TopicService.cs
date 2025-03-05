@@ -15,7 +15,30 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             this._dbContext = dbContext;
         }
 
-        // Get all topics
+        public async Task<Topic?> GetByIdAsync(Int64 id)
+        {
+            if (id <= 0)
+            {
+                return null;
+            }
+
+            return await this._dbContext.Topics
+                .AsNoTracking()
+                .Where(topic => topic.Id == id)
+                .SingleOrDefaultAsync();
+        }
+        public async Task<Topic[]> GetRangeAsync(int pageNumber, int pageSize)
+        {
+            if (pageSize <= 0 || pageNumber <= 0) return Array.Empty<Topic>();
+
+            return await this._dbContext.Topics
+                .AsNoTracking()
+                .OrderBy(topic => topic.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToArrayAsync();
+        }
+
         public async Task<Topic[]> GetAllAsync()
         {
             return await this._dbContext.Topics
@@ -23,7 +46,12 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .ToArrayAsync();
         }
 
-        // Check if topic exist
+        public async Task<int> CountAsync()
+        {
+            return await this._dbContext.Topics
+                .CountAsync();
+        }
+
         public async Task<bool> IsExistsAsync(string topicName)
         {
             if (topicName.IsNullOrEmpty())
@@ -36,35 +64,24 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .AnyAsync();
         }
 
-        // Count of topics
-        public async Task<int> CountAsync()
-        {
-            return await this._dbContext.Topics
-                .CountAsync();
-        }
-
-        // Add topic
         public async Task AddAsync(Topic topic)
         {
             await this._dbContext.Topics.AddAsync(topic);
             await this._dbContext.SaveChangesAsync();
         }
 
-        // Update topic
         public async Task UpdateAsync(Topic topic)
         {
             this._dbContext.Topics.Update(topic);
             await this._dbContext.SaveChangesAsync();
         }
 
-        // Delete topic
         public async Task DeleteAsync(Topic topic)
         {
             this._dbContext.Topics.Remove(topic);
             await this._dbContext.SaveChangesAsync();
         }
 
-        // Get related sources
         public async Task<Source[]?> GetRelatedSources(Int64 id)
         {
             if (id <= 0)
@@ -87,17 +104,6 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             return topic.Sources.ToArray(); ;
         }
 
-        public async Task<Topic?> GetByIdAsync(Int64 id)
-        {
-            if (id <= 0)
-            {
-                return null;
-            }
 
-            return await this._dbContext.Topics
-                .AsNoTracking()
-                .Where(topic => topic.Id == id)
-                .SingleOrDefaultAsync();
-        }
     }
 }

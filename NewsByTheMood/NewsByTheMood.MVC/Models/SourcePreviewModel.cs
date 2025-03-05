@@ -1,5 +1,6 @@
 ﻿namespace NewsByTheMood.MVC.Models
 {
+    // Source preview display model
     public class SourcePreviewModel
     {
         public required string Id { get; set; }

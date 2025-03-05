@@ -15,10 +15,12 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             this._dbContext = dbContext;
         }
 
-        // Get source item by id
         public async Task<Source?> GetByIdAsync(Int64 id)
         {
-            if(id <= 0) return null;
+            if (id <= 0)
+            {
+                return null;
+            }
 
             return await this._dbContext.Sources
                 .AsNoTracking()
@@ -27,7 +29,6 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .SingleOrDefaultAsync();
         }
 
-        // Get source preview range
         public async Task<Source[]> GetPreviewRangeAsync(int pageNumber, int pageSize)
         {
             if(pageSize <= 0 || pageNumber <= 0) return Array.Empty<Source>();
@@ -41,35 +42,12 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .ToArrayAsync();
         }
 
-        // Get source count 
         public async Task<int> CountAsync()
         {
             return await this._dbContext.Sources
                 .CountAsync();
         }
 
-        // Add source item
-        public async Task AddAsync(Source source)
-        {
-            await this._dbContext.Sources.AddAsync(source);
-            await this._dbContext.SaveChangesAsync();
-        }
-
-        // Update source item
-        public async Task UpdateAsync(Source source)
-        {
-            this._dbContext.Sources.Update(source);
-            await this._dbContext.SaveChangesAsync();
-        }
-
-        // Delete source
-        public async Task DeleteAsync(Source source)
-        {
-            this._dbContext.Sources.Remove(source);
-            await this._dbContext.SaveChangesAsync();
-        }
-
-        // Check if source exist by name
         public async Task<bool> IsExistsAsync(string sourceName)
         {
             if (sourceName.IsNullOrEmpty())
@@ -78,11 +56,28 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             }
 
             return await this._dbContext.Sources
-                .Where(source => source.Name == sourceName) 
+                .Where(source => source.Name.Equals(sourceName))
                 .AnyAsync();
         }
 
-        // Get related articles
+        public async Task AddAsync(Source source)
+        {
+            await this._dbContext.Sources.AddAsync(source);
+            await this._dbContext.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(Source source)
+        {
+            this._dbContext.Sources.Update(source);
+            await this._dbContext.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(Source source)
+        {
+            this._dbContext.Sources.Remove(source);
+            await this._dbContext.SaveChangesAsync();
+        }
+
         public async Task<Article[]?> GetRelatedArticles(Int64 id)
         {
             if (id <= 0)

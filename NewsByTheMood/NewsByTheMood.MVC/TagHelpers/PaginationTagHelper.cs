@@ -27,25 +27,34 @@ namespace NewsByTheMood.MVC.TagHelpers
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             var urlHelper = this._urlHelperFactory.GetUrlHelper(ViewContext);
-            var mainTag = new TagBuilder("div");
-            mainTag.AddCssClass("btn-group");
+
+            //var paginationWrap = new TagBuilder("nav");
+            var pagList = new TagBuilder("ul");
+            pagList.AddCssClass("pagination");
 
             for (int i = 1; i <= this.PageInfo.TotalPages; i++)
             {
-                var innerTag = new TagBuilder("a");
-                innerTag.AddCssClass("btn");
+                var pagElem = new TagBuilder("li");
+                pagElem.AddCssClass("page-item");
+                if (PageInfo.Page == i)
+                {
+                    pagElem.AddCssClass("active");
+                }
 
-                if (PageInfo.Page == i) innerTag.AddCssClass("active");
-                innerTag.Attributes["href"] = urlHelper.Action(PageAction, new { page = i })?.ToLower();
-                innerTag.InnerHtml.AppendHtml(i.ToString());
+                var pagLink = new TagBuilder("a");
+                pagLink.AddCssClass("page-link");
+                pagLink.Attributes["href"] = urlHelper.Action(PageAction, new { page = i })?.ToLower();
+                pagLink.InnerHtml.AppendHtml(i.ToString());
 
-                mainTag.InnerHtml.AppendHtml(innerTag);
+                pagElem.InnerHtml.AppendHtml(pagLink);
+
+                pagList.InnerHtml.AppendHtml(pagElem);
             }
 
-            output.TagName = "div";
-            output.AddClass("pagination", HtmlEncoder.Default);
+            output.TagName = "nav";
+            //output.AddClass("pagination", HtmlEncoder.Default);
             //output.TagMode = TagMode.SelfClosing;
-            output.Content.AppendHtml(mainTag);
+            output.Content.AppendHtml(pagList);
         }
     }
 }

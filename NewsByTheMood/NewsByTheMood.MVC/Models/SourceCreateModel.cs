@@ -2,13 +2,8 @@
 
 namespace NewsByTheMood.MVC.Models
 {
-    // Display source model
-    public class SourceModel
+    public class SourceCreateModel
     {
-        [Required]
-        [StringLength(100, MinimumLength = 1)]
-        public required string Id { get; set; }
-
         [Required]
         [StringLength(100, MinimumLength = 1, ErrorMessage = "Name is too small or long (maximum is 100 characters)")]
         public required string Name { get; set; }

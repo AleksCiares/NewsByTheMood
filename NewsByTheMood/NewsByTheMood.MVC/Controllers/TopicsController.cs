@@ -14,15 +14,18 @@ namespace NewsByTheMood.MVC.Controllers
             this._topicService = topicService;
         }
 
-        // Get range of sources previews
+        // Get range of topics
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index([FromQuery]PaginationModel pagination)
         {
+            var totalTopics = await _topicService.CountAsync();
             var topics = Array.Empty<TopicModel>();
 
-            if (await this._topicService.CountAsync() > 0)
+            if (totalTopics > 0)
             {
-                topics = (await this._topicService.GetAllAsync())
+                topics = (await this._topicService.GetRangeAsync(
+                    pagination.Page,
+                    pagination.PageSize))
                     .Select(topic => new TopicModel()
                     { 
                         Id = topic.Id.ToString(),
@@ -32,35 +35,44 @@ namespace NewsByTheMood.MVC.Controllers
                     .ToArray();
             }
 
-            return View(topics);
+            return View(new TopicCollectionModel() 
+            {
+                Topics = topics,
+                PageInfo = new PageInfoModel()
+                {
+                    Page = pagination.Page,
+                    PageSize = pagination.PageSize,
+                    TotalItems = totalTopics
+                }
+            });
         }
 
-        // Add topic item
+        // Create topic item
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
-        // Add topic item processing
+        // Create topic item processing
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm]TopicModel topic)
+        public async Task<IActionResult> Create([FromForm]TopicCreateModel topicCreate)
         {
             if (!ModelState.IsValid)
             {
-                return View(topic);
+                return View(topicCreate);
             }
 
-            if (await this._topicService.IsExistsAsync(topic.Name))
+            if (await this._topicService.IsExistsAsync(topicCreate.Name))
             {
-                ModelState.AddModelError(nameof(topic.Name), "A topic with the same name already exists");
-                return View(topic);
+                ModelState.AddModelError(nameof(topicCreate.Name), "A topic with the same name already exists");
+                return View(topicCreate);
             }
 
             await this._topicService.AddAsync(new Topic()
             {
-                Name = topic.Name,
-                IconCssClass = topic.IconCssClass,
+                Name = topicCreate.Name,
+                IconCssClass = topicCreate.IconCssClass,
             });
 
             return RedirectToAction("Index");
@@ -91,7 +103,7 @@ namespace NewsByTheMood.MVC.Controllers
             { 
                 Topic = new TopicModel()
                 {
-                    Id = id,
+                    Id = topicEntity.Id.ToString(),
                     Name = topicEntity.Name,
                     IconCssClass = topicEntity.IconCssClass,
                 },
@@ -101,49 +113,41 @@ namespace NewsByTheMood.MVC.Controllers
 
         // Edit topic item proccessing
         [HttpPost("{Controller}/{Action}/{id:required}")]
-        public async Task<IActionResult> Edit([FromRoute]string id, [FromForm]TopicModel topic)
+        public async Task<IActionResult> Edit([FromRoute]string id, [FromForm]TopicEditModel topicEdit)
         {
+            topicEdit.Topic.Id = id;
             if (!ModelState.IsValid)
             {
-                topic.Id = id;
-                return View(new TopicEditModel()
-                {
-                    Topic = topic,
-                    RelatedSources = Array.Empty<SourcePreviewModel>()
-                });
+                return View(topicEdit);
             }
 
-            var topicEntity = await this._topicService.GetByIdAsync(Int64.Parse(id));
+            var topicEntity = await this._topicService.GetByIdAsync(Int64.Parse(topicEdit.Topic.Id));
             if (topicEntity == null)
             {
                 return BadRequest();
             }
 
-            if (await this._topicService.IsExistsAsync(topic.Name) && !topic.Name.Equals(topicEntity.Name))
+            if (await this._topicService.IsExistsAsync(topicEdit.Topic.Name) && !topicEdit.Topic.Name.Equals(topicEntity.Name))
             {
-                ModelState.AddModelError(nameof(Topic.Name), "A topic with the same name already exists");
-                topic.Id = id;
-                return View(new TopicEditModel()
-                {
-                    Topic = topic,
-                    RelatedSources = Array.Empty<SourcePreviewModel>()
-                });
+                ModelState.AddModelError("Topic.Name", "A topic with the same name already exists");
+                return View(topicEdit);
             }
 
             await this._topicService.UpdateAsync(new Topic() 
             {
-                Id = Int64.Parse(id),
-                Name = topic.Name,
-                IconCssClass = topic.IconCssClass,
+                Id = Int64.Parse(topicEdit.Topic.Id),
+                Name = topicEdit.Topic.Name,
+                IconCssClass = topicEdit.Topic.IconCssClass,
             });
 
             return RedirectToAction("Index");
         }
 
         // Delete topic item
-        [HttpGet("{Controller}/{Action}/{id:required}")]
-        public async Task<IActionResult> Delete([FromRoute]string id, [FromForm]TopicModel topic)
+        [HttpPost("{Controller}/{Action}/{id:required}")]
+        public async Task<IActionResult> Delete([FromRoute]string id, TopicEditModel topicEdit)
         {
+            topicEdit.Topic.Id = id;
             //var relatedSourcesCount = (await this._topicService.GetRelatedSources(Int64.Parse(id)))?
             //    .Count();
 
@@ -160,7 +164,7 @@ namespace NewsByTheMood.MVC.Controllers
 
             await this._topicService.DeleteAsync(new Topic()
             {
-                Id = Int64.Parse(id),
+                Id = Int64.Parse(topicEdit.Topic.Id),
             });
 
             return RedirectToAction("Index");

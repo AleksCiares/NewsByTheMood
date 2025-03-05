@@ -1,22 +1,47 @@
 ﻿@model SourceEditModel
 @{
 	ViewData["PageTitle"] = $"{Model.Source.Name} - Editing";
+
+	var topicsSelect = new List<SelectListItem>();
+	foreach (var topic in Model.Topics)
+	{
+		topicsSelect.Add(new SelectListItem()
+				{
+					Value = topic.Id,
+					Text = topic.Name
+				});
+	}
 }
 
 <div class="source container">
-	<div class="source__panel row align-items-start justify-content-start">
-		<nav class="nav">
-            <button type="button" class="btn btn-danger">
-				<a asp-controller="topics" asp-action="delete" asp-route-id="@Model.Source.Id">Delete</a>
-			</button>
-		</nav>
+	<div class="topic__header d-flex row mb-4">
+		<h4 class="mb-0">Edit topic @Model.Source.Name</h4>
 	</div>
-	<div class="source__form row align-items-start justify-content-start">
-		<form asp-controller="sources" asp-action="edit" asp-antiforgery="true" method="post">
-			<partial name="_SourceEditFormPartial" model="@Model" />
-		</form>
-	</div>
-    <hr class="hr" />
+	<form asp-antiforgery="true" method="post">
+		<div class="form__panel row align-items-start justify-content-between mb-4">
+			<div class="col-auto">
+				<button asp-controller="sources" asp-action="edit" asp-route-id="@Model.Source.Id" class="btn btn-primary" type="submit">Submit</button>
+				<button asp-controller="sources" asp-action="index" class="btn btn-secondary">Cancel</button>
+			</div>
+			<div class="col-auto">
+				<button asp-controller="sources" asp-action="delete" asp-route-id="@Model.Source.Id" class="btn btn-danger">Delete</button>
+			</div>
+		</div>
+		<div class="form__body row align-items-start justify-content-start mb-4">
+			<div class="form__warp">
+				<div class="topic form-floating mb-3">
+					<select asp-for="@Model.Source.TopicId" asp-items="@topicsSelect" class="form-select">
+					</select>
+					<label asp-for="@Model.Source.TopicId" class="form-label">Topic</label>
+					<span asp-validation-for="@Model.Source.TopicId" class="error-feedback alert alert-danger" role="alert"></span>
+				</div>
+				<partial name="_SourceEditFormPartial" model="@Model.Source" />
+			</div>
+		</div>
+	</form>
+</div>
+
+@* <hr class="hr" />
 	<div class="source__related-articles row align-items-start justify-content-start">
 		<label asp-for="@Model.RelatedArticles">Related articles</label>
         <div class="alert alert-danger" role="alert">
@@ -38,5 +63,4 @@
 			}
 
 		</div>
-	</div>
-</div>
+	</div> *@

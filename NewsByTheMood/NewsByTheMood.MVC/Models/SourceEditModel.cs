@@ -2,14 +2,15 @@
 
 namespace NewsByTheMood.MVC.Models
 {
-    // Model for editing or adding source
     public class SourceEditModel
     {
         [Required]
-        public SourceModel Source { get; set; }
+        public required SourceModel Source { get; set; }
 
+        [Required]
         public required TopicModel[] Topics { get; set; }
 
-        public ArticlePreviewModel[] RelatedArticles { get; set; } = Array.Empty<ArticlePreviewModel>();
+        [Required]
+        public required ArticlePreviewModel[] RelatedArticles { get; set; } = Array.Empty<ArticlePreviewModel>();
     }
 }
