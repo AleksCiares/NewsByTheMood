@@ -58,14 +58,8 @@ namespace NewsByTheMood.MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromForm]TopicCreateModel topicCreate)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || await this.IsSameNameExistsAsync(topicCreate.Name))
             {
-                return View(topicCreate);
-            }
-
-            if (await this._topicService.IsExistsAsync(topicCreate.Name))
-            {
-                ModelState.AddModelError(nameof(topicCreate.Name), "A topic with the same name already exists");
                 return View(topicCreate);
             }
 
@@ -88,17 +82,6 @@ namespace NewsByTheMood.MVC.Controllers
                 return BadRequest();
             }
 
-            /*var relatedSources = (await this._topicService.GetRelatedSources(Int64.Parse(id)))!
-                .Select(source => new SourcePreviewModel()
-                {
-                    Id = source.Id.ToString(),
-                    Name = source.Name,
-                    Topic = source.Topic.Name,
-                    Url = source.Url,
-                    ArticleAmmount = source.Articles.Count,
-                })
-                .ToArray();*/
-
             return View(new TopicEditModel()
             { 
                 Topic = new TopicModel()
@@ -107,7 +90,7 @@ namespace NewsByTheMood.MVC.Controllers
                     Name = topicEntity.Name,
                     IconCssClass = topicEntity.IconCssClass,
                 },
-                RelatedSources = Array.Empty<SourcePreviewModel>()
+                RelatedSources = await this.GetRelatedSources()
             });
         }
 
@@ -116,20 +99,9 @@ namespace NewsByTheMood.MVC.Controllers
         public async Task<IActionResult> Edit([FromRoute]string id, [FromForm]TopicEditModel topicEdit)
         {
             topicEdit.Topic.Id = id;
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || await this.IsSameNameExistsAsync(topicEdit.Topic.Id, topicEdit.Topic.Name))
             {
-                return View(topicEdit);
-            }
-
-            var topicEntity = await this._topicService.GetByIdAsync(Int64.Parse(topicEdit.Topic.Id));
-            if (topicEntity == null)
-            {
-                return BadRequest();
-            }
-
-            if (await this._topicService.IsExistsAsync(topicEdit.Topic.Name) && !topicEdit.Topic.Name.Equals(topicEntity.Name))
-            {
-                ModelState.AddModelError("Topic.Name", "A topic with the same name already exists");
+                topicEdit.RelatedSources = await this.GetRelatedSources();
                 return View(topicEdit);
             }
 
@@ -148,19 +120,13 @@ namespace NewsByTheMood.MVC.Controllers
         public async Task<IActionResult> Delete([FromRoute]string id, TopicEditModel topicEdit)
         {
             topicEdit.Topic.Id = id;
-            //var relatedSourcesCount = (await this._topicService.GetRelatedSources(Int64.Parse(id)))?
-            //    .Count();
+            if ((await this.GetRelatedSources()).Length > 0)
+            {
+                topicEdit.RelatedSources = await this.GetRelatedSources();
+                ModelState.AddModelError("Topic.Name", "You can't delete topic with related sources");
+                return View("Edit", topicEdit);
+            }
 
-            //if (relatedSourcesCount > 0)
-            //{
-            //    ModelState.AddModelError("RelatedSources", "There are related sources. First of all delete all related sources or change topic of it");
-            //    return await Edit(id, topic);
-            //}
-
-            //if (relatedSourcesCount == null)
-            //{
-            //    return BadRequest();
-            //}
 
             await this._topicService.DeleteAsync(new Topic()
             {
@@ -168,6 +134,41 @@ namespace NewsByTheMood.MVC.Controllers
             });
 
             return RedirectToAction("Index");
+        }
+
+        [NonAction]
+        private async Task<SourcePreviewModel[]> GetRelatedSources()
+        {
+            return Array.Empty<SourcePreviewModel>();
+        }
+
+        [NonAction]
+        private async Task<bool> IsSameNameExistsAsync(string id, string sourceName)
+        {
+            var topicEntity = await this._topicService.GetByIdAsync(Int64.Parse(id));
+            /*            if (sourceEntity == null)
+                        {
+                            return null;
+                        }*/
+            if (await this._topicService.IsExistsAsync(sourceName) && !sourceName.Equals(topicEntity.Name))
+            {
+                ModelState.AddModelError("Topic.Name", "A topic with the same name already exists");
+                return true;
+            }
+
+            return false;
+        }
+
+        [NonAction]
+        private async Task<bool> IsSameNameExistsAsync(string sourceName)
+        {
+            if (await this._topicService.IsExistsAsync(sourceName))
+            {
+                ModelState.AddModelError("Name", "A topic with the same name already exists");
+                return true;
+            }
+
+            return false;
         }
     }
 }

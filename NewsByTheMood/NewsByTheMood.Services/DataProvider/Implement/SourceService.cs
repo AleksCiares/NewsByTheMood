@@ -36,6 +36,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             return await this._dbContext.Sources
                 .AsNoTracking()
                 .Include(source => source.Topic)
+                .Include(source => source.Articles)
                 .OrderByDescending(source => source.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)

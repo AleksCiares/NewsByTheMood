@@ -4,7 +4,7 @@
 }
 
 <div class="sources container">
-    <div class="topic__header d-flex row mb-4">
+    <div class="topic__header d-flex row mb-5">
         <h4 class="mb-0">Sources</h4>
     </div>
     <div class="topics__panel row align-items-start justify-content-start mb-4">
@@ -12,28 +12,22 @@
             <a asp-controller="sources" asp-action="create" class="btn btn-primary">Create</a>
         </div>
     </div>
-    <div class="sources__list row row-cols-4 row-cols-sm-6 row-cols-md-8 row-cols-lg-10 mb-4">
-        @foreach (var sourcePreview in Model.SourcePreviews)
-        {
-            <div class="source-preview col mb-4 rounded">
-                <div class="card text-center">
-                    <div class="card-header">
-                        @sourcePreview.Name
+    <div class="sources__list mb-4">
+            @foreach (var sourcePreview in Model.SourcePreviews)
+            {
+            <div class="source-preview row justify-content-start align-items-center mb-3">
+                    <div class="col-auto">@sourcePreview.Name</div>
+                    <div class="col-auto">@sourcePreview.Topic</div>
+                    <div class="col-auto">
+                        <span>related articles </span>
+                        <span class="badge bg-primary rounded-pill">@sourcePreview.ArticleAmmount</span>
                     </div>
-                    <div class="card-body">
-                        <div class="topic card-subtitle">@sourcePreview.Topic</div>
-                        <div class="url card-link">@sourcePreview.Url</div>
-                        <div class="articles-ammount">
-                            <span>related articles </span>
-                            <span class="badge bg-primary rounded-pill">@sourcePreview.ArticleAmmount</span>
-                        </div>
-                    </div>
-                    <div class="card-footer text-muted">
+                    <div class="col-auto">
                         <a asp-controller="sources" asp-action="edit" asp-route-id="@sourcePreview.Id" class="btn btn-primary">Edit</a>
                     </div>
-                </div>
             </div>
-        }
+            }
+        </div>
     </div>
     @if (Model.PageInfo.TotalPages > 1)
     {

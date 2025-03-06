@@ -4,14 +4,14 @@
 }
 
 <div class="topic container">
-	<div class="topic__header d-flex row mb-4">
+	<div class="topic__header d-flex row mb-5">
 		<h4 class="mb-0">Create a topic</h4>
 	</div>
 	<form asp-antiforgery="true" method="post">
 		<div class="form__panel row align-items-start justify-content-between mb-4">
 			<div class="col-auto">
 				<button asp-controller="topics" asp-action="create" class="btn btn-primary" type="submit">Submit</button>
-				<button asp-controller="topics" asp-action="index" class="btn btn-secondary">Cancel</button>
+				<a asp-controller="topics" asp-action="index" class="btn btn-secondary">Cancel</a>
 			</div>
 		</div>
 		<div class="form__body row align-items-start justify-content-start mb-4">
@@ -19,12 +19,12 @@
 				<div class="name form-floating mb-3">
 					<input asp-for="@Model.Name" type="text" class="form-control" placeholder="@nameof(Model.Name)" />
 					<label asp-for="@Model.Name" class="form-label">Topic name</label>
-					<span asp-validation-for="@Model.Name" class="error-feedback alert alert-danger" role="alert"></span>
+					<span asp-validation-for="@Model.Name" class="error-feedback invalid-feedback"></span>
 				</div>
 				<div class="icon form-floating mb-3">
 					<input asp-for="@Model.IconCssClass" type="text" class="form-control" placeholder="@nameof(Model.IconCssClass)" />
 					<label asp-for="@Model.IconCssClass" class="form-label">Icon css class</label>
-					<span asp-validation-for="@Model.IconCssClass" class="error-feedback alert alert-danger" role="alert"></span>
+					<span asp-validation-for="@Model.IconCssClass" class="error-feedback invalid-feedback"></span>
 				</div>
 				@await Component.InvokeAsync("TopicsIcons")
 			</div>

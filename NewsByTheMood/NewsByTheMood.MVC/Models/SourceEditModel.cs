@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace NewsByTheMood.MVC.Models
 {
@@ -7,10 +8,8 @@ namespace NewsByTheMood.MVC.Models
         [Required]
         public required SourceModel Source { get; set; }
 
-        [Required]
-        public required TopicModel[] Topics { get; set; }
+        public List<SelectListItem>? Topics { get; set; }
 
-        [Required]
-        public required ArticlePreviewModel[] RelatedArticles { get; set; } = Array.Empty<ArticlePreviewModel>();
+        public ArticlePreviewModel[]? RelatedArticles { get; set; }
     }
 }

@@ -20,7 +20,7 @@ namespace NewsByTheMood.MVC.Models
         public required string Url { get; set; }
 
         [Required]
-        [Range(10, Int32.MaxValue)]
+        [Range(10, 267840)]
         public required int SurveyPeriod { get; set; }
 
         [Required]
@@ -34,11 +34,11 @@ namespace NewsByTheMood.MVC.Models
         public required string PageElementLoaded { get; set; }
 
         [Required]
-        [Range(0, Int32.MaxValue)]
+        [Range(0, 600)]
         public required int PageLoadTimeout { get; set; }
 
         [Required]
-        [Range(0, Int32.MaxValue)]
+        [Range(0, 300)]
         public required int ElementLoadTimeout { get; set; }
 
         [Required]

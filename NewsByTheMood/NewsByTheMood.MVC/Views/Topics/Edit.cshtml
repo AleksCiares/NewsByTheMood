@@ -4,14 +4,14 @@
 }
 
 <div class="topic container">
-	<div class="topic__header d-flex row mb-4">
+	<div class="topic__header d-flex row mb-5">
 		<h4 class="mb-0">Edit topic @Model.Topic.Name</h4>
 	</div>
 	<form asp-antiforgery="true" method="post">
 		<div class="form__panel row align-items-start justify-content-between mb-4">
 			<div class="col-auto">
 				<button asp-controller="topics" asp-action="edit" asp-route-id="@Model.Topic.Id" type="submit" class="btn btn-primary">Submit</button>
-				<button asp-controller="topics" asp-action="index" class="btn btn-secondary">Cancel</button>
+				<a asp-controller="topics" asp-action="index" class="btn btn-secondary">Cancel</a>
 			</div>
 			<div class="col-auto">
 				<button asp-controller="topics" asp-action="delete" asp-route-id="@Model.Topic.Id" type="submit" class="btn btn-danger">Delete</button>
@@ -21,17 +21,16 @@
 			<div class="form__warp">
 				<div class="id form-floating mb-3" style="display:none;">
 					<input asp-for="@Model.Topic.Id" type="text" value="@Model.Topic.Id" class="form-control" placeholder="@nameof(Model.Topic.Id)" />
-					<label asp-for="@Model.Topic.Id" class="form-label">Id</label>
 				</div>
 				<div class="name form-floating mb-3">
 					<input asp-for="@Model.Topic.Name" type="text" class="form-control" placeholder="@nameof(Model.Topic.Name)" />
 					<label asp-for="@Model.Topic.Name" class="form-label">Topic name</label>
-					<span asp-validation-for="@Model.Topic.Name" class="error-feedback alert alert-danger" role="alert"></span>
+					<span asp-validation-for="@Model.Topic.Name" class="error-feedback invalid-feedback"></span>
 				</div>
 				<div class="icon form-floating mb-3">
 					<input asp-for="@Model.Topic.IconCssClass" type="text" class="form-control" placeholder="@nameof(Model.Topic.IconCssClass)" />
 					<label asp-for="@Model.Topic.IconCssClass" class="form-label">Icon css class</label>
-					<span asp-validation-for="@Model.Topic.IconCssClass" class="error-feedback alert alert-danger" role="alert"></span>
+					<span asp-validation-for="@Model.Topic.IconCssClass" class="error-feedback invalid-feedback"></span>
 				</div>
 				@await Component.InvokeAsync("TopicsIcons")
 			</div>
