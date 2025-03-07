@@ -23,7 +23,7 @@ namespace WebScraper.Core.Loaders.Implement
           }
         }, 500)
         ";*/
-        private readonly string jsScrollScript = @"window.scrollBy(0, 50)";
+        private readonly string _jsScrollScript = @"window.scrollBy(0, 50)";
         private readonly WebLoaderSettings _settings;
 
         public DynamicPageLoader(WebLoaderSettings settings)
@@ -32,7 +32,7 @@ namespace WebScraper.Core.Loaders.Implement
             NetworkAuthenticationHandler? proxyAuthHandler = null;
 
             var options = new ChromeOptions();
-            //options.AddArgument("--headless");
+            options.AddArgument("--headless");
             options.AddArgument($"--user-agent={this._settings.UserAgent}");
             options.AcceptInsecureCertificates = this._settings.AcceptInsecureCertificates;
             options.PageLoadStrategy = PageLoadStrategy.Normal;
@@ -89,7 +89,7 @@ namespace WebScraper.Core.Loaders.Implement
         public async Task<string> LoadPageAsync(string url)
         {
             await this._webDriver.Navigate().GoToUrlAsync(url);
-            ((IJavaScriptExecutor)this._webDriver).ExecuteScript(jsScrollScript);
+            ((IJavaScriptExecutor)this._webDriver).ExecuteScript(this._jsScrollScript);
             var wait = new WebDriverWait(this._webDriver, this._settings.ElementLoadTimeout);
             var controlledElement = wait.Until(
                 c => c.FindElement(By.CssSelector(this._settings.ElemCssSelectorPageLoaded)));

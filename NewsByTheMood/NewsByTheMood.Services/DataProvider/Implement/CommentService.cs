@@ -14,7 +14,6 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             this._dbContext = dbContext;
         }
 
-        // Get range of comments for certain article
         public async Task<Comment[]> GetRangeAsync(Int64 articleId, int pageNumber, int pageSize)
         {
             if(articleId <= 0 || pageSize <= 0 || pageSize <= 0) 

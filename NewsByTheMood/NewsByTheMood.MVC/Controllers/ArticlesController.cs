@@ -64,7 +64,7 @@ namespace NewsByTheMood.MVC.Controllers
         [HttpGet("{Controller}/{Action}/{topic:required:alpha}")]
         public async Task<IActionResult> Topic([FromRoute]string topic, [FromQuery]PaginationModel pagination)
         {
-            var totalArticles = await this._articleService.CountAsync(this._defaultPositivity, Int64.Parse(topic));
+            var totalArticles = await this._articleService.CountByTopicAsync(this._defaultPositivity, Int64.Parse(topic));
             var articles = Array.Empty<ArticlePreviewModel>();
 
             if (totalArticles > 0)

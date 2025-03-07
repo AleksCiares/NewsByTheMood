@@ -15,7 +15,6 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             this._dbContext = dbContext;
         }
 
-        // Get article by certain id
         public async Task<Article?> GetByIdAsync(Int64 id)
         {
             if(id <= 0) return null;
@@ -30,7 +29,6 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .SingleOrDefaultAsync();
         }
 
-        // Get range off articles preview with certain positivity
         public async Task<Article[]> GetRangePreviewAsync(int pageNumber, int pageSize, short positivity)
         {
             if (pageNumber <= 0 || pageSize <= 0 || positivity <= 0) 
@@ -64,7 +62,6 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .ToArrayAsync();
         }
 
-        // Get range off articles preview with certain positivity and topic
         public async Task<Article[]> GetRangePreviewByTopicAsync(int pageNumber, int pageSize, short positivity, Int64 topicId)
         {
             if (pageNumber <= 0 || pageSize <= 0 || positivity <= 0 || topicId <= 0) 
@@ -82,7 +79,6 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .ToArrayAsync();
         }
 
-        //Get article count with certain positivity
         public async Task<int> CountAsync(short positivity)
         {
             if(positivity <= 0) return 0;
@@ -93,8 +89,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .CountAsync();
         }
 
-        //Get article count with certain positivity and topic
-        public async Task<int> CountAsync(short positivity, Int64 topicId)
+        public async Task<int> CountByTopicAsync(short positivity, Int64 topicId)
         {
             if (positivity <= 0 || topicId <= 0) return 0;
 
@@ -103,6 +98,19 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .Where(article => article.Positivity >= positivity)
                 .Where(article => article.Source.TopicId == topicId)
                 .CountAsync();
+        }
+
+        public async Task<bool> IsExistByUrl(string articleUrl)
+        {
+            if (articleUrl.IsNullOrEmpty())
+            {
+                return false;
+            }
+
+            return await this._dbContext.Articles
+                .AsNoTracking()
+                .Where (article => article.Url == articleUrl)
+                .AnyAsync();
         }
     }
 }

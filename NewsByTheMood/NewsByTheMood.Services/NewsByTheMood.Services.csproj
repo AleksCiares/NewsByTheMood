@@ -8,6 +8,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NewsByTheMood.Data\NewsByTheMood.Data.csproj" />
+    <ProjectReference Include="..\WebScraper.Core\WebScraper.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="WebScrapeProvider\Abstract\" />
   </ItemGroup>
 
 </Project>

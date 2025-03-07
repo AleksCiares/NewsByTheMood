@@ -15,7 +15,6 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             this._dbContext = dbContext;
         }
 
-        // Is email exists in db
         public async Task<bool> IsEmailExistsAsync(string email)
         {
             if (email.IsNullOrEmpty()) return false;
@@ -26,7 +25,6 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .AnyAsync();
         }
 
-        // Is username exists in db
         public  async Task<bool> IsUserNameExistsAsync(string username)
         {
             if (username.IsNullOrEmpty()) return false;
