@@ -1,11 +1,5 @@
 ﻿using AngleSharp;
 using AngleSharp.Dom;
-using AngleSharp.Html.Parser;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WebScraper.Core.Parsers.Abstract;
 
 namespace WebScraper.Core.Parsers.Implement

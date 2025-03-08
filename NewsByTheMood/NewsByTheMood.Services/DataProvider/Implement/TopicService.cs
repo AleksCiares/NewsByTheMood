@@ -49,6 +49,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         public async Task<int> CountAsync()
         {
             return await this._dbContext.Topics
+                .AsNoTracking()
                 .CountAsync();
         }
 
@@ -60,6 +61,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             }
 
             return await this._dbContext.Topics
+                .AsNoTracking()
                 .Where(topic => topic.Name.Equals(topicName))
                 .AnyAsync();
         }
@@ -93,7 +95,6 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .AsNoTracking()
                 .Where(topic => topic.Id == id)
                 .Include(topic => topic.Sources)
-                .ThenInclude(source => source.Articles)
                 .SingleOrDefaultAsync();
 
             if (topic == null)

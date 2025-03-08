@@ -54,10 +54,15 @@
 							</div>
 						</div>
 					</div>
+					<div class="has-dynamic-page form-check mb-3">
+						<input asp-for="@Model.Source.HasDynamicPage" type="checkbox" class="form-check-input" />
+						<label asp-for="@Model.Source.HasDynamicPage" class="form-check-label">@nameof(Model.Source.HasDynamicPage)</label>
+						<div class="field-tip form-text text-muted">Сheck the box if the resource has dynamic page</div>
+					</div>
 					<div class="is-insecure-certs form-check mb-3">
 						<input asp-for="@Model.Source.AcceptInsecureCerts" type="checkbox" class="form-check-input" />
 						<label asp-for="@Model.Source.AcceptInsecureCerts" class="form-check-label">@nameof(Model.Source.AcceptInsecureCerts)</label>
-						<div class="field-tip form-text text-muted">Сheck the box if the reModel has an insecure certificate</div>
+						<div class="field-tip form-text text-muted">Сheck the box if the resource has an insecure certificate</div>
 					</div>
 					<div class="element-loaded form-floating mb-3">
 						<input asp-for="@Model.Source.PageElementLoaded" type="text" class="form-control" placeholder="@nameof(Model.Source.PageElementLoaded)" />

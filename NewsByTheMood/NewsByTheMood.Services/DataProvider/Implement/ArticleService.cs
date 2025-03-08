@@ -24,8 +24,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .Where(article => article.Id == id)
                 .Include(article => article.Source)
                 .ThenInclude(source => source.Topic)
-                .Include(article => article.ArticleTags)
-                .ThenInclude(articleTags => articleTags.Tag)
+                .Include(article => article.Tags)
                 .SingleOrDefaultAsync();
         }
 
@@ -111,6 +110,12 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .AsNoTracking()
                 .Where (article => article.Url == articleUrl)
                 .AnyAsync();
+        }
+
+        public async Task AddAsync(Article article)
+        {
+            await this._dbContext.Articles.AddAsync(article);
+            await this._dbContext.SaveChangesAsync();
         }
     }
 }

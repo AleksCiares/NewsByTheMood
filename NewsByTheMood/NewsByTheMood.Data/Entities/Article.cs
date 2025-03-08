@@ -17,7 +17,7 @@
         // nav property
         public Source Source { get; set; }
         // nav property
-        public List<ArticleTag> ArticleTags { get; set; }
+        public List<Tag> Tags { get; set; }
         // nav property
         public List <Comment> Comments { get; set; }
 

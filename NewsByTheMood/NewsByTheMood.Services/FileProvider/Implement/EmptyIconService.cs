@@ -2,7 +2,7 @@
 
 namespace NewsByTheMood.Services.FileProvider.Implement
 {
-    public class EmptyIconsService : IiconsService
+    public class EmptyIconService : IiconService
     {
         public async Task<string[]> GetIconsCssClasses()
         {

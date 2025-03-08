@@ -1,4 +1,4 @@
-﻿namespace WebScraper.Core.Loaders
+﻿namespace WebScraper.Core.Settings
 {
     /// <summary>
     /// Settings for the web loader
@@ -11,7 +11,7 @@
         /// <summary> 
         /// Css selector for the element to wait for full page load
         /// </summary>
-        public required string ElemCssSelectorPageLoaded { get; set; }
+        public required string PageElementLoaded { get; set; }
         public required TimeSpan PageLoadTimeout { get; set; }
         public required TimeSpan ElementLoadTimeout { get; set; }
     }

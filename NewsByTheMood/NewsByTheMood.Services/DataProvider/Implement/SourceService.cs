@@ -46,6 +46,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         public async Task<int> CountAsync()
         {
             return await this._dbContext.Sources
+                .AsNoTracking()
                 .CountAsync();
         }
 
@@ -57,6 +58,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             }
 
             return await this._dbContext.Sources
+                .AsNoTracking()
                 .Where(source => source.Name.Equals(sourceName))
                 .AnyAsync();
         }

@@ -123,7 +123,7 @@ namespace NewsByTheMood.MVC.Controllers
                 Rating = article.Rating,
                 SourceName = article.Source.Name,
                 TopicName = article.Source.Topic.Name,
-                ArticleTags = article.ArticleTags.Select(t => t.Tag.Name).ToArray()
+                ArticleTags = article.Tags.Select(t => t.Name).ToArray()
             });
         }
     }

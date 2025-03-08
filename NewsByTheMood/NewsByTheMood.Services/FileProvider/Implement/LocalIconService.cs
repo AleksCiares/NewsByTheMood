@@ -7,11 +7,11 @@ using NewsByTheMood.Services.FileProvider.Abstract;
 namespace NewsByTheMood.Services.FileProvider.Implement
 {
     // Service for provide user icons for elements
-    public class LocalIconsService : IiconsService
+    public class LocalIconService : IiconService
     {
         private readonly UserIconsOptions _options;
 
-        public LocalIconsService(IOptions<UserIconsOptions> options)
+        public LocalIconService(IOptions<UserIconsOptions> options)
         {
             this._options = options.Value;
         }

@@ -7,6 +7,6 @@
         public string Name { get; set; }
 
         // nav property
-        public List<ArticleTag> ArticleTags { get; set; }
+        public List<Article> Articles { get; set; }
     }
 }

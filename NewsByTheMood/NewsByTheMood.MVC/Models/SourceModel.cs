@@ -27,6 +27,9 @@ namespace NewsByTheMood.MVC.Models
         public required bool IsRandomPeriod { get; set; }
 
         [Required]
+        public required bool HasDynamicPage { get; set; }
+
+        [Required]
         public required bool AcceptInsecureCerts { get; set; }
 
         [Required]

@@ -10,6 +10,6 @@
         // nav property
         public List<Source> Sources { get; set; }
         // nav property
-        public List<UserTopic> UserTopics { get; set; }
+        public List<User> Users { get; set; }
     }
 }

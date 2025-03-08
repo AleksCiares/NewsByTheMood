@@ -43,7 +43,8 @@ namespace NewsByTheMood.Data.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IconCssClass = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -88,6 +89,7 @@ namespace NewsByTheMood.Data.Migrations
                     Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SurveyPeriod = table.Column<int>(type: "int", nullable: false),
                     IsRandomPeriod = table.Column<bool>(type: "bit", nullable: false),
+                    HasDynamicPage = table.Column<bool>(type: "bit", nullable: false),
                     AcceptInsecureCerts = table.Column<bool>(type: "bit", nullable: false),
                     PageElementLoaded = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PageLoadTimeout = table.Column<int>(type: "int", nullable: false),
@@ -116,30 +118,28 @@ namespace NewsByTheMood.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserTopics",
+                name: "TopicUser",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<long>(type: "bigint", nullable: false),
-                    TopicId = table.Column<long>(type: "bigint", nullable: false)
+                    TopicsId = table.Column<long>(type: "bigint", nullable: false),
+                    UsersId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserTopics", x => x.Id);
+                    table.PrimaryKey("PK_TopicUser", x => new { x.TopicsId, x.UsersId });
                     table.ForeignKey(
-                        name: "FK_UserTopics_Topics_TopicId",
-                        column: x => x.TopicId,
+                        name: "FK_TopicUser_Topics_TopicsId",
+                        column: x => x.TopicsId,
                         principalTable: "Topics",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict, 
+                        onDelete: ReferentialAction.Restrict,
                         onUpdate: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserTopics_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_TopicUser_Users_UsersId",
+                        column: x => x.UsersId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict, 
+                        onDelete: ReferentialAction.Restrict,
                         onUpdate: ReferentialAction.Cascade);
                 });
 
@@ -171,27 +171,25 @@ namespace NewsByTheMood.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ArticleTags",
+                name: "ArticleTag",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ArticleId = table.Column<long>(type: "bigint", nullable: false),
-                    TagId = table.Column<long>(type: "bigint", nullable: false)
+                    ArticlesId = table.Column<long>(type: "bigint", nullable: false),
+                    TagsId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ArticleTags", x => x.Id);
+                    table.PrimaryKey("PK_ArticleTag", x => new { x.ArticlesId, x.TagsId });
                     table.ForeignKey(
-                        name: "FK_ArticleTags_Articles_ArticleId",
-                        column: x => x.ArticleId,
+                        name: "FK_ArticleTag_Articles_ArticlesId",
+                        column: x => x.ArticlesId,
                         principalTable: "Articles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict, 
                         onUpdate: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ArticleTags_Tags_TagId",
-                        column: x => x.TagId,
+                        name: "FK_ArticleTag_Tags_TagsId",
+                        column: x => x.TagsId,
                         principalTable: "Tags",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict, 
@@ -234,14 +232,9 @@ namespace NewsByTheMood.Data.Migrations
                 column: "SourceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ArticleTags_ArticleId",
-                table: "ArticleTags",
-                column: "ArticleId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ArticleTags_TagId",
-                table: "ArticleTags",
-                column: "TagId");
+                name: "IX_ArticleTag_TagsId",
+                table: "ArticleTag",
+                column: "TagsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_ArticleId",
@@ -259,32 +252,27 @@ namespace NewsByTheMood.Data.Migrations
                 column: "TopicId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TopicUser_UsersId",
+                table: "TopicUser",
+                column: "UsersId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_RightId",
                 table: "Users",
                 column: "RightId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserTopics_TopicId",
-                table: "UserTopics",
-                column: "TopicId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserTopics_UserId",
-                table: "UserTopics",
-                column: "UserId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ArticleTags");
+                name: "ArticleTag");
 
             migrationBuilder.DropTable(
                 name: "Comments");
 
             migrationBuilder.DropTable(
-                name: "UserTopics");
+                name: "TopicUser");
 
             migrationBuilder.DropTable(
                 name: "Tags");

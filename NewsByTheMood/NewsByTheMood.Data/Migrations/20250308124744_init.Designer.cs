@@ -12,7 +12,7 @@ using NewsByTheMood.Data;
 namespace NewsByTheMood.Data.Migrations
 {
     [DbContext(typeof(NewsByTheMoodDbContext))]
-    [Migration("20250302204122_init")]
+    [Migration("20250308124744_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -24,6 +24,21 @@ namespace NewsByTheMood.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("ArticleTag", b =>
+                {
+                    b.Property<long>("ArticlesId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("TagsId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("ArticlesId", "TagsId");
+
+                    b.HasIndex("TagsId");
+
+                    b.ToTable("ArticleTag");
+                });
 
             modelBuilder.Entity("NewsByTheMood.Data.Entities.Article", b =>
                 {
@@ -64,29 +79,6 @@ namespace NewsByTheMood.Data.Migrations
                     b.HasIndex("SourceId");
 
                     b.ToTable("Articles");
-                });
-
-            modelBuilder.Entity("NewsByTheMood.Data.Entities.ArticleTag", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("ArticleId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("TagId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ArticleId");
-
-                    b.HasIndex("TagId");
-
-                    b.ToTable("ArticleTags");
                 });
 
             modelBuilder.Entity("NewsByTheMood.Data.Entities.Comment", b =>
@@ -183,6 +175,9 @@ namespace NewsByTheMood.Data.Migrations
                     b.Property<int>("ElementLoadTimeout")
                         .HasColumnType("int");
 
+                    b.Property<bool>("HasDynamicPage")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsRandomPeriod")
                         .HasColumnType("bit");
 
@@ -238,6 +233,9 @@ namespace NewsByTheMood.Data.Migrations
                         .HasColumnType("bigint");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("IconCssClass")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -295,27 +293,34 @@ namespace NewsByTheMood.Data.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("NewsByTheMood.Data.Entities.UserTopic", b =>
+            modelBuilder.Entity("TopicUser", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<long>("TopicsId")
                         .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("TopicId")
+                    b.Property<long>("UsersId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
+                    b.HasKey("TopicsId", "UsersId");
 
-                    b.HasKey("Id");
+                    b.HasIndex("UsersId");
 
-                    b.HasIndex("TopicId");
+                    b.ToTable("TopicUser");
+                });
 
-                    b.HasIndex("UserId");
+            modelBuilder.Entity("ArticleTag", b =>
+                {
+                    b.HasOne("NewsByTheMood.Data.Entities.Article", null)
+                        .WithMany()
+                        .HasForeignKey("ArticlesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.ToTable("UserTopics");
+                    b.HasOne("NewsByTheMood.Data.Entities.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("NewsByTheMood.Data.Entities.Article", b =>
@@ -327,25 +332,6 @@ namespace NewsByTheMood.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Source");
-                });
-
-            modelBuilder.Entity("NewsByTheMood.Data.Entities.ArticleTag", b =>
-                {
-                    b.HasOne("NewsByTheMood.Data.Entities.Article", "Article")
-                        .WithMany("ArticleTags")
-                        .HasForeignKey("ArticleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("NewsByTheMood.Data.Entities.Tag", "Tag")
-                        .WithMany("ArticleTags")
-                        .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Article");
-
-                    b.Navigation("Tag");
                 });
 
             modelBuilder.Entity("NewsByTheMood.Data.Entities.Comment", b =>
@@ -389,29 +375,23 @@ namespace NewsByTheMood.Data.Migrations
                     b.Navigation("Right");
                 });
 
-            modelBuilder.Entity("NewsByTheMood.Data.Entities.UserTopic", b =>
+            modelBuilder.Entity("TopicUser", b =>
                 {
-                    b.HasOne("NewsByTheMood.Data.Entities.Topic", "Topic")
-                        .WithMany("UserTopics")
-                        .HasForeignKey("TopicId")
+                    b.HasOne("NewsByTheMood.Data.Entities.Topic", null)
+                        .WithMany()
+                        .HasForeignKey("TopicsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NewsByTheMood.Data.Entities.User", "User")
-                        .WithMany("UserTopics")
-                        .HasForeignKey("UserId")
+                    b.HasOne("NewsByTheMood.Data.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Topic");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("NewsByTheMood.Data.Entities.Article", b =>
                 {
-                    b.Navigation("ArticleTags");
-
                     b.Navigation("Comments");
                 });
 
@@ -425,23 +405,14 @@ namespace NewsByTheMood.Data.Migrations
                     b.Navigation("Articles");
                 });
 
-            modelBuilder.Entity("NewsByTheMood.Data.Entities.Tag", b =>
-                {
-                    b.Navigation("ArticleTags");
-                });
-
             modelBuilder.Entity("NewsByTheMood.Data.Entities.Topic", b =>
                 {
                     b.Navigation("Sources");
-
-                    b.Navigation("UserTopics");
                 });
 
             modelBuilder.Entity("NewsByTheMood.Data.Entities.User", b =>
                 {
                     b.Navigation("Comments");
-
-                    b.Navigation("UserTopics");
                 });
 #pragma warning restore 612, 618
         }

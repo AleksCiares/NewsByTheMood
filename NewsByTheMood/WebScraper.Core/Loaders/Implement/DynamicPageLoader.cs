@@ -2,6 +2,7 @@
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using WebScraper.Core.Loaders.Abstract;
+using WebScraper.Core.Settings;
 
 namespace WebScraper.Core.Loaders.Implement
 {
@@ -9,22 +10,8 @@ namespace WebScraper.Core.Loaders.Implement
     {
         private bool _disposed = false;
         private readonly IWebDriver _webDriver;
-        /*private readonly string jsScrollScript = @"
-        const scrolls = 1
-        let scrollCount = 0
-
-        // scroll down and then wait for 0.5s
-        const scrollInterval = setInterval(() => {
-        window.scrollTo(0, document.body.scrollHeight)
-        scrollCount++
-
-          if (scrollCount === numScrolls) {
-              clearInterval(scrollInterval)
-          }
-        }, 500)
-        ";*/
-        private readonly string _jsScrollScript = @"window.scrollBy(0, 50)";
         private readonly WebLoaderSettings _settings;
+        private readonly string _jsScrollScript = @"window.scrollBy(0, 50)";
 
         public DynamicPageLoader(WebLoaderSettings settings)
         {
@@ -32,7 +19,7 @@ namespace WebScraper.Core.Loaders.Implement
             NetworkAuthenticationHandler? proxyAuthHandler = null;
 
             var options = new ChromeOptions();
-            options.AddArgument("--headless");
+            //options.AddArgument("--headless");
             options.AddArgument($"--user-agent={this._settings.UserAgent}");
             options.AcceptInsecureCertificates = this._settings.AcceptInsecureCertificates;
             options.PageLoadStrategy = PageLoadStrategy.Normal;
@@ -92,7 +79,7 @@ namespace WebScraper.Core.Loaders.Implement
             ((IJavaScriptExecutor)this._webDriver).ExecuteScript(this._jsScrollScript);
             var wait = new WebDriverWait(this._webDriver, this._settings.ElementLoadTimeout);
             var controlledElement = wait.Until(
-                c => c.FindElement(By.CssSelector(this._settings.ElemCssSelectorPageLoaded)));
+                c => c.FindElement(By.CssSelector(this._settings.PageElementLoaded)));
                   
             return this._webDriver.PageSource;
         }

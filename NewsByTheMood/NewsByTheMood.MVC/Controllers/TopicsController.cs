@@ -146,10 +146,6 @@ namespace NewsByTheMood.MVC.Controllers
         private async Task<bool> IsSameNameExistsAsync(string id, string sourceName)
         {
             var topicEntity = await this._topicService.GetByIdAsync(Int64.Parse(id));
-            /*            if (sourceEntity == null)
-                        {
-                            return null;
-                        }*/
             if (await this._topicService.IsExistsAsync(sourceName) && !sourceName.Equals(topicEntity.Name))
             {
                 ModelState.AddModelError("Topic.Name", "A topic with the same name already exists");

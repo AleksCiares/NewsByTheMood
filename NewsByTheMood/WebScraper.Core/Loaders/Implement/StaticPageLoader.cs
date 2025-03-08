@@ -1,22 +1,42 @@
 ﻿using WebScraper.Core.Loaders.Abstract;
+using WebScraper.Core.Settings;
 
 namespace WebScraper.Core.Loaders.Implement
 {
 
     public class StaticPageLoader : IWebLoader
     {
+        private bool _disposed = false;
         private readonly HttpClient _httpClient;
-        private readonly WebLoaderSettings _webLoaderSettings;  
+        private readonly WebLoaderSettings _settings;  
 
-        public StaticPageLoader(HttpClient httpClient, WebLoaderSettings webLoaderSettings)
+        public StaticPageLoader(WebLoaderSettings webLoaderSettings)
         {
-            this._httpClient = httpClient;
-            this._webLoaderSettings = webLoaderSettings;
+            this._httpClient = new HttpClient();
+            this._settings = webLoaderSettings;
+        }
+
+        ~StaticPageLoader()
+        {
+            this.Dispose(false);
         }
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this._disposed)
+            {
+                if (disposing)
+                {
+                    this._httpClient.Dispose();
+                }
+                this._disposed = true;
+            }
         }
 
         public async Task<string> LoadPageAsync(string url)
@@ -24,14 +44,8 @@ namespace WebScraper.Core.Loaders.Implement
 
             this._httpClient.BaseAddress = new Uri(url);
             var response = await this._httpClient.GetAsync(url);
-            if (response.IsSuccessStatusCode)
-            {
-                return await response.Content.ReadAsStringAsync();
-            }
-            else
-            {
-                throw new Exception("Failed to load page");
-            }
+
+            return await response.Content.ReadAsStringAsync();
         }
     }
 }

@@ -5,9 +5,9 @@ namespace NewsByTheMood.MVC.Components
 {
     public class TopicsIconsViewComponent : ViewComponent
     {
-        private readonly IiconsService _iconsService;
+        private readonly IiconService _iconsService;
 
-        public TopicsIconsViewComponent(IiconsService iconsService)
+        public TopicsIconsViewComponent(IiconService iconsService)
         {
             _iconsService = iconsService;
         }

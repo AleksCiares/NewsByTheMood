@@ -1,12 +1,13 @@
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using NewsByTheMood.Data;
 using NewsByTheMood.MVC.Options;
+using NewsByTheMood.Services.DataLoadProvider.Abstract;
+using NewsByTheMood.Services.DataLoadProvider.Implement;
 using NewsByTheMood.Services.DataProvider.Abstract;
 using NewsByTheMood.Services.DataProvider.Implement;
 using NewsByTheMood.Services.FileProvider.Abstract;
 using NewsByTheMood.Services.FileProvider.Implement;
+using NewsByTheMood.Services.Options;
 
 namespace NewsByTheMood.MVC
 {
@@ -21,11 +22,11 @@ namespace NewsByTheMood.MVC
 
             // Db provider service
             builder.Services.AddDbContext<NewsByTheMoodDbContext>(
-                opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default1")));
+                opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
             // Configuration
-            builder.Services.Configure<SpoofOptions>(
-                builder.Configuration.GetSection(SpoofOptions.Position));
+            /*builder.Services.Configure<SpoofOptions>(
+                builder.Configuration.GetSection(SpoofOptions.Position));*/
 
 
             // Data provider services
@@ -35,6 +36,8 @@ namespace NewsByTheMood.MVC
             builder.Services.AddScoped<ICommentService, CommentService>();
             // Source service
             builder.Services.AddScoped<ISourceService, SourceService>();
+            // Tag service
+            builder.Services.AddScoped<ITagService, TagService>();
             // Topic service
             builder.Services.AddScoped<ITopicService, TopicService>();
             // User service
@@ -46,12 +49,18 @@ namespace NewsByTheMood.MVC
             {
                 builder.Services.Configure<UserIconsOptions>(
                     builder.Configuration.GetSection(UserIconsOptions.Position));
-                builder.Services.AddSingleton<IiconsService, LocalIconsService>();
+                builder.Services.AddSingleton<IiconService, LocalIconService>();
             }
             else
             {
-                builder.Services.AddSingleton<IiconsService, EmptyIconsService>();
+                builder.Services.AddSingleton<IiconService, EmptyIconService>();
             }
+
+            // Data load provider services
+            builder.Services.Configure<WebScrapeOptions>(
+                builder.Configuration.GetSection(WebScrapeOptions.Position));
+            // Article load service
+            builder.Services.AddScoped<IArticleLoadService, ArticleLoadService>();
 
             var app = builder.Build();
 

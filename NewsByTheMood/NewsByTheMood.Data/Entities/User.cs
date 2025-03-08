@@ -20,7 +20,7 @@
         // nav property
         public List<Comment> Comments { get; set; }
         // nav property
-        public List<UserTopic> UserTopics { get; set; }
+        public List<Topic> Topics { get; set; }
 
     }
 }

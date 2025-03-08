@@ -8,6 +8,7 @@
         public string Url { get; set; }
         public int SurveyPeriod { get; set; }
         public bool IsRandomPeriod { get; set; }
+        public bool HasDynamicPage { get; set; }
         public bool AcceptInsecureCerts { get; set; }
         public string PageElementLoaded { get; set; }
         public int PageLoadTimeout { get; set; }

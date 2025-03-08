@@ -16,15 +16,18 @@
             @foreach (var sourcePreview in Model.SourcePreviews)
             {
             <div class="source-preview row justify-content-start align-items-center mb-3">
-                    <div class="col-auto">@sourcePreview.Name</div>
-                    <div class="col-auto">@sourcePreview.Topic</div>
-                    <div class="col-auto">
-                        <span>related articles </span>
-                        <span class="badge bg-primary rounded-pill">@sourcePreview.ArticleAmmount</span>
-                    </div>
-                    <div class="col-auto">
-                        <a asp-controller="sources" asp-action="edit" asp-route-id="@sourcePreview.Id" class="btn btn-primary">Edit</a>
-                    </div>
+                <div class="col-auto">@sourcePreview.Name</div>
+                <div class="col-auto">@sourcePreview.Topic</div>
+                <div class="col-auto">
+                    <span>related articles </span>
+                    <span class="badge bg-primary rounded-pill">@sourcePreview.ArticleAmmount</span>
+                </div>
+                <div class="col-auto">
+                    <a asp-controller="sources" asp-action="edit" asp-route-id="@sourcePreview.Id" class="btn btn-primary">Edit</a>
+                </div>
+                <div class="col-auto">
+                    <a asp-controller="loadarticles" asp-action="load" asp-route-id="@sourcePreview.Id" class="btn btn-primary">Load articles</a>
+                </div>
             </div>
             }
         </div>

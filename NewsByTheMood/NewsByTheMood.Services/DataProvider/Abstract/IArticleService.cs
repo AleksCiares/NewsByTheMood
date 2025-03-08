@@ -25,5 +25,7 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
 
         // Is exist article with current url
         public Task<bool> IsExistByUrl(string articleUrl);
+
+        public Task AddAsync(Article article);
     }
 }
