@@ -61,10 +61,10 @@ namespace NewsByTheMood.MVC.Controllers
         }
 
         // Get range of articles privew by topic
-        [HttpGet("{Controller}/{Action}/{topic:required:alpha}")]
-        public async Task<IActionResult> Topic([FromRoute]string topic, [FromQuery]PaginationModel pagination)
+        [HttpGet("{Controller}/{Action}/{id:required}")]
+        public async Task<IActionResult> Topic([FromRoute]string id, [FromQuery]PaginationModel pagination)
         {
-            var totalArticles = await this._articleService.CountByTopicAsync(this._defaultPositivity, Int64.Parse(topic));
+            var totalArticles = await this._articleService.CountByTopicAsync(this._defaultPositivity, Int64.Parse(id));
             var articles = Array.Empty<ArticlePreviewModel>();
 
             if (totalArticles > 0)
@@ -73,7 +73,7 @@ namespace NewsByTheMood.MVC.Controllers
                     pagination.Page,
                     pagination.PageSize,
                     this._defaultPositivity,
-                    Int64.Parse(topic))) // replaced with mapper
+                    Int64.Parse(id))) // replaced with mapper
                     .Select(a => new ArticlePreviewModel()
                     {
                         Id = a.Id.ToString(),
@@ -97,7 +97,7 @@ namespace NewsByTheMood.MVC.Controllers
                     PageSize = pagination.PageSize,
                     TotalItems = totalArticles,
                 },
-                PageTitle = totalArticles > 0 ? topic : "",
+                PageTitle = totalArticles > 0 ? articles[0].TopicName : "",
             });
         }
 

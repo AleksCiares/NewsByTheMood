@@ -5,9 +5,16 @@
 </head>
 <body>
     <partial name="~/Views/Shared/PartialViews/_HeaderPartial.cshtml" />
-    <main role="main" class="pb-3">
-        <div class="container">
-            @RenderBody()
+    <main role="main">
+        <div class="container-fluid">
+            <div class="row flex-nowrap">
+                <div class="aside-bar col-auto px-sm-2 px-0">
+                    @await Component.InvokeAsync("TopicsNavBar")
+                </div>
+                <div class="col mb-4">
+                    @RenderBody()
+                </div>
+            </div>
         </div>
     </main>
     <footer class="border-top footer text-muted">

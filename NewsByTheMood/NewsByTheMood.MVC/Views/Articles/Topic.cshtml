@@ -2,14 +2,17 @@
 @{
     ViewData["PageTitle"] = Model.PageTitle;
 }
-@await Component.InvokeAsync("TopicsNavBar")
-<div class="articles">
-    <div class="articles_topic">
-        <h3>
-            @Model.PageTitle
-        </h3>
-    </div>
-    <partial name="~/Views/Shared/PartialViews/_ArticlesPreviewPartial.cshtml" model="@Model.ArticlePreviews" />
-</div>
-<pagination page-action="topic" page-info="@Model.PageInfo"></pagination>
 
+<div class="articles container">
+	<div class="articles__list row justify-content-center row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 mb-4">
+		<partial name="~/Views/Shared/PartialViews/_ArticlesPreviewPartial.cshtml" model="@Model.ArticlePreviews" />
+	</div>
+	@if (Model.PageInfo.TotalPages > 1)
+	{
+		<div class="articles__pagination row align-items-center justify-content-center mb-4">
+			<div class="col-auto">
+				<pagination page-action="index" page-info="@Model.PageInfo"></pagination>
+			</div>
+		</div>
+	}
+</div>

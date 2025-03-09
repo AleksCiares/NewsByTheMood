@@ -1,13 +1,17 @@
 ﻿@model NewsByTheMood.MVC.Models.TopicModel[]
 
-<div class="navbar_topics">
-	<ul>
-		@foreach (var topic in Model)
-		{
-			<li>
-				<a asp-controller="articles" asp-action="topic" asp-route-id="@topic.Id">@topic.Name</a>
-			</li>
-		}
-	</ul>
+<div class="topics-navbar d-flex flex-column align-items-center align-items-sm-start px-3 text-white">
+    <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+        @foreach (var topic in Model)
+        {
+        <li class="nav-item">
+                <a asp-controller="articles" asp-action="topic" asp-route-id="@topic.Id" class="nav-link px-0 align-middle">
+                    <i class="fs-4 @topic.IconCssClass"></i> <span class="ms-1 d-none d-sm-inline">
+                        @topic.Name
+                    </span>
+                </a>
+        </li>
+        }
+    </ul>
 </div>
 

@@ -2,7 +2,10 @@
 @{
     ViewData["PageTitle"] = "Home";
 }
-<div class="Home">
-    <partial name="~/Views/Shared/PartialViews/_ArticlesPreviewPartial.cshtml" model="@Model" />
+
+<div class="articles container">
+	<div class="articles__list row justify-content-center row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 mb-4">
+		<partial name="~/Views/Shared/PartialViews/_ArticlesPreviewPartial.cshtml" model="@Model" />
+	</div>
 </div>
 
