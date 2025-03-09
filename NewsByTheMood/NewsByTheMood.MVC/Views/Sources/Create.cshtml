@@ -152,8 +152,8 @@
 						<input asp-for="@Model.Source.ArticleBodyItemPath" type="text" class="form-control" placeholder="@nameof(Model.Source.ArticleBodyItemPath)" />
 						<label asp-for="@Model.Source.ArticleBodyItemPath" class="form-label">@nameof(Model.Source.ArticleBodyItemPath)</label>
 						<div class="field-tip form-text text-muted">
-							Сss path to the html element(s) that stores the main content of the article,
-							the path relative to the article body container <strong>@nameof(Model.Source.ArticleBodyCollectionsPath)</strong>
+							Сss path to the html element(s) that stores the main content of the article, which will be extracted along with the html.
+							The path relative to the article body container <strong>@nameof(Model.Source.ArticleBodyCollectionsPath)</strong>
 						</div>
 						<span asp-validation-for="@Model.Source.ArticleBodyItemPath" class="error-feedback invalid-feedback"></span>
 					</div>

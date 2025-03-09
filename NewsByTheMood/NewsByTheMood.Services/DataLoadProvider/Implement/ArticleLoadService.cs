@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
+﻿using AngleSharp.Dom;
+using Microsoft.Extensions.Options;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.DataLoadProvider.Abstract;
 using NewsByTheMood.Services.DataProvider.Abstract;
@@ -26,47 +26,16 @@ namespace NewsByTheMood.Services.DataLoadProvider.Implement
 
         public async Task LoadArticles(Source source)
         {
-            var rnd = new Random();
-
-            var userAgent = _options.UserAgents[rnd.Next(0, _options.UserAgents.Length - 1)];
-            ProxySettings? proxy = null;
-            if (_options.UseProxies && _options.Proxies != null && _options.Proxies.Length > 0)
-            {
-                if (_options.UseIpRotation)
-                {
-                    proxy = _options.Proxies[rnd.Next(0, _options.Proxies.Length - 1)];
-                }
-                else
-                {
-                    proxy = _options.Proxies[0];
-                }
-            }
-
-            var loaderSettings = new WebLoaderSettings
-            {
-                UserAgent = userAgent,
-                ProxySettings = proxy,
-                AcceptInsecureCertificates = source.AcceptInsecureCerts,
-                PageElementLoaded = source.PageElementLoaded,
-                PageLoadTimeout = TimeSpan.FromSeconds(source.PageLoadTimeout),
-                ElementLoadTimeout = TimeSpan.FromSeconds(source.ElementLoadTimeout)
-            };
-            IArticleScrapeService scraper;
-            if (source.HasDynamicPage)
-            {
-                scraper = new DynamicArticleScrapeService(loaderSettings);
-            }
-            else
-            {
-                scraper = new StaticArticleScrapeService(loaderSettings);
-            }
+            var scraper = this.CreateScraper(source);
 
             var articlesUrls = await scraper.GetArticlesUrlsAsync(source);
-            foreach (var url in articlesUrls)
+            articlesUrls.Reverse();
+
+            for (var i = articlesUrls.Count - 1; i >= 0; i--)
             {
-                if (await _articleService.IsExistByUrl(url))
+                if (await _articleService.IsExistByUrl(articlesUrls[i]))
                 {
-                    articlesUrls.Remove(url);
+                    articlesUrls.RemoveAt(i);
                 }
             }
 
@@ -89,24 +58,57 @@ namespace NewsByTheMood.Services.DataLoadProvider.Implement
             }
         }
 
+        private IArticleScrapeService CreateScraper(Source source)
+        {
+            var rnd = new Random();
+            var userAgent = _options.UserAgents[rnd.Next(0, _options.UserAgents.Length - 1)];
+            ProxySettings? proxy = null;
+            if (_options.UseProxies && _options.Proxies != null && _options.Proxies.Length > 0)
+            {
+                if (_options.UseIpRotation)
+                {
+                    proxy = _options.Proxies[rnd.Next(0, _options.Proxies.Length - 1)];
+                }
+                else
+                {
+                    proxy = _options.Proxies[0];
+                }
+            }
+            var loaderSettings = new WebLoaderSettings
+            {
+                UserAgent = userAgent,
+                ProxySettings = proxy,
+                AcceptInsecureCertificates = source.AcceptInsecureCerts,
+                PageElementLoaded = source.PageElementLoaded,
+                PageLoadTimeout = TimeSpan.FromSeconds(source.PageLoadTimeout),
+                ElementLoadTimeout = TimeSpan.FromSeconds(source.ElementLoadTimeout)
+            };
+
+            IArticleScrapeService scraper;
+            if (source.HasDynamicPage)
+            {
+                scraper = new DynamicArticleScrapeService(loaderSettings);
+            }
+            else
+            {
+                scraper = new StaticArticleScrapeService(loaderSettings);
+            }
+
+            return scraper;
+        }
+
         private async Task<List<Tag>> SaveTagsAsync(string[] tags)
         {
             var tagsList = new List<Tag>();
             foreach (var tag in tags)
             {
-                var whiteSpaceLessTag = Regex.Replace(tag, @"\s+", "");
+                var whiteSpaceLessTag = Regex.Replace(tag, @"\s+", ""); // доделать чтобы не удалялиь пробелы между словами
                 if (!await _tagService.IsExistsAsync(whiteSpaceLessTag))
                 {
                     await _tagService.AddAsync(new Tag { Name = whiteSpaceLessTag });
                 }
 
                 tagsList.Add(new Tag { Name = whiteSpaceLessTag });
-
-                //var tagEntity = await _tagService.GetByName(whiteSpaceLessTag);
-                //if (tagEntity != null)
-                //{
-                //    tagsList.Add(tagEntity);
-                //}
             }
 
             return tagsList;

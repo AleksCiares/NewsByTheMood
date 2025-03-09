@@ -4,13 +4,13 @@ using WebScraper.Core.Parsers.Abstract;
 
 namespace WebScraper.Core.Parsers.Implement
 {
-    public class HtmlParser : IDocumentParser<IElement>
+    public class MyHtmlParser : IDocumentParser<IElement>
     {
         private bool _disposed = false;
         private readonly IBrowsingContext _context;
         private readonly IDocument _document;
 
-        public HtmlParser(string html) 
+        public MyHtmlParser(string html) 
         {
             var config = Configuration.Default.WithDefaultLoader().WithCss();
             this._context = BrowsingContext.New(config);
@@ -27,7 +27,7 @@ namespace WebScraper.Core.Parsers.Implement
             return this._document.QuerySelector(selector);
         }
 
-        ~HtmlParser()
+        ~MyHtmlParser()
         {
             this.Dispose(false);
         }

@@ -5,6 +5,8 @@ using WebScraper.Core.Parsers.Implement;
 using WebScraper.Core.Settings;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.WebScrapeProvider.Models;
+using AngleSharp;
+using AngleSharp.Html;
 
 
 namespace NewsByTheMood.Services.WebScrapeProvider.Abstract
@@ -12,10 +14,13 @@ namespace NewsByTheMood.Services.WebScrapeProvider.Abstract
     public abstract class BaseArticleScrapeService : IArticleScrapeService
     {
         protected readonly WebLoaderSettings _loadersettings;
+        private readonly IMarkupFormatter _htmlMarkupFormatter;
 
         public BaseArticleScrapeService(WebLoaderSettings loadersettings) 
         {
             this._loadersettings = loadersettings;
+            this._htmlMarkupFormatter = new PrettyMarkupFormatter();
+            //this._htmlMarkupFormatter = new MyMarkupFormatter();
         }
 
         public abstract Task<List<string>> GetArticlesUrlsAsync(Source source);
@@ -26,7 +31,7 @@ namespace NewsByTheMood.Services.WebScrapeProvider.Abstract
         {
             List<string> articleUrls = new List<string>();
 
-            using (IDocumentParser<IElement> documentParser = new HtmlParser(articleCollectionPage))
+            using (IDocumentParser<IElement> documentParser = new MyHtmlParser(articleCollectionPage))
             {
                 var articlesCollections = documentParser.SelectAllFromDocument(source.ArticleCollectionsPath);
 
@@ -56,7 +61,7 @@ namespace NewsByTheMood.Services.WebScrapeProvider.Abstract
         protected ArticleScrapeModel ParseArticle(Source source, string articlePage)
         {
             ArticleScrapeModel article = new ArticleScrapeModel();
-            using (IDocumentParser<IElement> documentParser = new HtmlParser(articlePage))
+            using (IDocumentParser<IElement> documentParser = new MyHtmlParser(articlePage))
             {
                 // article title
                 article.Title = documentParser.SelectFromDocument(source.ArticleTitlePath)?.TextContent ?? "No article title";
@@ -77,7 +82,7 @@ namespace NewsByTheMood.Services.WebScrapeProvider.Abstract
                 StringBuilder body = new StringBuilder();
                 foreach (var bodyElement in bodies)
                 {
-                    body.Append(bodyElement.InnerHtml);
+                    body.Append(bodyElement.ToHtml(this._htmlMarkupFormatter));
                 }
                 article.Body = body.ToString();
 
