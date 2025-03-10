@@ -11,7 +11,7 @@ namespace NewsByTheMood.MVC.Models
 
         // Number of displayed items on the page
         [Range(5, 20)]
-        public int PageSize { get; set; } = 10;
+        public int PageSize { get; set; } = 12;
 
         // Total number of items
         [Range(0, Int32.MaxValue)]

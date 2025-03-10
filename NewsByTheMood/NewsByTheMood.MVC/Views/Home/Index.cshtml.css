@@ -1,0 +1,17 @@
+﻿.articles__card {
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+    min-height: 20vh !important;
+}
+
+.articles__card {
+    box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.45);
+}
+
+.articles__positivity {
+    font-size: 1.5rem;
+}
+
+    .articles__positivity:hover {
+        cursor: pointer;
+    }

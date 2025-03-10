@@ -15,22 +15,19 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             this._dbContext = dbContext;
         }
 
-        public async Task<Article?> GetByIdAsync(Int64 id)
+        public async Task<int> CountAsync(short positivity)
         {
-            if(id <= 0) return null;
+            if (positivity < 0) return 0;
 
             return await this._dbContext.Articles
                 .AsNoTracking()
-                .Where(article => article.Id == id)
-                .Include(article => article.Source)
-                .ThenInclude(source => source.Topic)
-                .Include(article => article.Tags)
-                .SingleOrDefaultAsync();
+                .Where(article => article.Positivity >= positivity)
+                .CountAsync();
         }
 
-        public async Task<Article[]> GetRangePreviewAsync(int pageNumber, int pageSize, short positivity)
+        public async Task<Article[]> GetRangeLatestAsync(short positivity, int pageNumber, int pageSize)
         {
-            if (pageNumber <= 0 || pageSize <= 0 || positivity <= 0) 
+            if (positivity < 0 || pageNumber <= 0 || pageSize <= 0)
                 return Array.Empty<Article>();
 
             return await this._dbContext.Articles
@@ -44,7 +41,48 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .ToArrayAsync();
         }
 
-        public async Task<Article[]> GetRangePreviewAsync(int pageNumber, int pageSize, short positivity, int rating)
+        public async Task<int> CountByTopicAsync(short positivity, Int64 topicId)
+        {
+            if (positivity < 0 || topicId <= 0) return 0;
+
+            return await this._dbContext.Articles
+                .AsNoTracking()
+                .Where(article => article.Positivity >= positivity)
+                .Where(article => article.Source.TopicId == topicId)
+                .CountAsync();
+        }
+
+        public async Task<Article[]> GetRangeByTopicAsync(short positivity, Int64 topicId, int pageNumber, int pageSize)
+        {
+            if (positivity < 0 || topicId <= 0 || pageNumber <= 0 || pageSize <= 0)
+                return Array.Empty<Article>();
+
+            return await this._dbContext.Articles
+                .AsNoTracking()
+                .Where(article => article.Positivity >= positivity)
+                .Include(article => article.Source)
+                .ThenInclude(source => source.Topic)
+                .Where(article => article.Source.TopicId == topicId)
+                .OrderByDescending(a => a.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToArrayAsync();
+        }
+
+        public async Task<Article?> GetByIdAsync(Int64 id)
+        {
+            if(id <= 0) return null;
+
+            return await this._dbContext.Articles
+                .AsNoTracking()
+                .Where(article => article.Id == id)
+                .Include(article => article.Source)
+                .ThenInclude(source => source.Topic)
+                .Include(article => article.Tags)
+                .SingleOrDefaultAsync();
+        }
+
+        /*public async Task<Article[]> GetRangePreviewAsync(int pageNumber, int pageSize, short positivity, int rating)
         {
             if (pageNumber <= 0 || pageSize <= 0 || positivity <= 0)
                 return Array.Empty<Article>();
@@ -59,45 +97,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToArrayAsync();
-        }
-
-        public async Task<Article[]> GetRangePreviewByTopicAsync(int pageNumber, int pageSize, short positivity, Int64 topicId)
-        {
-            if (pageNumber <= 0 || pageSize <= 0 || positivity <= 0 || topicId <= 0) 
-                return Array.Empty<Article>();
-
-            return await this._dbContext.Articles
-                .AsNoTracking()
-                .Where(article => article.Positivity >= positivity)
-                .Include(article => article.Source)
-                .ThenInclude(source => source.Topic)
-                .Where(article => article.Source.TopicId == topicId)
-                .OrderByDescending(a => a.Id)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToArrayAsync();
-        }
-
-        public async Task<int> CountAsync(short positivity)
-        {
-            if(positivity <= 0) return 0;
-
-            return await this._dbContext.Articles
-                .AsNoTracking()
-                .Where(article => article.Positivity >= positivity)
-                .CountAsync();
-        }
-
-        public async Task<int> CountByTopicAsync(short positivity, Int64 topicId)
-        {
-            if (positivity <= 0 || topicId <= 0) return 0;
-
-            return await this._dbContext.Articles
-                .AsNoTracking()
-                .Where(article => article.Positivity >= positivity)
-                .Where(article => article.Source.TopicId == topicId)
-                .CountAsync();
-        }
+        }*/
 
         public async Task<bool> IsExistByUrl(string articleUrl)
         {

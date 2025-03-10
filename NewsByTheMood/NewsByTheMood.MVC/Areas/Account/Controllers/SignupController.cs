@@ -1,21 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
 
 
-namespace NewsByTheMood.MVC.Controllers
+namespace NewsByTheMood.MVC.Areas.Account.Controllers
 {
     // Registration controller
+    [Area("Account")]
     public class SignupController : Controller
     {
         private readonly IUserService _userService;
 
         public SignupController(IUserService userService)
         {
-            this._userService = userService;
+            _userService = userService;
         }
-        
+
         [HttpGet]
         public IActionResult Index()
         {
@@ -23,7 +23,7 @@ namespace NewsByTheMood.MVC.Controllers
         }
 
         [HttpPost]
-        public  IActionResult Index([FromForm]SignupModel signup)
+        public IActionResult Index([FromForm] SignupModel signup)
         {
             if (!ModelState.IsValid)
             {
@@ -37,16 +37,16 @@ namespace NewsByTheMood.MVC.Controllers
 
         // Check on existing username in db
         [HttpPost]
-        public async Task<IActionResult> CheckUserName(string username) 
+        public async Task<IActionResult> CheckUserName(string username)
         {
-            return Json(!await this._userService.IsUserNameExistsAsync(username));
+            return Json(!await _userService.IsUserNameExistsAsync(username));
         }
 
         // Check on existing email in db
         [HttpPost]
         public async Task<IActionResult> CheckEmail(string email)
         {
-            return Json(!await this._userService.IsUserNameExistsAsync(email));
+            return Json(!await _userService.IsUserNameExistsAsync(email));
         }
     }
 }

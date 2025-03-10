@@ -5,23 +5,16 @@
 </head>
 <body>
     <partial name="~/Views/Shared/PartialViews/_HeaderPartial.cshtml" />
-    <main role="main">
+    @await Component.InvokeAsync("TopicsNavBar")
+    <main role="main" class="mt-5">
         <div class="container-fluid">
             <div class="row flex-nowrap">
-                <div class="aside-bar col-auto px-sm-2 px-0">
-                    @await Component.InvokeAsync("TopicsNavBar")
-                </div>
-                <div class="col mb-4">
+                <div class="col">
                     @RenderBody()
                 </div>
             </div>
         </div>
     </main>
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - NewsByTheMood - <a asp-area="" asp-controller="home" asp-action="index">Home</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

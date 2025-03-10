@@ -4,7 +4,7 @@
 }
 
 <div class="topics container">
-	<div class="topic__header d-flex row mb-4">
+	<div class="topic__header d-flex row mb-5">
 		<h4 class="mb-0">Topics</h4>
 	</div>
 	<div class="topics__panel row align-items-start justify-content-start mb-4">
@@ -15,7 +15,7 @@
 	<div class="topics__list row row-cols-4 row-cols-sm-6 row-cols-md-8 row-cols-lg-10 mb-4">
 		@foreach (var topic in Model.Topics)
 		{
-			<div class="topics__preview col mb-4 rounded">
+			<div class="topics__preview col mb-3 rounded">
 				<div class="card text-center">
 					<div class="card-header">
 						@topic.Name

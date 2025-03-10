@@ -12,6 +12,7 @@ namespace NewsByTheMood.MVC.Models
         public required short Positivity { get; set; }
         public required int Rating { get; set; }
         public required string SourceName { get; set; }
+        public required string SourceUrl { get; set; }
         public required string TopicName { get; set; }
     }
 }

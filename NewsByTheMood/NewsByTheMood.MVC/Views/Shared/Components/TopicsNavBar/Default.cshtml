@@ -1,17 +1,27 @@
 ﻿@model NewsByTheMood.MVC.Models.TopicModel[]
 
-<div class="topics-navbar d-flex flex-column align-items-center align-items-sm-start px-3 text-white">
-    <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
-        @foreach (var topic in Model)
-        {
-        <li class="nav-item">
-                <a asp-controller="articles" asp-action="topic" asp-route-id="@topic.Id" class="nav-link px-0 align-middle">
-                    <i class="fs-4 @topic.IconCssClass"></i> <span class="ms-1 d-none d-sm-inline">
+<div class="position-fixed">
+    <div class="aside-bar d-flex flex-column justify-content-between align-items-start px-4">
+        <div>
+            @foreach (var topic in Model)
+            {
+                    <a asp-controller="home" asp-action="topic" asp-route-id="@topic.Id" class="nav-link">
+                    <i class="fs-4 @topic.IconCssClass"></i>
+                    <span class="ms-1 d-none d-xl-inline">
                         @topic.Name
                     </span>
                 </a>
-        </li>
-        }
-    </ul>
+            }
+        </div>
+        <div style="font-size: 10px;">
+            <a href="https://github.com/AleksCiares/NewsByTheMood" target="_blank" class="text-decoration-none d-flex ">
+                <img src="~/images/newsbythemood-logo.webp" style="width: 40px; height: 40px;" />
+                <div class="d-flex flex-column">
+                    <div class="d-none d-xl-inline">&copy; 2025</div>
+                    <div class="d-none d-xl-inline">NewsByTheMood</div>
+                </div>
+            </a>
+        </div>
+    </div>
 </div>
 

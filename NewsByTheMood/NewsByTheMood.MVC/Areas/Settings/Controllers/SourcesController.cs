@@ -4,9 +4,10 @@ using NewsByTheMood.Data.Entities;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
 
-namespace NewsByTheMood.MVC.Controllers
+namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 {
     // Source controller
+    [Area("Settings")]
     public class SourcesController : Controller
     {
         private readonly ISourceService _sourceService;
@@ -14,20 +15,20 @@ namespace NewsByTheMood.MVC.Controllers
 
         public SourcesController(ISourceService sourceService, ITopicService topicService)
         {
-            this._sourceService = sourceService;
-            this._topicService = topicService;
+            _sourceService = sourceService;
+            _topicService = topicService;
         }
 
         // Get range of sources previews
         [HttpGet]
-        public async Task<IActionResult> Index([FromQuery]PaginationModel pagination)
+        public async Task<IActionResult> Index([FromQuery] PaginationModel pagination)
         {
-            var totalSources = await this._sourceService.CountAsync();
+            var totalSources = await _sourceService.CountAsync();
             var sources = Array.Empty<SourcePreviewModel>();
 
             if (totalSources > 0)
             {
-                sources = (await this._sourceService.GetPreviewRangeAsync(
+                sources = (await _sourceService.GetPreviewRangeAsync(
                     pagination.Page,
                     pagination.PageSize))
                     .Select(source => new SourcePreviewModel()
@@ -58,22 +59,22 @@ namespace NewsByTheMood.MVC.Controllers
         public async Task<IActionResult> Create()
         {
             return View(new SourceCreateModel()
-            { 
-                Topics = await this.GetTopicsAsync(),
+            {
+                Topics = await GetTopicsAsync(),
             });
         }
 
         // Create source item proccessing
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm]SourceCreateModel sourceCreate)
+        public async Task<IActionResult> Create([FromForm] SourceCreateModel sourceCreate)
         {
-            if (!ModelState.IsValid || await this.IsSameNameExistsAsync(sourceCreate.Source.Name))
+            if (!ModelState.IsValid || await IsSameNameExistsAsync(sourceCreate.Source.Name))
             {
-                sourceCreate.Topics = await this.GetTopicsAsync();
-                return View(sourceCreate);  
+                sourceCreate.Topics = await GetTopicsAsync();
+                return View(sourceCreate);
             }
 
-            await this._sourceService.AddAsync(new Source()
+            await _sourceService.AddAsync(new Source()
             {
                 Name = sourceCreate.Source.Name,
                 Url = sourceCreate.Source.Url,
@@ -93,7 +94,7 @@ namespace NewsByTheMood.MVC.Controllers
                 ArticleBodyItemPath = sourceCreate.Source.ArticleBodyItemPath,
                 ArticlePdatePath = sourceCreate.Source.ArticlePdatePath,
                 ArticleTagPath = sourceCreate.Source.ArticleTagPath,
-                TopicId = Int64.Parse(sourceCreate.Source.TopicId),
+                TopicId = long.Parse(sourceCreate.Source.TopicId),
             });
 
             return RedirectToAction("Index");
@@ -102,9 +103,9 @@ namespace NewsByTheMood.MVC.Controllers
 
         // Edit source item
         [HttpGet("{Controller}/{Action}/{id:required}")]
-        public async Task<IActionResult> Edit([FromRoute]string id)
+        public async Task<IActionResult> Edit([FromRoute] string id)
         {
-            var sourceEntity = await this._sourceService.GetByIdAsync(Int64.Parse(id));
+            var sourceEntity = await _sourceService.GetByIdAsync(long.Parse(id));
             if (sourceEntity == null)
             {
                 return BadRequest();
@@ -133,33 +134,33 @@ namespace NewsByTheMood.MVC.Controllers
                 ArticleTagPath = sourceEntity.ArticleTagPath,
                 TopicId = sourceEntity.TopicId.ToString(),
             };
-            var topics = await this.GetTopicsAsync();
-            var relatedArticles = await this.GetRelatedArticles();  
+            var topics = await GetTopicsAsync();
+            var relatedArticles = await GetRelatedArticles();
 
 
             return View(new SourceEditModel()
             {
-               Source = source,
-               Topics = topics,
-               RelatedArticles = relatedArticles,
+                Source = source,
+                Topics = topics,
+                RelatedArticles = relatedArticles,
             });
         }
 
         // Edit source item proccessing
         [HttpPost("{Controller}/{Action}/{id:required}")]
-        public async Task<IActionResult> Edit([FromRoute]string id, [FromForm]SourceEditModel sourceEdit)
+        public async Task<IActionResult> Edit([FromRoute] string id, [FromForm] SourceEditModel sourceEdit)
         {
             sourceEdit.Source.Id = id;
-            if (!ModelState.IsValid || await this.IsSameNameExistsAsync(sourceEdit.Source.Id, sourceEdit.Source.Name))
+            if (!ModelState.IsValid || await IsSameNameExistsAsync(sourceEdit.Source.Id, sourceEdit.Source.Name))
             {
-                sourceEdit.Topics = await this.GetTopicsAsync();
-                sourceEdit.RelatedArticles = await this.GetRelatedArticles();
+                sourceEdit.Topics = await GetTopicsAsync();
+                sourceEdit.RelatedArticles = await GetRelatedArticles();
                 return View(sourceEdit);
             }
 
-            await this._sourceService.UpdateAsync(new Source()
+            await _sourceService.UpdateAsync(new Source()
             {
-                Id = Int64.Parse(id),
+                Id = long.Parse(id),
                 Name = sourceEdit.Source.Name,
                 Url = sourceEdit.Source.Url,
                 SurveyPeriod = sourceEdit.Source.SurveyPeriod,
@@ -178,7 +179,7 @@ namespace NewsByTheMood.MVC.Controllers
                 ArticleBodyItemPath = sourceEdit.Source.ArticleBodyItemPath,
                 ArticlePdatePath = sourceEdit.Source.ArticlePdatePath,
                 ArticleTagPath = sourceEdit.Source.ArticleTagPath,
-                TopicId = Int64.Parse(sourceEdit.Source.TopicId),
+                TopicId = long.Parse(sourceEdit.Source.TopicId),
             });
 
             return RedirectToAction("Index");
@@ -186,20 +187,20 @@ namespace NewsByTheMood.MVC.Controllers
 
         // Delete source utem
         [HttpPost("{Controller}/{Action}/{id:required}")]
-        public async Task<IActionResult> Delete([FromRoute]string id, [FromForm]SourceEditModel sourceEdit)
+        public async Task<IActionResult> Delete([FromRoute] string id, [FromForm] SourceEditModel sourceEdit)
         {
             sourceEdit.Source.Id = id;
-            if ((await this.GetRelatedArticles()).Length > 0)
+            if ((await GetRelatedArticles()).Length > 0)
             {
-                sourceEdit.Topics = await this.GetTopicsAsync();
-                sourceEdit.RelatedArticles = await this.GetRelatedArticles();
+                sourceEdit.Topics = await GetTopicsAsync();
+                sourceEdit.RelatedArticles = await GetRelatedArticles();
                 ModelState.AddModelError("Source.Name", "The source has related articles, you cannot delete it");
                 return View("Edit", sourceEdit);
             }
 
-            await this._sourceService.DeleteAsync(new Source()
+            await _sourceService.DeleteAsync(new Source()
             {
-                Id = Int64.Parse(sourceEdit.Source.Id)
+                Id = long.Parse(sourceEdit.Source.Id)
             });
 
             return RedirectToAction("Index");
@@ -208,7 +209,7 @@ namespace NewsByTheMood.MVC.Controllers
         [NonAction]
         private async Task<List<SelectListItem>> GetTopicsAsync()
         {
-            var topicEntities = (await this._topicService.GetAllAsync())
+            var topicEntities = (await _topicService.GetAllAsync())
                 .Select(topic => new TopicModel()
                 {
                     Id = topic.Id.ToString(),
@@ -258,12 +259,12 @@ namespace NewsByTheMood.MVC.Controllers
         [NonAction]
         private async Task<bool> IsSameNameExistsAsync(string id, string sourceName)
         {
-            var sourceEntity = await this._sourceService.GetByIdAsync(Int64.Parse(id));
-/*            if (sourceEntity == null)
-            {
-                return null;
-            }*/
-            if (await this._sourceService.IsExistsAsync(sourceName) && !sourceName.Equals(sourceEntity.Name))
+            var sourceEntity = await _sourceService.GetByIdAsync(long.Parse(id));
+            /*            if (sourceEntity == null)
+                        {
+                            return null;
+                        }*/
+            if (await _sourceService.IsExistsAsync(sourceName) && !sourceName.Equals(sourceEntity.Name))
             {
                 ModelState.AddModelError("Source.Name", "A source with the same name already exists");
                 return true;
@@ -275,7 +276,7 @@ namespace NewsByTheMood.MVC.Controllers
         [NonAction]
         private async Task<bool> IsSameNameExistsAsync(string sourceName)
         {
-            if (await this._sourceService.IsExistsAsync(sourceName))
+            if (await _sourceService.IsExistsAsync(sourceName))
             {
                 ModelState.AddModelError("Source.Name", "A source with the same name already exists");
                 return true;
