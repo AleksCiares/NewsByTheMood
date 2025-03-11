@@ -50,7 +50,7 @@ namespace NewsByTheMood.Services.DataLoadProvider.Implement
                     PreviewImgUrl = article.PreviewImgUrl,
                     Body = article.Body,
                     PublishDate = this.TryParseDate(article.PublishDate),
-                    Positivity = 10,
+                    Positivity = 0,
                     Rating = 0,
                     SourceId = source.Id,
                     Tags = article.Tags != null ? await this.SaveTagsAsync(article.Tags) : new List<Tag>()
@@ -103,12 +103,22 @@ namespace NewsByTheMood.Services.DataLoadProvider.Implement
             foreach (var tag in tags)
             {
                 var whiteSpaceLessTag = Regex.Replace(tag, @"\s+", ""); // доделать чтобы не удалялиь пробелы между словами
-                if (!await _tagService.IsExistsAsync(whiteSpaceLessTag))
+
+                /*if (!await _tagService.IsExistsAsync(whiteSpaceLessTag))
                 {
                     await _tagService.AddAsync(new Tag { Name = whiteSpaceLessTag });
+                }*/
+                /*var tagEntity = await _tagService.GetByName(whiteSpaceLessTag);*/
+                Tag? tagEntity = null;
+                if (tagEntity == null)
+                {
+                    tagEntity = new Tag
+                    {
+                        Name = whiteSpaceLessTag
+                    };
                 }
 
-                tagsList.Add(new Tag { Name = whiteSpaceLessTag });
+                tagsList.Add(tagEntity);
             }
 
             return tagsList;

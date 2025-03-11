@@ -5,11 +5,11 @@ using NewsByTheMood.Services.DataProvider.Abstract;
 namespace NewsByTheMood.MVC.Components
 {
     // Dynamically articles topics nav bar 
-    public class TopicsNavBarViewComponent : ViewComponent
+    public class TopicsListViewComponent : ViewComponent
     {
         private readonly ITopicService _topicService;
 
-        public TopicsNavBarViewComponent(ITopicService topicService)
+        public TopicsListViewComponent(ITopicService topicService)
         {
             this._topicService = topicService;
         }

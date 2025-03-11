@@ -1,6 +1,7 @@
 :root {
-    --main-highlight-color: rebeccapurple;
     --main-text-color: rgb(34, 33, 33);
+    --secondary-text-color: white;
+    --main-highlight-color: rebeccapurple;
     --main-background-color: white;
 }
 
@@ -48,6 +49,9 @@ body {
 
 a {
     color: var(--main-text-color) !important;
+}
+a.btn {
+    color: var(--secondary-text-color) !important;
 }
 
 a:hover {

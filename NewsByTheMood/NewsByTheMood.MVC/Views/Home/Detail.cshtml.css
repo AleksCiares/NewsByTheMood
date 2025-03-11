@@ -1,0 +1,8 @@
+﻿.article .article__preview-img img {
+    height: auto;
+    max-width: 100%;
+}
+
+.article .article__tags div {
+    border-color: var(--main-highlight-color) !important;
+}

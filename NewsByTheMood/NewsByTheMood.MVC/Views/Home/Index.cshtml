@@ -21,7 +21,7 @@
                             </div>
                         </div>
                         <div class="w-100">
-                            <a asp-controller="home" asp-action="detail" asp-route-id="@articlePreview.Id" class="card-title text-decoration-none text-white mb-2">
+                            <a asp-area="" asp-controller="home" asp-action="detail" asp-route-id="@articlePreview.Id" class="card-title text-decoration-none text-white mb-2">
                                 <h5>
                                     @articlePreview.Title
                                 </h5>
@@ -81,6 +81,7 @@
         </div>
     }
 </div>
+
 
  
 @section Scripts

@@ -2,37 +2,41 @@
 @{
     ViewData["PageTitle"] = Model.Title;
 }
-@await Component.InvokeAsync("TopicsNavBar")
-<div class="article">
-    <div class="article_title">
-        <h5>@Model.Title</h5>
-    </div>
-    <div class="article_positivity">
-        <span>positivity: @Model.Positivity</span>
-    </div>
-    <div class="article_rating">
-        <span>rating: @Model.Rating</span>
-    </div>
-    <div class="article_topic">
-        <span>topic: @Model.TopicName</span>
-    </div>
-    <div class="article_pdate">
-        <span>@Model.PublishDate</span>
-    </div>
-    <div class="article_tags">
-        tags: 
-        @foreach (var tag in Model.ArticleTags)
-        {
-            <span>@tag</span>
-        }
-    </div>
-    <div class="article_body">
-        <div>@Model.Body</div>
-    </div>
-    <div class="article_source">
-        <a href="@Model.Url" target="_blank">@Model.SourceName</a>
+
+<div class="article container">
+    <div class="row justify-content-center align-content-start mb-4">
+        <div class="container col-8">
+            <div class="article__title row mb-3">
+                <h3>@Model.Title</h3>
+            </div>
+            @if (Model.PreviewImgUrl != null)
+            {
+                <div class="article__preview-img row rounded mb-3">
+                    <img src="@Model.PreviewImgUrl" alt="@Model.Title">
+                </div>
+            }
+            <div class="article__body row mb-3">
+                @Html.Raw(@Model.Body)
+            </div>
+            <div class="article__source row align-items-center justify-content-end mb-3">
+                <div class="col-auto">
+                    <a href="@Model.Url" target="_blank" class="text-decoration-none">@Model.SourceName</a>
+                </div>
+            </div>
+            <div class="article__tags row align-items-center justify-content-start mb-3">
+                @foreach (var tag in Model.ArticleTags)
+                {
+                    <div class="col-auto border rounded-3">@tag</div>
+                }
+            </div>
+        </div>
     </div>
 </div>
+
+@section Footer
+{
+    <partial name="~/Views/Shared/PartialViews/_FooterPartial.cshtml" />
+}
 
 
 

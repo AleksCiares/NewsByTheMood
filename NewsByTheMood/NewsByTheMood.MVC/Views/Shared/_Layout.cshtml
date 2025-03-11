@@ -5,16 +5,16 @@
 </head>
 <body>
     <partial name="~/Views/Shared/PartialViews/_HeaderPartial.cshtml" />
-    @await Component.InvokeAsync("TopicsNavBar")
-    <main role="main" class="mt-5">
+    <main role="main">
         <div class="container-fluid">
-            <div class="row flex-nowrap">
-                <div class="col">
+            <div class="row flex-nowrap align-items-start justify-content-center">
+                <div class="col-auto">
                     @RenderBody()
                 </div>
             </div>
         </div>
     </main>
+    @await RenderSectionAsync("Footer", required: false)
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

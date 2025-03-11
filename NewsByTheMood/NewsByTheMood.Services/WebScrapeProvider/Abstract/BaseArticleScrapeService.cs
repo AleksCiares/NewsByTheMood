@@ -7,6 +7,7 @@ using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.WebScrapeProvider.Models;
 using AngleSharp;
 using AngleSharp.Html;
+using System.Text.RegularExpressions;
 
 
 namespace NewsByTheMood.Services.WebScrapeProvider.Abstract
@@ -67,10 +68,7 @@ namespace NewsByTheMood.Services.WebScrapeProvider.Abstract
                 article.Title = documentParser.SelectFromDocument(source.ArticleTitlePath)?.TextContent ?? "No article title";
 
                 // article preview
-                if (source.ArticlePreviewImgPath != null)
-                {
-                    article.PreviewImgUrl = documentParser.SelectFromDocument(source.ArticlePreviewImgPath)?.GetAttribute("src");
-                }
+                article.PreviewImgUrl = GetArticlePreviewImage(documentParser, source);
 
                 // article body
                 var articleBodyCollections = documentParser.SelectAllFromDocument(source.ArticleBodyCollectionsPath);
@@ -104,10 +102,35 @@ namespace NewsByTheMood.Services.WebScrapeProvider.Abstract
                     }
                     article.Tags = tags.ToArray();
                 }
-
             }
 
             return article;
+        }
+
+        private string GetArticlePreviewImage(IDocumentParser<IElement> documentParser, Source source)
+        {
+            var imgSrc = String.Empty;
+
+            if (source.ArticlePreviewImgPath != null)
+            {
+                var src = documentParser.SelectFromDocument(source.ArticlePreviewImgPath)?.GetAttribute("src");
+                if (src == null)
+                {
+                    var imgStyle = documentParser.SelectFromDocument(source.ArticlePreviewImgPath)?.GetAttribute("style");
+                    if (imgStyle != null)
+                    {
+                        var regex = new Regex(@"(?<=(background-image:\surl\((""|'|\s))).+(?=((""|'|\s)\)))", RegexOptions.Compiled);
+                        var matches = regex.Matches(imgStyle);
+
+                        if (matches.Count > 0)
+                        {
+                            imgSrc = matches[0].Value;
+                        }
+                    }
+                }
+            }
+
+            return imgSrc;
         }
     }
 }

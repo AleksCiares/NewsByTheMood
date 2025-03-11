@@ -37,7 +37,7 @@ namespace NewsByTheMood.Services.FileProvider.Implement
                 await fstream.ReadAsync(buffer, 0, buffer.Length);
                 textFromFile = Encoding.Default.GetString(buffer);
 
-                var regex = new Regex(this._options.CssClassRegex);
+                var regex = new Regex(this._options.CssClassRegex, RegexOptions.Compiled);
                 var matches = regex.Matches(textFromFile);
 
                 if (matches.Count > 0)
