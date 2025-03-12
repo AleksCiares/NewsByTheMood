@@ -1,5 +1,8 @@
-﻿namespace NewsByTheMood.Data.Entities
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace NewsByTheMood.Data.Entities
 {
+    [Index(nameof(AccessLevel), IsUnique = true)]
     public class Right
     {
         // [Key]

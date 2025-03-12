@@ -5,8 +5,6 @@
         // [Key]
         public Int64 Id { get; set; }
         public string Text { get; set; }
-        // [IgnoreDataMember]
-        // [NotMapped]
         public int Position { get; set; }
         // FK
         public Int64 ArticleId { get; set; }

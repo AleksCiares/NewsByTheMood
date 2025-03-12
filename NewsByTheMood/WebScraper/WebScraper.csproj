@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace>WebScraper.Core</RootNamespace>
-    <AssemblyName>WebScraper.Core</AssemblyName>
+    <RootNamespace>WebScraper</RootNamespace>
+    <AssemblyName>WebScraper</AssemblyName>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>

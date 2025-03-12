@@ -2,22 +2,23 @@
 using AngleSharp.Dom;
 using WebScraper.Core.Parsers.Abstract;
 using WebScraper.Core.Parsers.Implement;
-using WebScraper.Core.Settings;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.WebScrapeProvider.Models;
 using AngleSharp;
 using AngleSharp.Html;
 using System.Text.RegularExpressions;
+using Azure;
+using WebScraper.Settings;
 
 
 namespace NewsByTheMood.Services.WebScrapeProvider.Abstract
 {
     public abstract class BaseArticleScrapeService : IArticleScrapeService
     {
-        protected readonly WebLoaderSettings _loadersettings;
+        protected readonly LoaderSettings _loadersettings;
         private readonly IMarkupFormatter _htmlMarkupFormatter;
 
-        public BaseArticleScrapeService(WebLoaderSettings loadersettings) 
+        public BaseArticleScrapeService(LoaderSettings loadersettings) 
         {
             this._loadersettings = loadersettings;
             this._htmlMarkupFormatter = new PrettyMarkupFormatter();
@@ -32,7 +33,7 @@ namespace NewsByTheMood.Services.WebScrapeProvider.Abstract
         {
             List<string> articleUrls = new List<string>();
 
-            using (IDocumentParser<IElement> documentParser = new MyHtmlParser(articleCollectionPage))
+            using (IDocumentParser<IElement> documentParser = new PrettyHtmlParser(articleCollectionPage))
             {
                 var articlesCollections = documentParser.SelectAllFromDocument(source.ArticleCollectionsPath);
 
@@ -62,7 +63,7 @@ namespace NewsByTheMood.Services.WebScrapeProvider.Abstract
         protected ArticleScrapeModel ParseArticle(Source source, string articlePage)
         {
             ArticleScrapeModel article = new ArticleScrapeModel();
-            using (IDocumentParser<IElement> documentParser = new MyHtmlParser(articlePage))
+            using (IDocumentParser<IElement> documentParser = new PrettyHtmlParser(articlePage))
             {
                 // article title
                 article.Title = documentParser.SelectFromDocument(source.ArticleTitlePath)?.TextContent ?? "No article title";
@@ -94,6 +95,8 @@ namespace NewsByTheMood.Services.WebScrapeProvider.Abstract
                 // article tags
                 if (source.ArticleTagPath != null)
                 {
+                    var whiteSpaceLessTag = Regex.Replace(tag, @"\s+", ""); // доделать чтобы не удалялиь пробелы между словами
+
                     List<string> tags = new List<string>();
                     var tagsElements = documentParser.SelectAllFromDocument(source.ArticleTagPath);
                     foreach (var tagElement in tagsElements)
@@ -133,4 +136,12 @@ namespace NewsByTheMood.Services.WebScrapeProvider.Abstract
             return imgSrc;
         }
     }
+}
+private DateTime? TryParseDate(string? publishDate)
+{
+    if (DateTime.TryParse(publishDate, out var date))
+    {
+        return date;
+    }
+    return null;
 }

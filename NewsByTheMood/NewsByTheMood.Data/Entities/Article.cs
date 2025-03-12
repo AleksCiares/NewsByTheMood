@@ -1,4 +1,6 @@
-﻿namespace NewsByTheMood.Data.Entities
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace NewsByTheMood.Data.Entities
 {
     public class Article
     {

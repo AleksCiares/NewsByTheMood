@@ -1,5 +1,9 @@
-﻿namespace NewsByTheMood.Data.Entities
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace NewsByTheMood.Data.Entities
 {
+    [Index(nameof(UserName), IsUnique = true)]
+    [Index(nameof(Email), IsUnique = true)]
     public class User
     {
         // [Key]
@@ -14,9 +18,9 @@
         public string AvatarUrl { get; set; }
         // FK
         public Int64 RightId { get; set; }
+
         // nav property
         public Right Right { get; set; }
-
         // nav property
         public List<Comment> Comments { get; set; }
         // nav property

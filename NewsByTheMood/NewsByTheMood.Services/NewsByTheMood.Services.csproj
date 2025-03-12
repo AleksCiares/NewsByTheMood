@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NewsByTheMood.Data\NewsByTheMood.Data.csproj" />
-    <ProjectReference Include="..\WebScraper.Core\WebScraper.Core.csproj" />
+    <ProjectReference Include="..\WebScraper\WebScraper.csproj" />
   </ItemGroup>
 
 </Project>

@@ -8,11 +8,14 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
         // Get source item by id
         public Task<Source?> GetByIdAsync(Int64 id);
 
-        // Get source preview range
-        public Task<Source[]> GetPreviewRangeAsync(int pageNumber, int pageSize);
+        // Get source range
+        public Task<Source[]> GetRangeAsync(int pageNumber, int pageSize);
 
         // Get source count 
         public Task<int> CountAsync();
+
+        // Check if source exist by name
+        public Task<bool> IsExistsByNameAsync(string sourceName);
 
         // Add source item
         public Task AddAsync(Source source);
@@ -22,12 +25,5 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
 
         // Delete source
         public Task DeleteAsync(Source source);
-
-        // Check if source exist by name
-        public Task<bool> IsExistsAsync(string sourceName);
-
-        // Get related articles
-        public Task<Article[]?> GetRelatedArticles(Int64 id);
-
     }
 }

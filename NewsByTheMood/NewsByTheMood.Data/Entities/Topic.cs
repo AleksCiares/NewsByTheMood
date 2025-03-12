@@ -1,5 +1,8 @@
-﻿namespace NewsByTheMood.Data.Entities
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace NewsByTheMood.Data.Entities
 {
+    [Index(nameof(Name), IsUnique = true)]
     public class Topic
     {
         // [Key]

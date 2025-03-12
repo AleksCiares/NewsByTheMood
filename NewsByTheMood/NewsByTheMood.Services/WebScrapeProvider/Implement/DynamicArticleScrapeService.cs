@@ -1,9 +1,9 @@
 ﻿using WebScraper.Core.Loaders.Abstract;
 using WebScraper.Core.Loaders.Implement;
-using WebScraper.Core.Settings;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.WebScrapeProvider.Abstract;
 using NewsByTheMood.Services.WebScrapeProvider.Models;
+using WebScraper.Settings;
 
 
 namespace NewsByTheMood.Services.WebScrapeProvider.Implement
@@ -13,7 +13,7 @@ namespace NewsByTheMood.Services.WebScrapeProvider.Implement
     /// </summary>
     public class DynamicArticleScrapeService : BaseArticleScrapeService
     {
-        public DynamicArticleScrapeService(WebLoaderSettings loadersettings) : 
+        public DynamicArticleScrapeService(LoaderSettings loadersettings) : 
             base(loadersettings)
         {
         }
@@ -21,7 +21,7 @@ namespace NewsByTheMood.Services.WebScrapeProvider.Implement
         public async override Task<List<string>> GetArticlesUrlsAsync(Source source)
         {
             var page = "";
-            using (IWebLoader _webloader = new DynamicPageLoader(this._loadersettings))
+            using (ILoader _webloader = new DynamicPageLoader(this._loadersettings))
             {
                page = await _webloader.LoadPageAsync(source.Url);
             }
@@ -35,7 +35,7 @@ namespace NewsByTheMood.Services.WebScrapeProvider.Implement
             var page = "";
             foreach (var articleUrl in articlesUrls)
             {
-                using (IWebLoader _webloader = new DynamicPageLoader(this._loadersettings))
+                using (ILoader _webloader = new DynamicPageLoader(this._loadersettings))
                 {
                     page = await _webloader.LoadPageAsync(articleUrl);
                 }

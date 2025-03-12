@@ -6,10 +6,10 @@ using NewsByTheMood.Services.DataProvider.Abstract;
 
 namespace NewsByTheMood.Services.DataProvider.Implement
 {
-    // Service for provide Sources
     public class SourceService : ISourceService
     {
         private readonly NewsByTheMoodDbContext _dbContext;
+
         public SourceService(NewsByTheMoodDbContext dbContext)
         {
             this._dbContext = dbContext;
@@ -22,16 +22,44 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 return null;
             }
 
-            return await this._dbContext.Sources
+            var source = await _dbContext.Sources
+                .Where(source => source.Id == id)
+                .SingleOrDefaultAsync();
+            if (source != null)
+            {
+                var topicTask = _dbContext.Entry(source)
+                    .Reference(source => source.Topic)
+                    .LoadAsync();
+                var articlesTask = _dbContext.Entry(source)
+                    .Collection(source => source.Articles)
+                    .LoadAsync();
+
+                await Task.WhenAll(topicTask, articlesTask);
+
+                _dbContext.Entry(source)
+                    .State = EntityState.Detached;
+
+                return source;
+            }
+            else
+            {
+                return null;
+            }
+
+            /*return await this._dbContext.Sources
                 .AsNoTracking()
                 .Where(source => source.Id == id)
                 .Include(source => source.Topic)
-                .SingleOrDefaultAsync();
+                .Include(source => source.Articles)
+                .SingleOrDefaultAsync();*/
         }
 
-        public async Task<Source[]> GetPreviewRangeAsync(int pageNumber, int pageSize)
+        public async Task<Source[]> GetRangeAsync(int pageNumber, int pageSize)
         {
-            if(pageSize <= 0 || pageNumber <= 0) return Array.Empty<Source>();
+            if (pageSize <= 0 || pageNumber <= 0)
+            {
+                return Array.Empty<Source>();
+            }
 
             return await this._dbContext.Sources
                 .AsNoTracking()
@@ -50,7 +78,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .CountAsync();
         }
 
-        public async Task<bool> IsExistsAsync(string sourceName)
+        public async Task<bool> IsExistsByNameAsync(string sourceName)
         {
             if (sourceName.IsNullOrEmpty())
             {
@@ -79,28 +107,6 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         {
             this._dbContext.Sources.Remove(source);
             await this._dbContext.SaveChangesAsync();
-        }
-
-        public async Task<Article[]?> GetRelatedArticles(Int64 id)
-        {
-            if (id <= 0)
-            {
-                return null;
-            }
-
-            var source = await this._dbContext.Sources
-                .AsNoTracking()
-                .Where(source => source.Id == id)
-                .Include(source => source.Topic)
-                .Include(article => article.Articles)
-                .SingleOrDefaultAsync();
-
-            if (source == null)
-            {
-                return null;
-            }
-
-            return source.Articles.ToArray();
         }
     }
 }

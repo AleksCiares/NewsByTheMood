@@ -3,11 +3,6 @@ using Microsoft.IdentityModel.Tokens;
 using NewsByTheMood.Data;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.DataProvider.Abstract;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NewsByTheMood.Services.DataProvider.Implement
 {
@@ -17,39 +12,44 @@ namespace NewsByTheMood.Services.DataProvider.Implement
 
         public TagService(NewsByTheMoodDbContext dbContext)
         {
-            this._dbContext = dbContext;
+            _dbContext = dbContext;
         }
 
-        public async Task AddAsync(Tag tag)
-        {
-            await this._dbContext.Tags.AddAsync(tag);
-            await this._dbContext.SaveChangesAsync();
-        }
-
-        public Task<Tag?> GetByName(string tagName)
+        public async Task<Tag?> GetByNameAsync(string tagName)
         {
             if (tagName.IsNullOrEmpty())
             {
                 return null;
             }
 
-            return this._dbContext.Tags
+            return await _dbContext.Tags
                 .AsNoTracking()
-                .Where(tag => tag.Name == tagName)
+                .Where(tag => tag.Name.Equals(tagName))
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<bool> IsExistsAsync(string tagName)
+        public async Task<bool> IsExistsByNameAsync(string tagName)
         {
             if (string.IsNullOrEmpty(tagName))
             {
                 return false;
             }
 
-            return await this._dbContext.Tags
+            return await _dbContext.Tags
                 .AsNoTracking()
                 .Where(tag => tag.Name == tagName)
                 .AnyAsync();
+        }
+
+        public async Task<Tag> AddAsync(Tag tag)
+        {
+            await _dbContext.Tags.AddAsync(tag);
+            await _dbContext.SaveChangesAsync();
+
+            return await _dbContext.Tags
+                .AsNoTracking()
+                .Where(t => t.Name.Equals(tag.Name))
+                .SingleAsync();
         }
     }
 }

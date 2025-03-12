@@ -28,7 +28,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 
             if (totalSources > 0)
             {
-                sources = (await _sourceService.GetPreviewRangeAsync(
+                sources = (await _sourceService.GetRangeAsync(
                     pagination.Page,
                     pagination.PageSize))
                     .Select(source => new SourcePreviewModel()
@@ -264,7 +264,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                         {
                             return null;
                         }*/
-            if (await _sourceService.IsExistsAsync(sourceName) && !sourceName.Equals(sourceEntity.Name))
+            if (await _sourceService.IsExistsByNameAsync(sourceName) && !sourceName.Equals(sourceEntity.Name))
             {
                 ModelState.AddModelError("Source.Name", "A source with the same name already exists");
                 return true;
@@ -276,7 +276,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         [NonAction]
         private async Task<bool> IsSameNameExistsAsync(string sourceName)
         {
-            if (await _sourceService.IsExistsAsync(sourceName))
+            if (await _sourceService.IsExistsByNameAsync(sourceName))
             {
                 ModelState.AddModelError("Source.Name", "A source with the same name already exists");
                 return true;

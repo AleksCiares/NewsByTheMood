@@ -8,24 +8,19 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
     public interface ITagService
     {
         /// <summary>
+        /// Get tag by name
+        /// </summary>
+        public Task<Tag?> GetByNameAsync(string tagName);
+
+        /// <summary>
         /// Is exist tag by name
         /// </summary>
-        /// <param name="tagName"></param>
-        /// <returns></returns>
-        public Task<bool> IsExistsAsync(string tagName);
+        public Task<bool> IsExistsByNameAsync(string tagName);
 
         /// <summary>
         /// Add tag
         /// </summary>
-        /// <param name="tag"></param>
-        /// <returns></returns>
-        public Task AddAsync(Tag tag);
+        public Task<Tag> AddAsync(Tag tag);
 
-        /// <summary>
-        /// Get tag by name
-        /// </summary>
-        /// <param name="tagName"></param>
-        /// <returns></returns>
-        public Task<Tag?> GetByName(string tagName);
     }
 }

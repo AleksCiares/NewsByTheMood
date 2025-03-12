@@ -7,5 +7,6 @@ namespace NewsByTheMood.Services.DataLoadProvider.Abstract
     public interface IArticleLoadService
     {
         public Task LoadArticles(Source source);
+        public Task LoadArticle(Source source, string articleUrl);
     }
 }

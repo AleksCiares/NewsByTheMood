@@ -20,12 +20,10 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
         // Get article by certain id
         public Task<Article?> GetByIdAsync(Int64 id);
 
-        // Get range off articles preview with certain positivity and rating
-        /*public Task<Article[]> GetRangePreviewAsync(int pageNumber, int pageSize, short positivity, int rating);*/
-
         // Is exist article with current url
-        public Task<bool> IsExistByUrl(string articleUrl);
+        public Task<bool> IsExistByUrlAsync(string articleUrl);
 
+        // Create article
         public Task AddAsync(Article article);
     }
 }

@@ -6,13 +6,13 @@ using NewsByTheMood.Services.DataProvider.Abstract;
 
 namespace NewsByTheMood.Services.DataProvider.Implement
 {
-    // Service for provide article topics
     public class TopicService : ITopicService
     {
         private readonly NewsByTheMoodDbContext _dbContext;
+
         public TopicService(NewsByTheMoodDbContext dbContext)
         {
-            this._dbContext = dbContext;
+            _dbContext = dbContext;
         }
 
         public async Task<Topic?> GetByIdAsync(Int64 id)
@@ -22,18 +22,56 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 return null;
             }
 
-            return await this._dbContext.Topics
-                .AsNoTracking()
+            var topic = await _dbContext.Topics
                 .Where(topic => topic.Id == id)
                 .SingleOrDefaultAsync();
+            if (topic != null)
+            {
+                var sourcesTask = _dbContext.Entry(topic)
+                    .Collection(topic => topic.Sources)
+                    .LoadAsync();
+
+                await sourcesTask;
+
+                _dbContext.Entry(topic)
+                    .State = EntityState.Detached;
+
+                return topic;
+            }
+            else
+            {
+                return null;
+            }
+
+            /*return await _dbContext.Topics
+                .AsNoTracking()
+                .Where(topic => topic.Id == id)
+                .SingleOrDefaultAsync();*/
         }
+
+        public async Task<Topic?> GetByNameAsync(string topicName)
+        {
+            if (topicName.IsNullOrEmpty())
+            {
+                return null;
+            }
+
+            return await _dbContext.Topics
+                .AsNoTracking()
+                .Where(topic => topic.Name.Equals(topicName))
+                .SingleOrDefaultAsync();
+        }
+
         public async Task<Topic[]> GetRangeAsync(int pageNumber, int pageSize)
         {
-            if (pageSize <= 0 || pageNumber <= 0) return Array.Empty<Topic>();
+            if (pageSize <= 0 || pageNumber <= 0)
+            {
+                return Array.Empty<Topic>();
+            }
 
-            return await this._dbContext.Topics
+            return await _dbContext.Topics
                 .AsNoTracking()
-                .OrderBy(topic => topic.Id)
+                .OrderByDescending(topic => topic.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToArrayAsync();
@@ -41,26 +79,26 @@ namespace NewsByTheMood.Services.DataProvider.Implement
 
         public async Task<Topic[]> GetAllAsync()
         {
-            return await this._dbContext.Topics
+            return await _dbContext.Topics
                 .AsNoTracking()
                 .ToArrayAsync();
         }
 
         public async Task<int> CountAsync()
         {
-            return await this._dbContext.Topics
+            return await _dbContext.Topics
                 .AsNoTracking()
                 .CountAsync();
         }
 
-        public async Task<bool> IsExistsAsync(string topicName)
+        public async Task<bool> IsExistsByNameAsync(string topicName)
         {
             if (topicName.IsNullOrEmpty())
             {
                 return false;
             }
 
-            return await this._dbContext.Topics
+            return await _dbContext.Topics
                 .AsNoTracking()
                 .Where(topic => topic.Name.Equals(topicName))
                 .AnyAsync();
@@ -68,43 +106,20 @@ namespace NewsByTheMood.Services.DataProvider.Implement
 
         public async Task AddAsync(Topic topic)
         {
-            await this._dbContext.Topics.AddAsync(topic);
-            await this._dbContext.SaveChangesAsync();
+            await _dbContext.Topics.AddAsync(topic);
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(Topic topic)
         {
-            this._dbContext.Topics.Update(topic);
-            await this._dbContext.SaveChangesAsync();
+            _dbContext.Topics.Update(topic);
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(Topic topic)
         {
-            this._dbContext.Topics.Remove(topic);
-            await this._dbContext.SaveChangesAsync();
+            _dbContext.Topics.Remove(topic);
+            await _dbContext.SaveChangesAsync();
         }
-
-        public async Task<Source[]?> GetRelatedSources(Int64 id)
-        {
-            if (id <= 0)
-            {
-                return null;
-            }
-
-            var topic = await this._dbContext.Topics
-                .AsNoTracking()
-                .Where(topic => topic.Id == id)
-                .Include(topic => topic.Sources)
-                .SingleOrDefaultAsync();
-
-            if (topic == null)
-            {
-                return null;
-            }
-
-            return topic.Sources.ToArray(); ;
-        }
-
-
     }
 }

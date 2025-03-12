@@ -22,5 +22,15 @@ namespace NewsByTheMood.Data
         {
             base.OnConfiguring(optionsBuilder);
         }
+        
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Right>().HasData(
+                new Right { Id = 1, AccessLevel = "Administrator"},
+                new Right { Id = 2, AccessLevel = "Moderator"},
+                new Right { Id = 1, AccessLevel = "Content editor"},
+                new Right { Id = 1, AccessLevel = "User"});
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }

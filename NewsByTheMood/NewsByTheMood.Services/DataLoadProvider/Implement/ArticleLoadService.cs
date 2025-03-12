@@ -1,13 +1,10 @@
-﻿using AngleSharp.Dom;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.DataLoadProvider.Abstract;
 using NewsByTheMood.Services.DataProvider.Abstract;
 using NewsByTheMood.Services.Options;
 using NewsByTheMood.Services.WebScrapeProvider.Abstract;
 using NewsByTheMood.Services.WebScrapeProvider.Implement;
-using System.Text.RegularExpressions;
-using WebScraper.Core.Settings;
 
 namespace NewsByTheMood.Services.DataLoadProvider.Implement
 {
@@ -26,21 +23,19 @@ namespace NewsByTheMood.Services.DataLoadProvider.Implement
 
         public async Task LoadArticles(Source source)
         {
-            var scraper = this.CreateScraper(source);
+            var scraper = CreateScraper(source);
 
             var articlesUrls = await scraper.GetArticlesUrlsAsync(source);
             articlesUrls.Reverse();
-
             for (var i = articlesUrls.Count - 1; i >= 0; i--)
             {
-                if (await _articleService.IsExistByUrl(articlesUrls[i]))
+                if (await _articleService.IsExistByUrlAsync(articlesUrls[i]))
                 {
                     articlesUrls.RemoveAt(i);
                 }
             }
 
             var articles = await scraper.GetArticlesAsync(source, articlesUrls.ToArray());
-            var tags = new List<Tag>();
             foreach (var article in articles)
             {
                 await _articleService.AddAsync(new Article()
@@ -49,13 +44,31 @@ namespace NewsByTheMood.Services.DataLoadProvider.Implement
                     Title = article.Title,
                     PreviewImgUrl = article.PreviewImgUrl,
                     Body = article.Body,
-                    PublishDate = this.TryParseDate(article.PublishDate),
+                    PublishDate = article.PublishDate,
                     Positivity = 0,
                     Rating = 0,
                     SourceId = source.Id,
-                    Tags = article.Tags != null ? await this.SaveTagsAsync(article.Tags) : new List<Tag>()
+                    Tags = await SaveTagsAsync(article.Tags)
                 });
             }
+        }
+
+        public async Task LoadArticle(Source source, string articleUrl)
+        {
+            var scraper = CreateScraper(source);
+            var article = await scraper.GetArticleAsync(source, articleUrl);
+            await _articleService.AddAsync(new Article()
+            {
+                Url = article.Url,
+                Title = article.Title,
+                PreviewImgUrl = article.PreviewImgUrl,
+                Body = article.Body,
+                PublishDate = article.PublishDate,
+                Positivity = 0,
+                Rating = 0,
+                SourceId = source.Id,
+                Tags = await SaveTagsAsync(article.Tags) 
+            });
         }
 
         private IArticleScrapeService CreateScraper(Source source)
@@ -63,6 +76,7 @@ namespace NewsByTheMood.Services.DataLoadProvider.Implement
             var rnd = new Random();
             var userAgent = _options.UserAgents[rnd.Next(0, _options.UserAgents.Length - 1)];
             ProxySettings? proxy = null;
+
             if (_options.UseProxies && _options.Proxies != null && _options.Proxies.Length > 0)
             {
                 if (_options.UseIpRotation)
@@ -74,7 +88,8 @@ namespace NewsByTheMood.Services.DataLoadProvider.Implement
                     proxy = _options.Proxies[0];
                 }
             }
-            var loaderSettings = new WebLoaderSettings
+
+            var loaderSettings = new LoaderSettings
             {
                 UserAgent = userAgent,
                 ProxySettings = proxy,
@@ -97,25 +112,20 @@ namespace NewsByTheMood.Services.DataLoadProvider.Implement
             return scraper;
         }
 
-        private async Task<List<Tag>> SaveTagsAsync(string[] tags)
+        private async Task<List<Tag>> SaveTagsAsync(string[]? tags)
         {
+            if (tags == null)
+            {
+                return new List<Tag>();
+            }
+
             var tagsList = new List<Tag>();
             foreach (var tag in tags)
             {
-                var whiteSpaceLessTag = Regex.Replace(tag, @"\s+", ""); // доделать чтобы не удалялиь пробелы между словами
-
-                /*if (!await _tagService.IsExistsAsync(whiteSpaceLessTag))
-                {
-                    await _tagService.AddAsync(new Tag { Name = whiteSpaceLessTag });
-                }*/
-                /*var tagEntity = await _tagService.GetByName(whiteSpaceLessTag);*/
-                Tag? tagEntity = null;
+                var tagEntity = await _tagService.GetByNameAsync(tag);
                 if (tagEntity == null)
                 {
-                    tagEntity = new Tag
-                    {
-                        Name = whiteSpaceLessTag
-                    };
+                    tagEntity = await _tagService.AddAsync(new Tag { Name = tag });
                 }
 
                 tagsList.Add(tagEntity);
@@ -124,13 +134,6 @@ namespace NewsByTheMood.Services.DataLoadProvider.Implement
             return tagsList;
         }
 
-        private DateTime? TryParseDate(string? publishDate)
-        {
-            if (DateTime.TryParse(publishDate, out var date))
-            {
-                return date;
-            }
-            return null;
-        }
+       
     }
 }

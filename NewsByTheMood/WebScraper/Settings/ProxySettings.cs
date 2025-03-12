@@ -1,4 +1,4 @@
-﻿namespace WebScraper.Core.Settings
+﻿namespace WebScraper.Settings
 {
     /// <summary>
     /// Web loader proxy settings

@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewsByTheMood.Services", "N
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewsByTheMood.Core", "NewsByTheMood.Core\NewsByTheMood.Core.csproj", "{0B7EE277-460E-4936-8353-2114939E7E44}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebScraper.Core", "WebScraper.Core\WebScraper.Core.csproj", "{00732017-046E-F821-77BD-55DDD89E213E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebScraper", "WebScraper\WebScraper.csproj", "{B65DC308-845F-D3FD-D19F-7C062B684087}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +35,10 @@ Global
 		{0B7EE277-460E-4936-8353-2114939E7E44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B7EE277-460E-4936-8353-2114939E7E44}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B7EE277-460E-4936-8353-2114939E7E44}.Release|Any CPU.Build.0 = Release|Any CPU
-		{00732017-046E-F821-77BD-55DDD89E213E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{00732017-046E-F821-77BD-55DDD89E213E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{00732017-046E-F821-77BD-55DDD89E213E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{00732017-046E-F821-77BD-55DDD89E213E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B65DC308-845F-D3FD-D19F-7C062B684087}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B65DC308-845F-D3FD-D19F-7C062B684087}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B65DC308-845F-D3FD-D19F-7C062B684087}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B65DC308-845F-D3FD-D19F-7C062B684087}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
