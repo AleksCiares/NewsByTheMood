@@ -3,7 +3,7 @@
 @foreach (var topic in Model)
 {
     <li>
-        <a asp-area="" asp-controller="home" asp-action="topic" asp-route-id="@topic.Id" class="dropdown-item">
+        <a asp-area="" asp-controller="home" asp-action="topic" asp-route-id="@topic.Name" class="dropdown-item">
             <i class="fs-4 @topic.IconCssClass"></i>
             <span class="ms-1 d-none d-xl-inline">
                 @topic.Name

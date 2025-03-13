@@ -12,7 +12,8 @@
         public IDocumentParser SelectAll(string selector);
         public string? GetAttribute(string name);
         public List<string> GetAttributes(string name);
-        public string TextContent();
+        public List<string> TextContent();
+        public List<string> InnerText();
         public string ToHtml();
     }
 }

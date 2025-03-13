@@ -12,8 +12,8 @@ using NewsByTheMood.Data;
 namespace NewsByTheMood.Data.Migrations
 {
     [DbContext(typeof(NewsByTheMoodDbContext))]
-    [Migration("20250311154604_Unique_Property_Name_Table_Tag")]
-    partial class Unique_Property_Name_Table_Tag
+    [Migration("20250312094338_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -121,11 +121,36 @@ namespace NewsByTheMood.Data.Migrations
 
                     b.Property<string>("AccessLevel")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AccessLevel")
+                        .IsUnique();
+
                     b.ToTable("Rights");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            AccessLevel = "Administrator"
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            AccessLevel = "Moderator"
+                        },
+                        new
+                        {
+                            Id = 3L,
+                            AccessLevel = "Content editor"
+                        },
+                        new
+                        {
+                            Id = 4L,
+                            AccessLevel = "User"
+                        });
                 });
 
             modelBuilder.Entity("NewsByTheMood.Data.Entities.Source", b =>
@@ -242,9 +267,12 @@ namespace NewsByTheMood.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Topics");
                 });
@@ -267,7 +295,7 @@ namespace NewsByTheMood.Data.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsVerified")
                         .HasColumnType("bit");
@@ -287,13 +315,34 @@ namespace NewsByTheMood.Data.Migrations
 
                     b.Property<string>("UserName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Email")
+                        .IsUnique();
+
                     b.HasIndex("RightId");
 
+                    b.HasIndex("UserName")
+                        .IsUnique();
+
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            AvatarUrl = "~/images/newsbythemood-logo.webp",
+                            DisplayedName = "NewsByTheMood Admin",
+                            Email = "test@test.com",
+                            IsVerified = true,
+                            PasswordHash = "Qwerty",
+                            PreferedPositivity = (short)0,
+                            RegDate = new DateTime(2025, 3, 12, 12, 35, 21, 312, DateTimeKind.Local),
+                            RightId = 1L,
+                            UserName = "Administrator"
+                        });
                 });
 
             modelBuilder.Entity("TopicUser", b =>

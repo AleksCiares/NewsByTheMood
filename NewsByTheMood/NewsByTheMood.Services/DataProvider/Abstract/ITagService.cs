@@ -20,7 +20,7 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
         /// <summary>
         /// Add tag
         /// </summary>
-        public Task<Tag> AddAsync(Tag tag);
+        public Task AddAsync(Tag tag);
 
     }
 }

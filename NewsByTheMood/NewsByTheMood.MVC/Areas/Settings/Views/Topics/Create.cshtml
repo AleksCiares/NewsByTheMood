@@ -1,4 +1,4 @@
-﻿@model TopicCreateModel
+﻿@model TopicModel
 @{
 	ViewData["PageTitle"] = "Create a topic";
 }
@@ -10,8 +10,8 @@
 	<form asp-antiforgery="true" method="post">
 		<div class="form__panel row align-items-start justify-content-between mb-4">
 			<div class="col-auto">
-				<button asp-controller="topics" asp-action="create" class="btn btn-primary" type="submit">Submit</button>
-				<a asp-controller="topics" asp-action="index" class="btn btn-secondary">Cancel</a>
+				<button asp-area="settings" asp-controller="topics" asp-action="create" class="btn btn-primary" type="submit">Submit</button>
+				<a asp-area="settings" asp-controller="topics" asp-action="index" class="btn btn-secondary">Cancel</a>
 			</div>
 		</div>
 		<div class="form__body row align-items-start justify-content-start mb-4">

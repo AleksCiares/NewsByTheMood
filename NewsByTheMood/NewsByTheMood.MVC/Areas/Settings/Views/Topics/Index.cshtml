@@ -9,7 +9,7 @@
 	</div>
 	<div class="topics__panel row align-items-start justify-content-start mb-4">
 		<div class="col-auto">
-			<a asp-controller="topics" asp-action="create" class="btn btn-primary">Create</a>
+			<a asp-area="settings" asp-controller="topics" asp-action="create" class="btn btn-primary">Create</a>
 		</div>
 	</div>
 	<div class="topics__list row row-cols-4 row-cols-sm-6 row-cols-md-8 row-cols-lg-10 mb-4">
@@ -24,7 +24,7 @@
 						<i class="fs-4 @topic.IconCssClass"></i> <span class="ms-1 d-none d-sm-inline"></span>
 					</div>
 					<div class="card-footer">
-						<a asp-controller="topics" asp-action="edit" asp-route-id="@topic.Id" class="btn btn-primary">Edit</a>
+						<a asp-area="settings" asp-controller="topics" asp-action="edit" asp-route-id="@topic.Name" class="btn btn-primary">Edit</a>
 					</div>
 				</div>
 			</div>

@@ -1,13 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using NewsByTheMood.Data;
 using NewsByTheMood.MVC.Options;
-using NewsByTheMood.Services.DataLoadProvider.Abstract;
-using NewsByTheMood.Services.DataLoadProvider.Implement;
 using NewsByTheMood.Services.DataProvider.Abstract;
 using NewsByTheMood.Services.DataProvider.Implement;
 using NewsByTheMood.Services.FileProvider.Abstract;
 using NewsByTheMood.Services.FileProvider.Implement;
 using NewsByTheMood.Services.Options;
+using NewsByTheMood.Services.ScrapeProvider.Abstract;
+using NewsByTheMood.Services.ScrapeProvider.Implement;
 
 namespace NewsByTheMood.MVC
 {
@@ -22,7 +22,7 @@ namespace NewsByTheMood.MVC
 
             // Db provider service
             builder.Services.AddDbContext<NewsByTheMoodDbContext>(
-                opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+                opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default1")));
 
             // Configuration
             /*builder.Services.Configure<SpoofOptions>(
@@ -56,11 +56,11 @@ namespace NewsByTheMood.MVC
                 builder.Services.AddSingleton<IiconService, EmptyIconService>();
             }
 
-            // Data load provider services
+            // Scrape provider services
             builder.Services.Configure<WebScrapeOptions>(
                 builder.Configuration.GetSection(WebScrapeOptions.Position));
-            // Article load service
-            builder.Services.AddScoped<IArticleLoadService, ArticleLoadService>();
+            // Article scrape service
+            builder.Services.AddScoped<IArticleScrapeService, ArticleScrapeService>();
 
             var app = builder.Build();
 

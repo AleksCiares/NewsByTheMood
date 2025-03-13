@@ -5,7 +5,7 @@
     /// </summary>
     public interface IWebLoader
     {
-        internal Task<string> LoadPageAsync(string url);
+        internal Task<string> LoadAsync(string url);
         internal void Dispose();
         public Task DownloadFile(string url, string storePath);
     }

@@ -41,15 +41,10 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .AnyAsync();
         }
 
-        public async Task<Tag> AddAsync(Tag tag)
+        public async Task AddAsync(Tag tag)
         {
             await _dbContext.Tags.AddAsync(tag);
             await _dbContext.SaveChangesAsync();
-
-            return await _dbContext.Tags
-                .AsNoTracking()
-                .Where(t => t.Name.Equals(tag.Name))
-                .SingleAsync();
         }
     }
 }

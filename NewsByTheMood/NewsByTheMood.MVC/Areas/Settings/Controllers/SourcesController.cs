@@ -37,7 +37,6 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                         Name = source.Name,
                         Url = source.Url,
                         Topic = source.Topic.Name,
-                        ArticleAmmount = source.Articles == null ? 0 : source.Articles.Count,
                     })
                     .ToArray();
             }
@@ -68,9 +67,13 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromForm] SourceCreateModel sourceCreate)
         {
-            if (!ModelState.IsValid || await IsSameNameExistsAsync(sourceCreate.Source.Name))
+            if (!ModelState.IsValid)
             {
-                sourceCreate.Topics = await GetTopicsAsync();
+                return View(sourceCreate);
+            }
+            if (await _sourceService.IsExistsByNameAsync(sourceCreate.Source.Name))
+            {
+                ModelState.AddModelError("Source.Name", "A source with the same name already exists");
                 return View(sourceCreate);
             }
 
@@ -105,44 +108,39 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         [HttpGet("{Controller}/{Action}/{id:required}")]
         public async Task<IActionResult> Edit([FromRoute] string id)
         {
-            var sourceEntity = await _sourceService.GetByIdAsync(long.Parse(id));
-            if (sourceEntity == null)
+            var source = await _sourceService.GetByIdAsync(long.Parse(id));
+            if (source == null)
             {
                 return BadRequest();
             }
 
-            var source = new SourceModel()
-            {
-                Id = sourceEntity.Id.ToString(),
-                Name = sourceEntity.Name,
-                Url = sourceEntity.Url,
-                SurveyPeriod = sourceEntity.SurveyPeriod,
-                IsRandomPeriod = sourceEntity.IsRandomPeriod,
-                HasDynamicPage = sourceEntity.HasDynamicPage,
-                AcceptInsecureCerts = sourceEntity.AcceptInsecureCerts,
-                PageElementLoaded = sourceEntity.PageElementLoaded,
-                PageLoadTimeout = sourceEntity.PageLoadTimeout,
-                ElementLoadTimeout = sourceEntity.ElementLoadTimeout,
-                ArticleCollectionsPath = sourceEntity.ArticleCollectionsPath,
-                ArticleItemPath = sourceEntity.ArticleItemPath,
-                ArticleUrlPath = sourceEntity.ArticleUrlPath,
-                ArticleTitlePath = sourceEntity.ArticleTitlePath,
-                ArticlePreviewImgPath = sourceEntity.ArticlePreviewImgPath,
-                ArticleBodyCollectionsPath = sourceEntity.ArticleBodyCollectionsPath,
-                ArticleBodyItemPath = sourceEntity.ArticleBodyItemPath,
-                ArticlePdatePath = sourceEntity.ArticlePdatePath,
-                ArticleTagPath = sourceEntity.ArticleTagPath,
-                TopicId = sourceEntity.TopicId.ToString(),
-            };
-            var topics = await GetTopicsAsync();
-            var relatedArticles = await GetRelatedArticles();
-
-
             return View(new SourceEditModel()
             {
-                Source = source,
-                Topics = topics,
-                RelatedArticles = relatedArticles,
+                Source = new SourceModel()
+                {
+                    Id = source.Id.ToString(),
+                    Name = source.Name,
+                    Url = source.Url,
+                    SurveyPeriod = source.SurveyPeriod,
+                    IsRandomPeriod = source.IsRandomPeriod,
+                    HasDynamicPage = source.HasDynamicPage,
+                    AcceptInsecureCerts = source.AcceptInsecureCerts,
+                    PageElementLoaded = source.PageElementLoaded,
+                    PageLoadTimeout = source.PageLoadTimeout,
+                    ElementLoadTimeout = source.ElementLoadTimeout,
+                    ArticleCollectionsPath = source.ArticleCollectionsPath,
+                    ArticleItemPath = source.ArticleItemPath,
+                    ArticleUrlPath = source.ArticleUrlPath,
+                    ArticleTitlePath = source.ArticleTitlePath,
+                    ArticlePreviewImgPath = source.ArticlePreviewImgPath,
+                    ArticleBodyCollectionsPath = source.ArticleBodyCollectionsPath,
+                    ArticleBodyItemPath = source.ArticleBodyItemPath,
+                    ArticlePdatePath = source.ArticlePdatePath,
+                    ArticleTagPath = source.ArticleTagPath,
+                    TopicId = source.TopicId.ToString(),
+                },
+                Topics = await GetTopicsAsync(),
+                RelatedArticlesCount = source.Articles.Count,
             });
         }
 
@@ -150,11 +148,18 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         [HttpPost("{Controller}/{Action}/{id:required}")]
         public async Task<IActionResult> Edit([FromRoute] string id, [FromForm] SourceEditModel sourceEdit)
         {
-            sourceEdit.Source.Id = id;
-            if (!ModelState.IsValid || await IsSameNameExistsAsync(sourceEdit.Source.Id, sourceEdit.Source.Name))
+            var source = await _sourceService.GetByIdAsync(long.Parse(id));
+            if (source == null)
             {
-                sourceEdit.Topics = await GetTopicsAsync();
-                sourceEdit.RelatedArticles = await GetRelatedArticles();
+                return BadRequest();
+            }
+            if (!ModelState.IsValid)
+            {
+                return View(sourceEdit);
+            }
+            if (await _sourceService.IsExistsByNameAsync(sourceEdit.Source.Name) && !source.Name.Equals(sourceEdit.Source.Name))
+            {
+                ModelState.AddModelError("Source.Name", "A source with the same name already exists");
                 return View(sourceEdit);
             }
 
@@ -189,18 +194,20 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         [HttpPost("{Controller}/{Action}/{id:required}")]
         public async Task<IActionResult> Delete([FromRoute] string id, [FromForm] SourceEditModel sourceEdit)
         {
-            sourceEdit.Source.Id = id;
-            if ((await GetRelatedArticles()).Length > 0)
+            var source = await _sourceService.GetByIdAsync(long.Parse(id));
+            if (source == null)
             {
-                sourceEdit.Topics = await GetTopicsAsync();
-                sourceEdit.RelatedArticles = await GetRelatedArticles();
+                return BadRequest();
+            }
+            if (source.Articles.Count > 0)
+            {
                 ModelState.AddModelError("Source.Name", "The source has related articles, you cannot delete it");
                 return View("Edit", sourceEdit);
             }
 
             await _sourceService.DeleteAsync(new Source()
             {
-                Id = long.Parse(sourceEdit.Source.Id)
+                Id = source.Id,
             });
 
             return RedirectToAction("Index");
@@ -209,80 +216,20 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         [NonAction]
         private async Task<List<SelectListItem>> GetTopicsAsync()
         {
-            var topicEntities = (await _topicService.GetAllAsync())
-                .Select(topic => new TopicModel()
+            var topics = (await _topicService.GetAllAsync())
+                .Select(topic => new SelectListItem()
                 {
-                    Id = topic.Id.ToString(),
-                    Name = topic.Name,
-                    IconCssClass = topic.IconCssClass,
+                    Value = topic.Id.ToString(),
+                    Text = topic.Name,
                 })
-                .ToArray();
-            var topics = new List<SelectListItem>();
-            if (topicEntities.Length == 0)
+                .ToList();
+
+            if (topics.Count == 0)
             {
                 ModelState.AddModelError("Source.TopicId", "No topics have been created, to create a source you must first create a topic");
             }
-            else
-            {
-                foreach (var topic in topicEntities)
-                {
-                    topics.Add(new SelectListItem()
-                    {
-                        Value = topic.Id,
-                        Text = topic.Name
-                    });
-                }
-            }
+           
             return topics;
-        }
-
-        [NonAction]
-        private async Task<ArticlePreviewModel[]> GetRelatedArticles()
-        {
-
-
-            /*            var relatedArticles = sourceEntity.Articles
-                            .Select(article => new ArticlePreviewModel()
-                            { 
-                                Id = article.Id.ToString(),
-                                Positivity = article.Positivity,
-                                Rating = article.Rating,
-                                SourceName = article.Source.Name,
-                                TopicName = article.Source.Topic.Name,
-                                PublishDate = article.PublishDate.ToString(),
-                                Title = article.Title,
-                            })
-                            .ToArray();*/
-            return Array.Empty<ArticlePreviewModel>();
-        }
-
-        [NonAction]
-        private async Task<bool> IsSameNameExistsAsync(string id, string sourceName)
-        {
-            var sourceEntity = await _sourceService.GetByIdAsync(long.Parse(id));
-            /*            if (sourceEntity == null)
-                        {
-                            return null;
-                        }*/
-            if (await _sourceService.IsExistsByNameAsync(sourceName) && !sourceName.Equals(sourceEntity.Name))
-            {
-                ModelState.AddModelError("Source.Name", "A source with the same name already exists");
-                return true;
-            }
-
-            return false;
-        }
-
-        [NonAction]
-        private async Task<bool> IsSameNameExistsAsync(string sourceName)
-        {
-            if (await _sourceService.IsExistsByNameAsync(sourceName))
-            {
-                ModelState.AddModelError("Source.Name", "A source with the same name already exists");
-                return true;
-            }
-
-            return false;
         }
     }
 }

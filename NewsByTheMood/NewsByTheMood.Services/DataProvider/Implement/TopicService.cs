@@ -27,11 +27,9 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .SingleOrDefaultAsync();
             if (topic != null)
             {
-                var sourcesTask = _dbContext.Entry(topic)
+                await _dbContext.Entry(topic)
                     .Collection(topic => topic.Sources)
                     .LoadAsync();
-
-                await sourcesTask;
 
                 _dbContext.Entry(topic)
                     .State = EntityState.Detached;
@@ -56,10 +54,29 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 return null;
             }
 
-            return await _dbContext.Topics
-                .AsNoTracking()
+            var topic = await _dbContext.Topics
                 .Where(topic => topic.Name.Equals(topicName))
                 .SingleOrDefaultAsync();
+            if (topic != null)
+            {
+                await _dbContext.Entry(topic)
+                    .Collection(topic => topic.Sources)
+                    .LoadAsync();
+
+                _dbContext.Entry(topic)
+                    .State = EntityState.Detached;
+
+                return topic;
+            }
+            else
+            {
+                return null;
+            }
+
+            /*return await _dbContext.Topics
+                .AsNoTracking()
+                .Where(topic => topic.Name.Equals(topicName))
+                .SingleOrDefaultAsync();*/
         }
 
         public async Task<Topic[]> GetRangeAsync(int pageNumber, int pageSize)

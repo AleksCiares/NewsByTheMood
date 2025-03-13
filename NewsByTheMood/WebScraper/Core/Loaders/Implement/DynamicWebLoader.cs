@@ -19,7 +19,7 @@ namespace WebScraper.Core.Loaders.Implement
             NetworkAuthenticationHandler? proxyAuthHandler = null;
 
             var options = new ChromeOptions();
-            options.AddArgument("--headless");
+            /*options.AddArgument("--headless");*/
             options.AddArgument($"--user-agent={_settings.UserAgent}");
             options.AcceptInsecureCertificates = _settings.AcceptInsecureCertificates;
             options.PageLoadStrategy = PageLoadStrategy.Normal;
@@ -48,12 +48,7 @@ namespace WebScraper.Core.Loaders.Implement
             _webDriver.Manage().Timeouts().PageLoad = _settings.PageLoadTimeout;
         }
 
-        public Task DownloadFile(string url, string storePath)
-        {
-            throw new NotImplementedException();
-        }
-
-        async Task<string> IWebLoader.LoadPageAsync(string url)
+        async Task<string> IWebLoader.LoadAsync(string url)
         {
             await _webDriver.Navigate().GoToUrlAsync(url);
             ((IJavaScriptExecutor)this._webDriver).ExecuteScript(this._jsScrollScript);
@@ -62,6 +57,11 @@ namespace WebScraper.Core.Loaders.Implement
                 c => c.FindElement(By.CssSelector(this._settings.SignalElement)));
 
             return _webDriver.PageSource;
+        }
+
+        public Task DownloadFile(string url, string storePath)
+        {
+            throw new NotImplementedException();
         }
 
         void IWebLoader.Dispose()

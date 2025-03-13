@@ -15,17 +15,17 @@ namespace WebScraper.Core.Loaders.Implement
             _settings = settings;
         }
 
-        public Task DownloadFile(string url, string storePath)
-        {
-            throw new NotImplementedException();
-        }
-
-        async Task<string> IWebLoader.LoadPageAsync(string url)
+        async Task<string> IWebLoader.LoadAsync(string url)
         {
             _httpClient.BaseAddress = new Uri(url);
             var response = await _httpClient.GetAsync(url);
 
             return await response.Content.ReadAsStringAsync();
+        }
+
+        public Task DownloadFile(string url, string storePath)
+        {
+            throw new NotImplementedException();
         }
 
         void IWebLoader.Dispose()

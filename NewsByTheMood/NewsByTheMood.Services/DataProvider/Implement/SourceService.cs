@@ -27,14 +27,14 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .SingleOrDefaultAsync();
             if (source != null)
             {
-                var topicTask = _dbContext.Entry(source)
+                await _dbContext.Entry(source)
                     .Reference(source => source.Topic)
                     .LoadAsync();
-                var articlesTask = _dbContext.Entry(source)
+
+                await _dbContext.Entry(source)
                     .Collection(source => source.Articles)
                     .LoadAsync();
 
-                await Task.WhenAll(topicTask, articlesTask);
 
                 _dbContext.Entry(source)
                     .State = EntityState.Detached;

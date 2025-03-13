@@ -19,7 +19,6 @@ namespace NewsByTheMood.MVC.Components
             var topics = (await this._topicService.GetAllAsync()) // replaced with mapper
                 .Select(t => new TopicModel()
                 {
-                    Id = t.Id.ToString(),
                     Name = t.Name,
                     IconCssClass = t.IconCssClass
                 })

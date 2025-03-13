@@ -1,7 +1,7 @@
 :root {
-    --main-text-color: rgb(34, 33, 33);
+    --main-text-color: rgb(33, 33, 33);
     --secondary-text-color: white;
-    --main-highlight-color: rebeccapurple;
+    --main-highlight-color: rgb(119, 7, 187);
     --main-background-color: white;
 }
 
@@ -48,9 +48,20 @@ body {
 }
 
 a {
+    color: var(--main-highlight-color) !important;
+    text-decoration-line: none !important;
+}
+a:hover {
+    text-shadow: 0px 0px 12px var(--main-highlight-color) !important;
+}
+a.active {
+    text-shadow: 0px 0px 7px var(--main-highlight-color) !important;
+}
+a.nav-link, a.dropdown-item {
     color: var(--main-text-color) !important;
 }
-a.btn {
+
+/*a.btn {
     color: var(--secondary-text-color) !important;
 }
 
@@ -60,7 +71,7 @@ a:hover {
 
 a.active {
     color: var(--main-highlight-color) !important;
-}
+}*/
 
 .aside-bar {
     border-right: 1px solid #dee2e6;

@@ -21,6 +21,11 @@ namespace WebScraper.Core.Parsers.Implement
 
         async Task<IDocumentParser> IDocumentParser.ParseAsync(string document)
         {
+            if (_document != null)
+            {
+                _document.Dispose();
+            }
+
             _document = await _context.OpenAsync(req => req.Content(document));
             if (_elements != null)
             {
@@ -128,20 +133,36 @@ namespace WebScraper.Core.Parsers.Implement
             return attributes;
         }
 
-        public string TextContent()
+        public List<string> TextContent()
         {
             if (_elements == null)
             {
                 throw new Exception();
             }
 
-            var text = new StringBuilder();
+            var textList = new List<string>();
             foreach (var element in _elements)
             {
-                text.Append(element.TextContent);
+                textList.Add(element.TextContent);
             }
-            
-            return text.ToString();
+
+            return textList;
+        }
+
+        public List<string> InnerText()
+        {
+            if (_elements == null)
+            {
+                throw new Exception();
+            }
+
+            var textList = new List<string>();
+            foreach (var element in _elements)
+            {
+                textList.Add(element.GetInnerText());
+            }
+
+            return textList;
         }
 
         public string ToHtml()

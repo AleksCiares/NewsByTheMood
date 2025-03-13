@@ -9,11 +9,13 @@ namespace NewsByTheMood.MVC.Controllers
     public class HomeController : Controller
     {
         private readonly IArticleService _articleService;
+        private readonly ITopicService _topicService;
         private readonly short _defaultPositivity = 0;
 
-        public HomeController(IArticleService articleService)
+        public HomeController(IArticleService articleService, ITopicService topicService)
         {
             _articleService = articleService;
+            _topicService = topicService;
         }
 
         // Get range of articles previews
@@ -53,22 +55,28 @@ namespace NewsByTheMood.MVC.Controllers
                     PageSize = pagination.PageSize,
                     TotalItems = totalArticles,
                 },
-                PageTitle = "Latest"
+                PageTitle = "Home"
             });
         }
 
         // Get range of articles privew by topic
-        [HttpGet("topic/{id:required}")]
-        public async Task<IActionResult> Topic([FromRoute] string id, [FromQuery] PaginationModel pagination)
+        [HttpGet("topic/{topicName:required}")]
+        public async Task<IActionResult> Topic([FromRoute] string topicName, [FromQuery] PaginationModel pagination)
         {
-            var totalArticles = await _articleService.CountByTopicAsync(_defaultPositivity, long.Parse(id));
+            var topicEntity = await _topicService.GetByNameAsync(topicName);
+            if (topicEntity == null)
+            {
+                return BadRequest();
+            }
+
+            var totalArticles = await _articleService.CountByTopicAsync(_defaultPositivity, topicEntity.Id);
             var articles = Array.Empty<ArticlePreviewModel>();
 
             if (totalArticles > 0)
             {
                 articles = (await _articleService.GetRangeByTopicAsync(
                     _defaultPositivity,
-                    long.Parse(id),
+                    topicEntity.Id,
                     pagination.Page,
                     pagination.PageSize)) // replaced with mapper
                     .Select(a => new ArticlePreviewModel()
@@ -95,7 +103,7 @@ namespace NewsByTheMood.MVC.Controllers
                     PageSize = pagination.PageSize,
                     TotalItems = totalArticles,
                 },
-                PageTitle = totalArticles > 0 ? articles[0].TopicName : "Oops.. nothing",
+                PageTitle = topicEntity.Name,
             });
         }
 

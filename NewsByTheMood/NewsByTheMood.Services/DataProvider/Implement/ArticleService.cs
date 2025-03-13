@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AngleSharp.Dom;
+using Azure;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NewsByTheMood.Data;
 using NewsByTheMood.Data.Entities;
@@ -91,17 +93,15 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .SingleOrDefaultAsync();
             if (article != null)
             {
-                var sourceTask = _dbContext.Entry(article)
+                await _dbContext.Entry(article)
                     .Reference(article => article.Source)
                     .LoadAsync();
-                var topicTask = _dbContext.Entry(article.Source)
+                await _dbContext.Entry(article.Source)
                     .Reference(source => source.Topic)
                     .LoadAsync();
-                var tagsTask = _dbContext.Entry(article)
+                await _dbContext.Entry(article)
                     .Collection(article => article.Tags)
                     .LoadAsync();
-
-                await Task.WhenAll(sourceTask, topicTask, tagsTask);
 
                 _dbContext.Entry(article)
                     .State = EntityState.Detached;
@@ -137,8 +137,51 @@ namespace NewsByTheMood.Services.DataProvider.Implement
 
         public async Task AddAsync(Article article)
         {
-            _dbContext.Attach(article.Tags);
+            var tagNames = article.Tags.Select(tag => tag.Name).ToList().Distinct().ToList();
+            article.Tags = new();
+
             await _dbContext.Articles.AddAsync(article);
+            foreach (var tagName in tagNames)
+            {
+                var tag = await _dbContext.Tags.SingleOrDefaultAsync(tag => tag.Name.Equals(tagName));
+                if (tag == null)
+                {
+                    tag = new Tag() { Name = tagName };
+                    await _dbContext.Tags.AddAsync(tag);
+                }
+                article.Tags.Add(tag);
+            }
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task AddRangeAsync(Article[] articles)
+        {
+            var tags = new Dictionary<string, Tag>();
+
+            foreach (var article in articles)
+            {
+                var tagNames = article.Tags.Select(tag => tag.Name).ToList().Distinct().ToList();
+                article.Tags = new();
+
+                foreach (var tagName in tagNames)
+                {
+                    if (!tags.ContainsKey(tagName))
+                    {
+                        var tag = await _dbContext.Tags.SingleOrDefaultAsync(tag => tag.Name.Equals(tagName));
+                        if (tag == null)
+                        {
+                            tag = new Tag() { Name = tagName };
+                            await _dbContext.Tags.AddAsync(tag);
+                        }
+                        tags.Add(tagName, tag);
+                    }
+
+                    article.Tags.Add(tags[tagName]);
+                }
+            }
+
+            await _dbContext.Articles.AddRangeAsync(articles);
             await _dbContext.SaveChangesAsync();
         }
     }

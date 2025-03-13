@@ -25,5 +25,8 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
 
         // Create article
         public Task AddAsync(Article article);
+
+        // Create range articles
+        public Task AddRangeAsync(Article[] articles);
     }
 }

@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace NewsByTheMood.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,7 +19,7 @@ namespace NewsByTheMood.Data.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AccessLevel = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    AccessLevel = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -30,7 +32,7 @@ namespace NewsByTheMood.Data.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -43,7 +45,7 @@ namespace NewsByTheMood.Data.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     IconCssClass = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -57,8 +59,8 @@ namespace NewsByTheMood.Data.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DisplayedName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PreferedPositivity = table.Column<short>(type: "smallint", nullable: false),
@@ -113,7 +115,7 @@ namespace NewsByTheMood.Data.Migrations
                         column: x => x.TopicId,
                         principalTable: "Topics",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict,
+                        onDelete: ReferentialAction.Restrict, 
                         onUpdate: ReferentialAction.Cascade);
                 });
 
@@ -132,14 +134,14 @@ namespace NewsByTheMood.Data.Migrations
                         column: x => x.TopicsId,
                         principalTable: "Topics",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict,
+                        onDelete: ReferentialAction.Restrict, 
                         onUpdate: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_TopicUser_Users_UsersId",
                         column: x => x.UsersId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict,
+                        onDelete: ReferentialAction.Restrict, 
                         onUpdate: ReferentialAction.Cascade);
                 });
 
@@ -166,7 +168,7 @@ namespace NewsByTheMood.Data.Migrations
                         column: x => x.SourceId,
                         principalTable: "Sources",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict, 
+                        onDelete: ReferentialAction.Restrict,
                         onUpdate: ReferentialAction.Cascade);
                 });
 
@@ -185,14 +187,14 @@ namespace NewsByTheMood.Data.Migrations
                         column: x => x.ArticlesId,
                         principalTable: "Articles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict, 
+                        onDelete: ReferentialAction.Restrict,
                         onUpdate: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ArticleTag_Tags_TagsId",
                         column: x => x.TagsId,
                         principalTable: "Tags",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict, 
+                        onDelete: ReferentialAction.Restrict,
                         onUpdate: ReferentialAction.Cascade);
                 });
 
@@ -215,16 +217,32 @@ namespace NewsByTheMood.Data.Migrations
                         column: x => x.ArticleId,
                         principalTable: "Articles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict, 
+                        onDelete: ReferentialAction.Restrict,
                         onUpdate: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Comments_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict, 
+                        onDelete: ReferentialAction.Restrict,
                         onUpdate: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.InsertData(
+                table: "Rights",
+                columns: new[] { "Id", "AccessLevel" },
+                values: new object[,]
+                {
+                    { 1L, "Administrator" },
+                    { 2L, "Moderator" },
+                    { 3L, "Content editor" },
+                    { 4L, "User" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "AvatarUrl", "DisplayedName", "Email", "IsVerified", "PasswordHash", "PreferedPositivity", "RegDate", "RightId", "UserName" },
+                values: new object[] { 1L, "~/images/newsbythemood-logo.webp", "NewsByTheMood Admin", "test@test.com", true, "Qwerty", (short)0, new DateTime(2025, 3, 12, 12, 35, 21, 312, DateTimeKind.Local), 1L, "Administrator" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Articles_SourceId",
@@ -247,9 +265,27 @@ namespace NewsByTheMood.Data.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Rights_AccessLevel",
+                table: "Rights",
+                column: "AccessLevel",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Sources_TopicId",
                 table: "Sources",
                 column: "TopicId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tags_Name",
+                table: "Tags",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Topics_Name",
+                table: "Topics",
+                column: "Name",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_TopicUser_UsersId",
@@ -257,9 +293,21 @@ namespace NewsByTheMood.Data.Migrations
                 column: "UsersId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_Email",
+                table: "Users",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_RightId",
                 table: "Users",
                 column: "RightId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_UserName",
+                table: "Users",
+                column: "UserName",
+                unique: true);
         }
 
         /// <inheritdoc />

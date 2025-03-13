@@ -9,27 +9,34 @@
     </div>
     <div class="topics__panel row align-items-start justify-content-start mb-4">
         <div class="col-auto">
-            <a asp-controller="sources" asp-action="create" class="btn btn-primary">Create</a>
+            <a asp-area="settings" asp-controller="sources" asp-action="create" class="btn btn-primary">Create</a>
         </div>
     </div>
-    <div class="sources__list mb-4">
-            @foreach (var sourcePreview in Model.SourcePreviews)
-            {
-            <div class="source-preview row justify-content-start align-items-center mb-3">
-                <div class="col-auto">@sourcePreview.Name</div>
-                <div class="col-auto">@sourcePreview.Topic</div>
-                <div class="col-auto">
-                    <span>related articles </span>
-                    <span class="badge bg-primary rounded-pill">@sourcePreview.ArticleAmmount</span>
-                </div>
-                <div class="col-auto">
-                    <a asp-controller="sources" asp-action="edit" asp-route-id="@sourcePreview.Id" class="btn btn-primary">Edit</a>
-                </div>
-                <div class="col-auto">
-                    <a asp-controller="loadarticles" asp-action="load" asp-route-id="@sourcePreview.Id" class="btn btn-primary">Load articles</a>
-                </div>
-            </div>
-            }
+    <div class="sources__table mb-4">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Url</th>
+                    <th scope="col">Topic</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var sourcePreview in Model.SourcePreviews)
+                {
+                    <tr @* class="source-preview row justify-content-start align-items-center mb-3" *@>
+                        <th scope="row">
+                            <a asp-area="settings" asp-controller="sources" asp-action="edit" asp-route-id="@sourcePreview.Id">@sourcePreview.Id</a>
+                        </th>
+                        <td>@sourcePreview.Name</td>
+                        <td>@sourcePreview.Url</td>
+                        <td>@sourcePreview.Topic</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+            
     </div>
     @if (Model.PageInfo.TotalPages > 1)
     {

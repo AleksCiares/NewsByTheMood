@@ -126,6 +126,28 @@ namespace NewsByTheMood.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("Rights");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            AccessLevel = "Administrator"
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            AccessLevel = "Moderator"
+                        },
+                        new
+                        {
+                            Id = 3L,
+                            AccessLevel = "Content editor"
+                        },
+                        new
+                        {
+                            Id = 4L,
+                            AccessLevel = "User"
+                        });
                 });
 
             modelBuilder.Entity("NewsByTheMood.Data.Entities.Source", b =>
@@ -303,6 +325,21 @@ namespace NewsByTheMood.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            AvatarUrl = "~/images/newsbythemood-logo.webp",
+                            DisplayedName = "NewsByTheMood Admin",
+                            Email = "test@test.com",
+                            IsVerified = true,
+                            PasswordHash = "Qwerty",
+                            PreferedPositivity = (short)0,
+                            RegDate = new DateTime(2025, 3, 12, 12, 35, 21, 312, DateTimeKind.Local),
+                            RightId = 1L,
+                            UserName = "Administrator"
+                        });
                 });
 
             modelBuilder.Entity("TopicUser", b =>

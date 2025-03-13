@@ -10,6 +10,6 @@ namespace NewsByTheMood.MVC.Models
 
         public List<SelectListItem>? Topics { get; set; }
 
-        public ArticlePreviewModel[]? RelatedArticles { get; set; }
+        public int RelatedArticlesCount { get; set; }
     }
 }

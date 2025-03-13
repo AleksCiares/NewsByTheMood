@@ -6,14 +6,14 @@ using WebScraper.Settings;
 
 namespace WebScraper
 {
-    public class PrettyScrapper : IDisposable
+    public class PrettyScraper : IDisposable
     {
         private bool _disposed = false;
         private readonly ScraperSettings _settings;
         private readonly IWebLoader _loader;
         private readonly IDocumentParser _parser;
 
-        public PrettyScrapper(ScraperSettings settings)
+        public PrettyScraper(ScraperSettings settings)
         {
             _settings = settings;
             _loader = settings.IsDynamicSource
@@ -22,9 +22,9 @@ namespace WebScraper
             _parser = new PrettyHtmlParser();
         }
 
-        public async Task LoadPage(string url)
+        public async Task GetPageAsync(string url)
         {
-            await _parser.ParseAsync(await _loader.LoadPageAsync(url));
+            await _parser.ParseAsync(await _loader.LoadAsync(url));
         }
 
         public IWebLoader Loader
@@ -56,7 +56,7 @@ namespace WebScraper
             }
         }
 
-        ~PrettyScrapper()
+        ~PrettyScraper()
         {
             Dispose(false);
         }

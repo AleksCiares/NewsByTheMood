@@ -10,11 +10,11 @@
 	<form asp-antiforgery="true" method="post">
 		<div class="form__panel row align-items-start justify-content-between mb-4">
 			<div class="col-auto">
-				<button asp-controller="sources" asp-action="edit" asp-route-id="@Model.Source.Id" class="btn btn-primary" type="submit">Submit</button>
-				<a asp-controller="sources" asp-action="index" class="btn btn-secondary">Cancel</a>
+				<button asp-area="settings" asp-controller="sources" asp-action="edit" asp-route-id="@Model.Source.Id" class="btn btn-primary" type="submit">Submit</button>
+				<a asp-area="settings" asp-controller="sources" asp-action="index" class="btn btn-secondary">Cancel</a>
 			</div>
 			<div class="col-auto">
-				<button asp-controller="sources" asp-action="delete" asp-route-id="@Model.Source.Id" class="btn btn-danger">Delete</button>
+				<button asp-area="settings" asp-controller="sources" asp-action="delete" asp-route-id="@Model.Source.Id" class="btn btn-danger">Delete</button>
 			</div>
 		</div>
 		<div class="form__body row align-items-start justify-content-start mb-4">

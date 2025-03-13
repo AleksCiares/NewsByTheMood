@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AngleSharp;
+﻿using AngleSharp;
 using AngleSharp.Dom;
 
-namespace NewsByTheMood.Services.WebScrapeProvider.Implement
+namespace WebScraper.Extensions
 {
     /// <summary>
     /// Html formatter
