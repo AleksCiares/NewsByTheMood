@@ -52,7 +52,7 @@ a {
     text-decoration-line: none !important;
 }
 a:hover {
-    text-shadow: 0px 0px 12px var(--main-highlight-color) !important;
+    text-shadow: 0px 0px 15px var(--main-highlight-color) !important;
 }
 a.active {
     text-shadow: 0px 0px 7px var(--main-highlight-color) !important;

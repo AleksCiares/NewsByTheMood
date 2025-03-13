@@ -27,6 +27,11 @@ namespace WebScraper
             await _parser.ParseAsync(await _loader.LoadAsync(url));
         }
 
+        public async Task LoadPageManuallyAsync(string page)
+        {
+           await _parser.ParseAsync(page);
+        }
+
         public IWebLoader Loader
         {
             get { return _loader; }

@@ -29,7 +29,7 @@ namespace NewsByTheMood.Services.ScrapeProvider.Implement
             var scraper = CreateScraper(source);
             await scraper.GetPageAsync(articleUrl);
 
-            var article = await ParseArticleAsync(source, scraper);
+            var article = ParseArticle(source, scraper);
             article.Url = articleUrl;
 
             scraper.Dispose();
@@ -61,7 +61,7 @@ namespace NewsByTheMood.Services.ScrapeProvider.Implement
             foreach (var url in articlesUrls)
             {
                 await scraper.GetPageAsync(url);
-                var article = await ParseArticleAsync(source, scraper);
+                var article = ParseArticle(source, scraper);
                 article.Url = url;
 
                 articles.Add(article);
@@ -109,22 +109,22 @@ namespace NewsByTheMood.Services.ScrapeProvider.Implement
             return new PrettyScraper(scraperSettings);
         }
 
-        private async Task<Article> ParseArticleAsync(Source source, PrettyScraper scraper)
+        private Article ParseArticle(Source source, PrettyScraper scraper)
         {
             return new Article()
             {
                 Title = scraper.Parser.Init(source.ArticleTitlePath).TextContent().ElementAtOrDefault(0)! ?? "No found title",
-                PreviewImgUrl = LoadPreviewImage(source, scraper),
-                Body = scraper.Parser.Init(source.ArticleBodyCollectionsPath).SelectAll(source.ArticleBodyItemPath).ToHtml(),
-                PublishDate = LoadPublishDateDate(source, scraper),
+                PreviewImgUrl = GetPreviewImageUrl(source, scraper),
+                PublishDate = GetPublishDateDate(source, scraper),
                 Positivity = 0,
                 Rating = 0,
                 SourceId = source.Id,
-                Tags = await LoadTagsAsync(source, scraper)
+                Tags = GetTags(source, scraper),
+                Body = GetBody(source, scraper),
             };
         }
 
-        private string? LoadPreviewImage(Source source, PrettyScraper scraper)
+        private string? GetPreviewImageUrl(Source source, PrettyScraper scraper)
         {
             if (source.ArticlePreviewImgPath.IsNullOrEmpty())
             {
@@ -158,7 +158,7 @@ namespace NewsByTheMood.Services.ScrapeProvider.Implement
             return path;
         }
 
-        private DateTime? LoadPublishDateDate(Source source, PrettyScraper scraper)
+        private DateTime? GetPublishDateDate(Source source, PrettyScraper scraper)
         {
             if (source.ArticlePdatePath.IsNullOrEmpty())
             {
@@ -173,7 +173,7 @@ namespace NewsByTheMood.Services.ScrapeProvider.Implement
             return null;
         }
 
-        private async Task<List<Tag>> LoadTagsAsync(Source source, PrettyScraper scraper)
+        private List<Tag> GetTags(Source source, PrettyScraper scraper)
         {
             if (source.ArticleTagPath.IsNullOrEmpty())
             {
@@ -184,24 +184,28 @@ namespace NewsByTheMood.Services.ScrapeProvider.Implement
             var tagsEntity = new List<Tag>();
             foreach (var plainTag in plainTags)
             {
-                //var tag = Regex.Replace(plainTag, @"\s+", "", RegexOptions.Compiled);
                 var tag = plainTag.Trim(' ', '\n', '\t');
                 if (tag.Length >= 20)
                 {
                     continue;
                 }
 
-                /*var tagEntity = await _tagService.GetByNameAsync(tag);
-                if (tagEntity == null)
-                {
-                    await _tagService.AddAsync(new Tag { Name = tag });
-                    tagEntity = await _tagService.GetByNameAsync(tag);
-                }*/
-
                 tagsEntity.Add(new Tag { Name = tag });
             }
 
             return tagsEntity;
         }
+
+        private string? GetBody(Source source, PrettyScraper scraper)
+        {
+            var body = scraper.Parser.Init(source.ArticleBodyCollectionsPath).SelectAll(source.ArticleBodyItemPath).ToHtml();
+            return body;
+        }
     }
 }
+
+/*
+ href
+src
+style="background: url(image.png)"
+ */
