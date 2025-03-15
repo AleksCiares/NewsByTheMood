@@ -7,6 +7,7 @@ namespace NewsByTheMood.MVC.Models
         [Required]
         public required TopicModel Topic { get; set; }
 
-        public SourcePreviewModel[]? RelatedSources { get; set; }
+        [Required]
+        public required int RelatedSourceCount { get; set; }
     }
 }

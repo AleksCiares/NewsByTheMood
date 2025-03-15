@@ -49,21 +49,32 @@ body {
 
 a {
     color: var(--main-highlight-color) !important;
-    text-decoration-line: none !important;
+    text-decoration-line: none;
 }
 a:hover {
-    text-shadow: 0px 0px 15px var(--main-highlight-color) !important;
+    text-shadow: 0px 0px 15px var(--main-highlight-color);
 }
 a.active {
-    text-shadow: 0px 0px 7px var(--main-highlight-color) !important;
+    text-shadow: 0px 0px 7px var(--main-highlight-color);
+}
+a.btn {
+    border-color: var(--main-highlight-color);
+}
+a.btn:hover {
+    color: var(--secondary-text-color) !important;
 }
 a.nav-link, a.dropdown-item {
     color: var(--main-text-color) !important;
 }
-
-/*a.btn {
-    color: var(--secondary-text-color) !important;
+/*.btn-outline-primary {
+    border-color: var(--main-highlight-color);
 }
+.btn-outline-primary:hover {
+    background-color: transparent;
+    text-shadow: none;
+    border-color: var(--main-highlight-color);
+}*/
+/*
 
 a:hover {
     color: var(--main-highlight-color) !important;
@@ -72,7 +83,6 @@ a:hover {
 a.active {
     color: var(--main-highlight-color) !important;
 }*/
-
 .aside-bar {
     border-right: 1px solid #dee2e6;
 }

@@ -9,26 +9,29 @@
 	</div>
 	<div class="topics__panel row align-items-start justify-content-start mb-4">
 		<div class="col-auto">
-			<a asp-area="settings" asp-controller="topics" asp-action="create" class="btn btn-primary">Create</a>
+			<a asp-area="settings" asp-controller="topics" asp-action="create" class="btn btn-outline-primary">Create</a>
 		</div>
 	</div>
-	<div class="topics__list row row-cols-4 row-cols-sm-6 row-cols-md-8 row-cols-lg-10 mb-4">
-		@foreach (var topic in Model.Topics)
-		{
-			<div class="topics__preview col mb-3 rounded">
-				<div class="card text-center">
-					<div class="card-header">
-						@topic.Name
-					</div>
-					<div class="card-body">
-						<i class="fs-4 @topic.IconCssClass"></i> <span class="ms-1 d-none d-sm-inline"></span>
-					</div>
-					<div class="card-footer">
-						<a asp-area="settings" asp-controller="topics" asp-action="edit" asp-route-id="@topic.Name" class="btn btn-primary">Edit</a>
-					</div>
-				</div>
-			</div>
-		}
+	<div class="topics__table mb-4">
+		<table class="table">
+			<thead>
+				<tr>
+					<th scope="col">Name</th>
+					<th scope="col">Icon</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var topic in Model.Topics)
+				{
+					<tr>
+						<th scope="row">
+							<a asp-area="settings" asp-controller="topics" asp-action="edit" asp-route-id="@topic.Name">@topic.Name</a>
+						</th>
+						<td><i class="fs-4 @topic.IconCssClass"></i> <span class="ms-1 d-none d-sm-inline"></span></td>
+					</tr>
+				}
+			</tbody>
+		</table>
 	</div>
 	@if (Model.PageInfo.TotalPages > 1)
 	{

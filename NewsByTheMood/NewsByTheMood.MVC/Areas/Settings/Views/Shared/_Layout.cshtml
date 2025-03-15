@@ -1,10 +1,10 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <partial name="~/Views/Shared/PartialViews/_HeadPartial.cshtml" />
+    <partial name="_HeadPartial" />
 </head>
 <body>
-    <partial name="~/Views/Shared/PartialViews/_HeaderPartial.cshtml" />
+    <partial name="_HeaderPartial" />
     <main role="main">
         <div class="container-fluid">
             <div class="row flex-nowrap">
@@ -40,9 +40,9 @@
             </div>
         </div>
     </main>
-    <partial name="~/Views/Shared/PartialViews/_FooterPartial.cshtml" />
+    <partial name="_FooterPartial" />
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <partial name="~/Views/Shared/PartialViews/_ValidationScriptsPartial.cshtml" />
+    <partial name="_ValidationScriptsPartial" />
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)

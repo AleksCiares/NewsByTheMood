@@ -8,8 +8,10 @@ namespace NewsByTheMood.MVC.Models
         [Required]
         public required SourceModel Source { get; set; }
 
-        public List<SelectListItem>? Topics { get; set; }
+        [Required]
+        public required List<SelectListItem> Topics { get; set; }
 
-        public int RelatedArticlesCount { get; set; }
+        [Required]
+        public required int RelatedArticlesCount { get; set; }
     }
 }

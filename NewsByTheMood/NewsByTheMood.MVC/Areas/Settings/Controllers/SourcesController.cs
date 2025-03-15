@@ -71,7 +71,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             {
                 return View(sourceCreate);
             }
-            if (await _sourceService.IsExistsByNameAsync(sourceCreate.Source.Name))
+            if (await _sourceService.IsExistsByNameAsync(sourceCreate.Source!.Name))
             {
                 ModelState.AddModelError("Source.Name", "A source with the same name already exists");
                 return View(sourceCreate);
@@ -157,9 +157,10 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             {
                 return View(sourceEdit);
             }
-            if (await _sourceService.IsExistsByNameAsync(sourceEdit.Source.Name) && !source.Name.Equals(sourceEdit.Source.Name))
+            if (await _sourceService.IsExistsByNameAsync(sourceEdit.Source.Name) && !sourceEdit.Source.Name.Equals(source.Name))
             {
                 ModelState.AddModelError("Source.Name", "A source with the same name already exists");
+                sourceEdit.Source.Name = source.Name;
                 return View(sourceEdit);
             }
 
@@ -201,7 +202,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             }
             if (source.Articles.Count > 0)
             {
-                ModelState.AddModelError("Source.Name", "The source has related articles, you cannot delete it");
+                ModelState.AddModelError("Source.Name", "Can not delete source with related articles. First of all delete all related articles");
                 return View("Edit", sourceEdit);
             }
 
@@ -224,7 +225,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                 })
                 .ToList();
 
-            if (topics.Count == 0)
+            if (topics.Count <= 0)
             {
                 ModelState.AddModelError("Source.TopicId", "No topics have been created, to create a source you must first create a topic");
             }

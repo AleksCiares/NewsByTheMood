@@ -95,14 +95,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                     Name = topic.Name,
                     IconCssClass = topic.IconCssClass,
                 },
-                RelatedSources = topic.Sources.Select(source => new SourcePreviewModel()
-                {
-                    Id = source.Id.ToString(),
-                    Name = source.Name,
-                    Url = source.Url,
-                    Topic = topic.Name
-                })
-                .ToArray()
+                RelatedSourceCount = topic.Sources.Count
             });
         }
 
@@ -119,9 +112,10 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             {
                 return View(topicEdit);
             }
-            if (await _topicService.IsExistsByNameAsync(topicEdit.Topic.Name) && !topic.Name.Equals(topicEdit.Topic.Name))
+            if (await _topicService.IsExistsByNameAsync(topicEdit.Topic.Name) && !topicEdit.Topic.Name.Equals(topic.Name))
             {
-                ModelState.AddModelError("Name", "A topic with the same name already exists");
+                ModelState.AddModelError("Topic.Name", "A topic with the same name already exists");
+                topicEdit.Topic.Name = topic.Name;  
                 return View(topicEdit);
             }
 
@@ -146,7 +140,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             }
             if (topic.Sources.Count > 0)
             {
-                ModelState.AddModelError("Topic.Name", "You can't delete topic with related sources");
+                ModelState.AddModelError("Topic.Name", "Can not delete topic with related source. First of all delete all related sources");
                 return View("Edit", topicEdit);
             }
 

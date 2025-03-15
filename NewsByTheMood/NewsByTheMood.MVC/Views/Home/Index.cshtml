@@ -21,13 +21,15 @@
                             </div>
                         </div>
                         <div class="w-100">
-                            <a asp-area="" asp-controller="home" asp-action="detail" asp-route-id="@articlePreview.Id" class="card-title text-decoration-none text-white mb-2">
+                            <a asp-area="" asp-controller="home" asp-action="detail" asp-route-id="@articlePreview.Id" 
+                                class="card-title text-decoration-none text-white mb-2">
                                 <h5>
                                     @articlePreview.Title
                                 </h5>
                             </a>
                             <div class="row justify-content-between mb-2">
-                                <div class="articles__positivity col-auto" data-bs-toggle="tooltip" data-bs-placement="right" title="positivity @articlePreview.Positivity">
+                                <div class="articles__positivity col-auto" data-bs-toggle="tooltip" data-bs-placement="right" 
+                                    title="positivity @articlePreview.Positivity">
                                     @switch (articlePreview.Positivity)
                                     {
                                         case 10:
@@ -82,8 +84,6 @@
     }
 </div>
 
-
- 
 @section Scripts
              {
     <script>

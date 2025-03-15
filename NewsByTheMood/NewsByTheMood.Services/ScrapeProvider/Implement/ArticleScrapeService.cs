@@ -125,7 +125,7 @@ namespace NewsByTheMood.Services.ScrapeProvider.Implement
         }
 
         private string? GetPreviewImageUrl(Source source, PrettyScraper scraper)
-        {
+         {
             if (source.ArticlePreviewImgPath.IsNullOrEmpty())
             {
                 return null;
@@ -138,7 +138,7 @@ namespace NewsByTheMood.Services.ScrapeProvider.Implement
                 if (!imgStyle.IsNullOrEmpty())
                 {
                     var regex = new Regex(@"(?<=(background-image:\surl\((""|'|\s))).+(?=((""|'|\s)\)))", RegexOptions.Compiled);
-                    var matches = regex.Matches(path!);
+                    var matches = regex.Matches(imgStyle!);
                     if (matches.Count > 0)
                     {
                         path = matches[0].Value;

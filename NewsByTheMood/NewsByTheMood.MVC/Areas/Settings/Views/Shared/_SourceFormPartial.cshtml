@@ -1,0 +1,157 @@
+﻿@model SourceCreateModel
+
+<div class="source-settings">
+	<div class="name form-floating mb-3">
+		<input asp-for="@Model.Source.Name" type="text" class="form-control" placeholder="Name" />
+		<label asp-for="@Model.Source.Name" class="form-label">Name</label>
+		<span asp-validation-for="@Model.Source.Name" class="error-feedback invalid-feedback"></span>
+	</div>
+	<div class="url form-floating mb-3">
+		<input asp-for="@Model.Source.Url" type="url" class="form-control" placeholder="Url" />
+		<label asp-for="@Model.Source.Url" class="form-label">Url</label>
+		<div class="field-tip form-text text-muted">Only http/https link formats are supported</div>
+		<span asp-validation-for="@Model.Source.Url" class="error-feedback invalid-feedback"></span>
+	</div>
+	<div class="survey row justify-content-start">
+		<div class="col-auto">
+			<div class="survey-period form-floating mb-3" data-mdb-input-init>
+				<input asp-for="@Model.Source.SurveyPeriod" type="number" class="form-control" placeholder="Survey period" />
+				<label asp-for="@Model.Source.SurveyPeriod" class="form-label">Survey period</label>
+				<div class="field-tip form-text text-muted">
+					Period of polling the source for new articles (in mins).<br>Minimum 10 minutes
+				</div>
+				<span asp-validation-for="@Model.Source.SurveyPeriod" class="error-feedback invalid-feedback"></span>
+			</div>
+		</div>
+		<div class="col-auto">
+			<div class="is-random-period form-check mb-3">
+				<input asp-for="@Model.Source.IsRandomPeriod" type="checkbox" class="form-check-input" />
+				<label asp-for="@Model.Source.IsRandomPeriod" class="form-check-label">Use random period</label>
+				<div class="field-tip form-text text-muted">
+					The survey period will be randomized from 10 to <strong>Use random period</strong> minutes
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="has-dynamic-page form-check mb-3">
+		<input asp-for="@Model.Source.HasDynamicPage" type="checkbox" class="form-check-input" />
+		<label asp-for="@Model.Source.HasDynamicPage" class="form-check-label">Has dynamic page</label>
+		<div class="field-tip form-text text-muted">Сheck the box if the resource has dynamic page</div>
+	</div>
+	<div class="is-insecure-certs form-check mb-3">
+		<input asp-for="@Model.Source.AcceptInsecureCerts" type="checkbox" class="form-check-input" />
+		<label asp-for="@Model.Source.AcceptInsecureCerts" class="form-check-label">Accept insecure certs</label>
+		<div class="field-tip form-text text-muted">Сheck the box if the reModel has an insecure certificate</div>
+	</div>
+	<div class="element-loaded form-floating mb-3">
+		<input asp-for="@Model.Source.PageElementLoaded" type="text" class="form-control" placeholder="Page element loaded" />
+		<label asp-for="@Model.Source.PageElementLoaded" class="form-label">Page element loaded</label>
+		<div class="field-tip form-text text-muted">
+			Css selector of an element, the loading of which signals the full loading of
+			the dynamic page (if the page is static, you can specify - body)
+		</div>
+		<span asp-validation-for="@Model.Source.PageElementLoaded" class="error-feedback invalid-feedback"></span>
+	</div>
+	<div class="timeout row justify-content-start">
+		<div class="col-auto">
+			<div class="page-load-timeout form-floating mb-3" data-mdb-input-init>
+				<input asp-for="@Model.Source.PageLoadTimeout" type="number" class="form-control" placeholder="Page load timeout" />
+				<label asp-for="@Model.Source.PageLoadTimeout" class="form-label">Page load timeout</label>
+				<div class="field-tip form-text text-muted">Timeout for waiting for the loading of the page (in seconds)</div>
+				<span asp-validation-for="@Model.Source.PageLoadTimeout" class="error-feedback invalid-feedback"></span>
+			</div>
+		</div>
+		<div class="col-auto">
+			<div class="element-load-timeout form-floating mb-3" data-mdb-input-init>
+				<input asp-for="@Model.Source.ElementLoadTimeout" type="number" class="form-control" placeholder="Element load timeout" />
+				<label asp-for="@Model.Source.ElementLoadTimeout" class="form-label">Element load timeout</label>
+				<div class="field-tip form-text text-muted">
+					Timeout for waiting for the loading of the element specified
+					<strong>Page element loaded</strong> field (in seconds)
+				</div>
+				<span asp-validation-for="@Model.Source.ElementLoadTimeout" class="error-feedback invalid-feedback"></span>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="article-collection-settings">
+	<div class="collection-path form-floating mb-3">
+		<input asp-for="@Model.Source.ArticleCollectionsPath" type="text" class="form-control" placeholder="Article collections path" />
+		<label asp-for="@Model.Source.ArticleCollectionsPath" class="form-label">Article collections path</label>
+		<div class="field-tip form-text text-muted">Css path to html element(s) that contain collection of articles previews</div>
+		<span asp-validation-for="@Model.Source.ArticleCollectionsPath" class="error-feedback invalid-feedback"></span>
+	</div>
+	<div class="item-path form-floating mb-3">
+		<input asp-for="@Model.Source.ArticleItemPath" type="text" class="form-control" placeholder="Article item path" />
+		<label asp-for="@Model.Source.ArticleItemPath" class="form-label">Article item path</label>
+		<div class="field-tip form-text">
+			Сss path to the html element that stores the description of the articles preview,
+			the path relative to the articles container <strong>Article collections path</strong>
+		</div>
+		<span asp-validation-for="@Model.Source.ArticleItemPath" class="error-feedback invalid-feedback"></span>
+	</div>
+	<div class="url-path form-floating mb-3">
+		<input asp-for="@Model.Source.ArticleUrlPath" type="text" class="form-control" placeholder="Article url path" />
+		<label asp-for="@Model.Source.ArticleUrlPath" class="form-label">Article url path</label>
+		<div class="field-tip form-text text-muted">
+			Css path to the html element that stores a link to the article (has attribute href),
+			the path relative to the article item <strong>Article collections path</strong>
+		</div>
+		<span asp-validation-for="@Model.Source.ArticleUrlPath" class="error-feedback invalid-feedback"></span>
+	</div>
+</div>
+<div class="article-item-settings">
+	<div class="title-path form-floating mb-3">
+		<input asp-for="@Model.Source.ArticleTitlePath" type="text" class="form-control" placeholder="Article title path" />
+		<label asp-for="@Model.Source.ArticleTitlePath" class="form-label">Article title path</label>
+		<div class="field-tip form-text text-muted">
+			Css path to the html element that stores a title of the article,
+			the path relative to page of the certain article
+		</div>
+		<span asp-validation-for="@Model.Source.ArticleTitlePath" class="error-feedback invalid-feedback"></span>
+	</div>
+	<div class="preview-img-path form-floating mb-3">
+		<input asp-for="@Model.Source.ArticlePreviewImgPath" type="text" class="form-control" placeholder="Article preview img path" />
+		<label asp-for="@Model.Source.ArticlePreviewImgPath" class="form-label">Article preview img path</label>
+		<div class="field-tip form-text text-muted">
+			Css path to the html element that stores a preview image of the article (if available),
+			the path relative to page of the certain article
+		</div>
+		<span asp-validation-for="@Model.Source.ArticlePreviewImgPath" class="error-feedback invalid-feedback"></span>
+	</div>
+	<div class="body-collection-path form-floating mb-3">
+		<input asp-for="@Model.Source.ArticleBodyCollectionsPath" type="text" class="form-control" placeholder="Article body collections path" />
+		<label asp-for="@Model.Source.ArticleBodyCollectionsPath" class="form-label">Article body collections path</label>
+		<div class="field-tip form-text text-muted">
+			Css path to html element(s) that contain collection of body article (main article content)
+		</div>
+		<span asp-validation-for="@Model.Source.ArticleBodyCollectionsPath" class="error-feedback invalid-feedback"></span>
+	</div>
+	<div class="body-item-path form-floating mb-3">
+		<input asp-for="@Model.Source.ArticleBodyItemPath" type="text" class="form-control" placeholder="Article body item path" />
+		<label asp-for="@Model.Source.ArticleBodyItemPath" class="form-label">Article body item path</label>
+		<div class="field-tip form-text text-muted">
+			Сss path to the html element(s) that stores the main content of the article, which will be extracted along with the html.
+			The path relative to the article body container <strong>Article body collections path</strong>
+		</div>
+		<span asp-validation-for="@Model.Source.ArticleBodyItemPath" class="error-feedback invalid-feedback"></span>
+	</div>
+	<div class="pdate-path form-floating mb-3">
+		<input asp-for="@Model.Source.ArticlePdatePath" type="text" class="form-control" placeholder="Article publish date path" />
+		<label asp-for="@Model.Source.ArticlePdatePath" class="form-label">Article publish date path</label>
+		<div class="field-tip form-text text-muted">
+			Css path to the html element that stores a publish date of the article (if available),
+			the path relative to page of the certain article
+		</div>
+		<span asp-validation-for="@Model.Source.ArticlePdatePath" class="error-feedback invalid-feedback"></span>
+	</div>
+	<div class="tag-path form-floating mb-3">
+		<input asp-for="@Model.Source.ArticleTagPath" type="text" class="form-control" placeholder="Article tag path" />
+		<label asp-for="@Model.Source.ArticleTagPath" class="form-label">Article tag path</label>
+		<div class="field-tip form-text text-muted">
+			Css path to the html element that stores a tags of the article (if available),
+			the path relative to page of the certain article
+		</div>
+		<span asp-validation-for="@Model.Source.ArticleTagPath" class="error-feedback invalid-feedback"></span>
+	</div>
+</div>

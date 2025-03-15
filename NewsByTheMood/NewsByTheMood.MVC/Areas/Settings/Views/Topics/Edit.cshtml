@@ -10,8 +10,8 @@
 	<form asp-antiforgery="true" method="post">
 		<div class="form__panel row align-items-start justify-content-between mb-4">
 			<div class="col-auto">
-				<button asp-area="settings" asp-controller="topics" asp-action="edit" asp-route-id="@Model.Topic.Name" type="submit" class="btn btn-primary">Submit</button>
-				<a asp-area="settings" asp-controller="topics" asp-action="index" class="btn btn-secondary">Cancel</a>
+				<button asp-area="settings" asp-controller="topics" asp-action="edit" asp-route-id="@Model.Topic.Name" type="submit" class="btn btn-outline-primary">Submit</button>
+				<a asp-area="settings" asp-controller="topics" asp-action="index" class="btn btn-outline-secondary">Cancel</a>
 			</div>
 			<div class="col-auto">
 				<button asp-area="settings" asp-controller="topics" asp-action="delete" asp-route-id="@Model.Topic.Name" type="submit" class="btn btn-danger">Delete</button>
@@ -19,9 +19,12 @@
 		</div>
 		<div class="form__body row align-items-start justify-content-start mb-4">
 			<div class="form__warp">
-				@* <div class="id form-floating mb-3" style="display:none;">
-					<input asp-for="@Model.Topic.Id" type="text" value="@Model.Topic.Id" class="form-control" placeholder="@nameof(Model.Topic.Id)" />
-				</div> *@
+				<div class="row mb-3">
+					<div class="col-auto">
+						<span class="text-muted">Topic has @(Model.RelatedSourceCount) related sources</span>
+						<input asp-for="@Model.RelatedSourceCount" type="hidden" class="invisible" />
+					</div>
+				</div>
 				<div class="name form-floating mb-3">
 					<input asp-for="@Model.Topic.Name" type="text" class="form-control" placeholder="@nameof(Model.Topic.Name)" />
 					<label asp-for="@Model.Topic.Name" class="form-label">Topic name</label>
@@ -48,27 +51,3 @@
 		})
 	</script>
 }
-
-@* <hr class="hr" /> *@
-@* <div class="topic__related-sources row align-items-start justify-content-start"> *@
-@* 	<label asp-for="@Model.RelatedSources">Related sources</label> *@
-@* 	<div class="alert alert-danger" role="alert"> *@
-@* 		<span class="field-error" asp-validation-for="@Model.RelatedSources"></span> *@
-@* 	</div> *@
-@* 	<div class="list-group"> *@
-@* 		@foreach (var source in Model.RelatedSources) *@
-@* 		{ *@
-@* 			<button class="source-preview list-group-item list-group-item-action"> *@
-@* 				<div class="name"> *@
-@* 					<a asp-controller="sources" asp-action="edit" asp-route-id="@source.Id" target="_parent"> *@
-@* 						@source.Name *@
-@* 					</a> *@
-@* 				</div> *@
-@* 				<div class="articles-ammount"> *@
-@* 					<span>related articles </span> *@
-@* 					<span class="badge bg-primary rounded-pill">@source.ArticleAmmount</span> *@
-@* 				</div> *@
-@* 			</button> *@
-@* 		} *@
-@* 	</div> *@
-@* </div> *@

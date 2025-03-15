@@ -9,7 +9,7 @@
     </div>
     <div class="topics__panel row align-items-start justify-content-start mb-4">
         <div class="col-auto">
-            <a asp-area="settings" asp-controller="sources" asp-action="create" class="btn btn-primary">Create</a>
+            <a asp-area="settings" asp-controller="sources" asp-action="create" class="btn btn-outline-primary">Create</a>
         </div>
     </div>
     <div class="sources__table mb-4">
@@ -25,7 +25,7 @@
             <tbody>
                 @foreach (var sourcePreview in Model.SourcePreviews)
                 {
-                    <tr @* class="source-preview row justify-content-start align-items-center mb-3" *@>
+                    <tr>
                         <th scope="row">
                             <a asp-area="settings" asp-controller="sources" asp-action="edit" asp-route-id="@sourcePreview.Id">@sourcePreview.Id</a>
                         </th>
@@ -36,7 +36,6 @@
                 }
             </tbody>
         </table>
-            
     </div>
     @if (Model.PageInfo.TotalPages > 1)
     {
