@@ -12,7 +12,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
 
         public SourceService(NewsByTheMoodDbContext dbContext)
         {
-            this._dbContext = dbContext;
+            _dbContext = dbContext;
         }
 
         public async Task<Source?> GetByIdAsync(Int64 id)
@@ -61,7 +61,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 return Array.Empty<Source>();
             }
 
-            return await this._dbContext.Sources
+            return await _dbContext.Sources
                 .AsNoTracking()
                 .Include(source => source.Topic)
                 .Include(source => source.Articles)
@@ -71,9 +71,16 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .ToArrayAsync();
         }
 
+        public async Task<Source[]> GetAllAsync()
+        {
+            return await _dbContext.Sources
+                .AsNoTracking()
+                .ToArrayAsync();
+        }
+
         public async Task<int> CountAsync()
         {
-            return await this._dbContext.Sources
+            return await _dbContext.Sources
                 .AsNoTracking()
                 .CountAsync();
         }
@@ -85,7 +92,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 return false;
             }
 
-            return await this._dbContext.Sources
+            return await _dbContext.Sources
                 .AsNoTracking()
                 .Where(source => source.Name.Equals(sourceName))
                 .AnyAsync();
@@ -93,20 +100,20 @@ namespace NewsByTheMood.Services.DataProvider.Implement
 
         public async Task AddAsync(Source source)
         {
-            await this._dbContext.Sources.AddAsync(source);
-            await this._dbContext.SaveChangesAsync();
+            await _dbContext.Sources.AddAsync(source);
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(Source source)
         {
-            this._dbContext.Sources.Update(source);
-            await this._dbContext.SaveChangesAsync();
+            _dbContext.Sources.Update(source);
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(Source source)
         {
-            this._dbContext.Sources.Remove(source);
-            await this._dbContext.SaveChangesAsync();
+            _dbContext.Sources.Remove(source);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

@@ -9,25 +9,38 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
     {
         private readonly IArticleScrapeService _articleLoadService;
         private readonly ISourceService _sourceService;
+        private readonly ILogger<ArticlesLoadController> _logger;
 
-        public ArticlesLoadController(IArticleScrapeService articleLoadService, ISourceService sourceService)
+        public ArticlesLoadController(IArticleScrapeService articleLoadService, ISourceService sourceService, ILogger<ArticlesLoadController> logger)
         {
             _articleLoadService = articleLoadService;
             _sourceService = sourceService;
+            _logger = logger;
         }
 
         [HttpGet("{Controller}/{Action}/{id:required}")]
         public async Task<IActionResult> LoadArticles(string id)
         {
-            var source = await _sourceService.GetByIdAsync(long.Parse(id));
-            if (source == null)
+            try
             {
+                var source = await _sourceService.GetByIdAsync(long.Parse(id));
+                if (source == null)
+                {
+                    _logger.LogWarning($"Source with id {id} was not found");
+                    return RedirectToAction("Index", "Sources");
+                }
+
+                await _articleLoadService.LoadArticles(source);
+
+                _logger.LogInformation($"Articles from source {source.Name} were loaded successfully");
+
                 return RedirectToAction("Index", "Sources");
             }
-
-            await _articleLoadService.LoadArticles(source);
-
-            return RedirectToAction("Index", "Sources");
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error while loading articles from source. SourceId: {id}");
+                return StatusCode(500);
+            }
         }
     }
 }

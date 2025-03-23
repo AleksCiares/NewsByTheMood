@@ -21,12 +21,18 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
         public Task<Article?> GetByIdAsync(Int64 id);
 
         // Is exist article with current url
-        public Task<bool> IsExistByUrlAsync(string articleUrl);
+        public Task<bool> IsExistsByUrlAsync(string articleUrl);
 
         // Create article
         public Task AddAsync(Article article);
 
         // Create range articles
         public Task AddRangeAsync(Article[] articles);
+
+        // Update article item
+        public Task UpdateAsync(Article article);
+
+        // Delete article
+        public Task DeleteAsync(Article article);
     }
 }

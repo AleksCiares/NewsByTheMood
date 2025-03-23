@@ -28,6 +28,13 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .SingleOrDefaultAsync();
         }
 
+        public async Task<Tag[]> GetAllAsync()
+        {
+            return await _dbContext.Tags
+                .AsNoTracking()
+                .ToArrayAsync();
+        }
+
         public async Task<bool> IsExistsByNameAsync(string tagName)
         {
             if (string.IsNullOrEmpty(tagName))

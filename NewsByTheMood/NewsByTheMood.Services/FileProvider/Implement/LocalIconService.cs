@@ -17,7 +17,7 @@ namespace NewsByTheMood.Services.FileProvider.Implement
         }
 
         // Get all icon css classes
-        public async Task<string[]> GetIconsCssClasses()
+        public async Task<string[]> GetIconsCssClassesAsync()
         {
             if (string.IsNullOrEmpty(this._options.CssFilePath) || 
                 string.IsNullOrEmpty(this._options.CssClassRegex) || 

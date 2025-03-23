@@ -1,0 +1,48 @@
+﻿@model ArticlePreviewCollectionModel
+@{
+    ViewData["PageTitle"] = "Articles";
+}
+
+<div class="articles container">
+    <div class="articles__header d-flex row mb-5">
+        <h4 class="mb-0">Sources</h4>
+    </div>
+    <div class="articles__panel row align-items-start justify-content-start mb-4">
+        <div class="col-auto">
+            <a asp-area="settings" asp-controller="articles" asp-action="create" class="btn btn-outline-primary">Create</a>
+        </div>
+    </div>
+    <div class="articles__table mb-4">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Source</th>
+                    <th scope="col">Topic</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var articlePreview in Model.ArticleShortPreviews)
+                {
+                    <tr>
+                        <th scope="row">
+                            <a asp-area="settings" asp-controller="articles" asp-action="edit" asp-route-id="@articlePreview.Id">@articlePreview.Id</a>
+                        </th>
+                        <td>@articlePreview.Title</td>
+                        <td>@articlePreview.SourceName</td>
+                        <td>@articlePreview.TopicName</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    @if (Model.PageInfo.TotalPages > 1)
+    {
+        <div class="topic__pagination row align-items-center justify-content-center mb-4">
+            <div class="col-auto">
+                <pagination page-action="index" page-info="@Model.PageInfo"></pagination>
+            </div>
+        </div>
+    }
+</div>

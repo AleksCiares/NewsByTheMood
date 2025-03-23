@@ -13,107 +13,130 @@ namespace NewsByTheMood.MVC.Filters
         private readonly bool _isSpoof = false;
         private readonly string[]? _pathToProperty = null;
         private readonly AlphabetCrypt? _alphabetCrypt = null;
+        private readonly ILogger<SpoofModelPropertyFilter> _logger;
 
-        public SpoofModelPropertyFilter(IOptions<SpoofOptions> options, string pathToProperty) 
+        public SpoofModelPropertyFilter(IOptions<SpoofOptions> options, string pathToProperty, ILogger<SpoofModelPropertyFilter> logger)
         {
-            if (this._isSpoof = options.Value.SpoofRealId)
+            _logger = logger;
+
+            try
             {
-                if (this._isSpoof &&
-                    !string.IsNullOrEmpty(pathToProperty))
+                if (_isSpoof = options.Value.SpoofRealId)
                 {
-                    this._pathToProperty = pathToProperty.Split('.');
-                    this._alphabetCrypt = new AlphabetCrypt(options.Value.SpoofSecret);
+                    if (_isSpoof && !string.IsNullOrEmpty(pathToProperty))
+                    {
+                        _pathToProperty = pathToProperty.Split('.');
+                        _alphabetCrypt = new AlphabetCrypt(options.Value.SpoofSecret);
+                    }
+                    else
+                    {
+                        _isSpoof = false;
+                        _pathToProperty = null;
+                        _alphabetCrypt = null;
+                    }
                 }
-                else
-                {
-                    this._isSpoof = false;
-                    this._pathToProperty = null;
-                    this._alphabetCrypt = null;
-                }               
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while initializing SpoofModelPropertyFilter");
+                _isSpoof = false;
+                _pathToProperty = null;
+                _alphabetCrypt = null;
             }
         }
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            if (this._isSpoof)
+            string? paramName = null;
+            if (_isSpoof)
             {
-                var paramName = this._pathToProperty![this._pathToProperty.Length - 1];
-                if (context.ActionArguments.ContainsKey(paramName) &&
-                    context.ActionArguments[paramName] is string param)
+                try
                 {
-                    context.ActionArguments[paramName] =
-                        this._alphabetCrypt!.Encrypt(param);
+                    paramName = _pathToProperty![_pathToProperty.Length - 1];
+                    if (context.ActionArguments.ContainsKey(paramName) &&
+                        context.ActionArguments[paramName] is string param)
+                    {
+                        context.ActionArguments[paramName] = _alphabetCrypt!.Encrypt(param);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Error while SpoofModelPropertyFilter. Parameter: {paramName}");
                 }
             }
-            
+
         }
 
         public void OnActionExecuted(ActionExecutedContext context)
         {
-            if (this._isSpoof)
+            if (_isSpoof)
             {
-                var model = (context.Result as ViewResult)?.Model;
-                if (model != null)
+                try
                 {
-                    var type = model.GetType();
-                    for (var i = 0; i < this._pathToProperty!.Length-1; i++)
+                    var model = (context.Result as ViewResult)?.Model;
+                    if (model != null)
                     {
-                        model = type.GetProperty(this._pathToProperty[i], 
-                            BindingFlags.IgnoreCase | 
-                            BindingFlags.Instance | 
-                            BindingFlags.Public)?.
-                            GetValue(model);
-                        if (model == null)
+                        var type = model.GetType();
+                        for (var i = 0; i < _pathToProperty!.Length - 1; i++)
                         {
-                            return;
+                            model = type.GetProperty(_pathToProperty[i],
+                                BindingFlags.IgnoreCase |
+                                BindingFlags.Instance |
+                                BindingFlags.Public)?.
+                                GetValue(model);
+                            if (model == null)
+                            {
+                                return;
+                            }
+                            type = model.GetType();
                         }
-                        type = model.GetType();
-                    }
 
-                    if (type.IsArray)
-                    {
-                        PropertyInfo? property = null;
-                        object? value = null;
-                        foreach (var item in (Array)model)
+                        if (type.IsArray)
                         {
-                            property = item.GetType().GetProperty(this._pathToProperty[this._pathToProperty.Length - 1], 
-                                BindingFlags.IgnoreCase | 
-                                BindingFlags.Instance | 
+                            PropertyInfo? property = null;
+                            object? value = null;
+                            foreach (var item in (Array)model)
+                            {
+                                property = item.GetType().GetProperty(_pathToProperty[_pathToProperty.Length - 1],
+                                    BindingFlags.IgnoreCase |
+                                    BindingFlags.Instance |
+                                    BindingFlags.Public);
+                                if (property == null)
+                                {
+                                    continue;
+                                }
+                                value = property.GetValue(item) as string;
+                                if (value == null)
+                                {
+                                    continue;
+                                }
+                                property.SetValue(item, _alphabetCrypt!.Crypt((string)value));
+                            }
+                        }
+                        else
+                        {
+                            var property = type.GetProperty(_pathToProperty[_pathToProperty.Length - 1],
+                                BindingFlags.IgnoreCase |
+                                BindingFlags.Instance |
                                 BindingFlags.Public);
                             if (property == null)
                             {
-                                continue;
+                                return;
                             }
-                            value = property.GetValue(item) as string;
+                            var value = property.GetValue(model) as string;
                             if (value == null)
                             {
-                                continue;
+                                return;
                             }
-                            property.SetValue(item, this._alphabetCrypt!.Crypt((string)value));
+                            property.SetValue(model, _alphabetCrypt!.Crypt((string)value));
                         }
                     }
-                    else
-                    {
-                        var property = type.GetProperty(this._pathToProperty[this._pathToProperty.Length - 1], 
-                            BindingFlags.IgnoreCase | 
-                            BindingFlags.Instance |
-                            BindingFlags.Public);
-                        if (property == null)
-                        {
-                            return;
-                        }
-                        var value = property.GetValue(model) as string;
-                        if (value == null)
-                        {
-                            return;
-                        }
-                        property.SetValue(model, this._alphabetCrypt!.Crypt((string)value));
-                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error while SpoofModelPropertyFilter");
                 }
             }
         }
-
-        
     }
-
 }

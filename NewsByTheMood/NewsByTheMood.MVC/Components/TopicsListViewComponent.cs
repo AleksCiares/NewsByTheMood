@@ -8,23 +8,33 @@ namespace NewsByTheMood.MVC.Components
     public class TopicsListViewComponent : ViewComponent
     {
         private readonly ITopicService _topicService;
+        private readonly ILogger<TopicsListViewComponent> _logger;
 
-        public TopicsListViewComponent(ITopicService topicService)
+        public TopicsListViewComponent(ITopicService topicService, ILogger<TopicsListViewComponent> logger)
         {
             this._topicService = topicService;
+            _logger = logger;
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var topics = (await this._topicService.GetAllAsync()) // replaced with mapper
-                .Select(t => new TopicModel()
-                {
-                    Name = t.Name,
-                    IconCssClass = t.IconCssClass
-                })
-                .ToArray();
+            try
+            {
+                var topics = (await this._topicService.GetAllAsync()) // replaced with mapper
+                    .Select(t => new TopicModel()
+                    {
+                        Name = t.Name,
+                        IconCssClass = t.IconCssClass
+                    })
+                    .ToArray();
 
-            return View(topics);
+                return View(topics);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching topics");
+                return View(Array.Empty<TopicModel>());
+            }
         }
     }
 }

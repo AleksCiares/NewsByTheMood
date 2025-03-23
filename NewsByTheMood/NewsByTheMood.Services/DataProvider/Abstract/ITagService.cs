@@ -18,6 +18,12 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
         public Task<bool> IsExistsByNameAsync(string tagName);
 
         /// <summary>
+        /// Get all tags
+        /// </summary>
+        /// <returns></returns>
+        public Task<Tag[]> GetAllAsync();
+
+        /// <summary>
         /// Add tag
         /// </summary>
         public Task AddAsync(Tag tag);

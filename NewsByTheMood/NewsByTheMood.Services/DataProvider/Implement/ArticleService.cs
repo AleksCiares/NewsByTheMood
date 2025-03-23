@@ -1,6 +1,4 @@
-﻿using AngleSharp.Dom;
-using Azure;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NewsByTheMood.Data;
 using NewsByTheMood.Data.Entities;
@@ -122,7 +120,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 .SingleOrDefaultAsync();*/
         }
 
-        public async Task<bool> IsExistByUrlAsync(string articleUrl)
+        public async Task<bool> IsExistsByUrlAsync(string articleUrl)
         {
             if (articleUrl.IsNullOrEmpty())
             {
@@ -184,5 +182,19 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             await _dbContext.Articles.AddRangeAsync(articles);
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task UpdateAsync(Article article)
+        {
+            this._dbContext.Articles.Update(article);
+            await this._dbContext.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(Article article)
+        {
+            _dbContext.Articles.Remove(article);
+            await _dbContext.SaveChangesAsync();
+        }
     }
+
+
 }

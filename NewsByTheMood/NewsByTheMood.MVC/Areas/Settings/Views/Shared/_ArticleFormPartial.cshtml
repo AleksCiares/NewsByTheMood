@@ -1,0 +1,66 @@
+﻿@model ArticleCreateModel
+
+<div class="article-settings">
+	<div class="name form-floating mb-3">
+		<input asp-for="@Model.Article.Title" type="text" class="form-control" placeholder="Title" />
+		<label asp-for="@Model.Article.Title" class="form-label">Title</label>
+		<span asp-validation-for="@Model.Article.Title" class="error-feedback invalid-feedback"></span>
+	</div>
+	<div class="url form-floating mb-3">
+		<input asp-for="@Model.Article.Url" type="url" class="form-control" placeholder="Url" />
+		<label asp-for="@Model.Article.Url" class="form-label">Url</label>
+		<div class="field-tip form-text text-muted">Only http/https link formats are supported</div>
+		<span asp-validation-for="@Model.Article.Url" class="error-feedback invalid-feedback"></span>
+	</div>
+	<div class="preview-img-url form-floating mb-3">
+		<input asp-for="@Model.Article.PreviewImgUrl" type="url" class="form-control" placeholder="Preview image url" />
+		<label asp-for="@Model.Article.PreviewImgUrl" class="form-label">Preview image url</label>
+		<div class="field-tip form-text text-muted">Only http/https link formats are supported</div>
+		<span asp-validation-for="@Model.Article.PreviewImgUrl" class="error-feedback invalid-feedback"></span>
+	</div>
+	<div class="body form-floating mb-3">
+		<input asp-for="@Model.Article.Body" type="text" class="form-control" placeholder="Body" />
+		<label asp-for="@Model.Article.Body" class="form-label">Body</label>
+		<span asp-validation-for="@Model.Article.Body" class="error-feedback invalid-feedback"></span>
+	</div>
+	<div class="publish-date form-floating mb-3">
+		<input asp-for="@Model.Article.PublishDate" type="datetime" class="form-control" placeholder="Publish date" />
+		<label asp-for="@Model.Article.PublishDate" class="form-label">Publish date</label>
+		<span asp-validation-for="@Model.Article.PublishDate" class="error-feedback invalid-feedback"></span>
+	</div>
+	<div class="positivity form-floating mb-3" data-mdb-input-init>
+		<input asp-for="@Model.Article.Positivity" type="number" class="form-control" placeholder="Positivity" />
+		<label asp-for="@Model.Article.Positivity" class="form-label">Positivity</label>
+		<span asp-validation-for="@Model.Article.Positivity" class=" error-feedback invalid-feedback"></span>
+	</div>
+    <div class="source form-floating mb-3">
+        <select asp-for="@Model.Article.SourceId" asp-items="@Model.Sources" class="form-select"></select>
+        <label asp-for="@Model.Article.SourceId" class="form-label">Source</label>
+        <span asp-validation-for="@Model.Article.SourceId" class="error-feedback invalid-feedback"></span>
+	</div>
+	<div class="tags form-floating mb-3">
+		<select asp-for="@Model.Tags" asp-items="@Model.Tags" class="form-select" multiple></select>
+		<label asp-for="@Model.Tags" class="form-label">Tags</label>
+		<span asp-validation-for="@Model.Tags" class="error-feedback invalid-feedback"></span>
+	</div>
+</div>
+@if (Model.Sources.Count > 0)
+{
+	<div class="sources">
+		@for (int i = 0; i < Model.Sources.Count; i++)
+		{
+			<input type="hidden" name="Sources[@i].Value" value="@Model.Sources[i].Value" />
+			<input type="hidden" name="Sources[@i].Text" value="@Model.Sources[i].Text" />
+		}
+	</div>
+}
+@if (Model.Tags.Count > 0)
+{
+	<div class="tags">
+		@for (int i = 0; i < Model.Tags.Count; i++)
+		{
+			<input type="hidden" name="Tags[@i].Value" value="@Model.Tags[i].Value" />
+			<input type="hidden" name="Tags[@i].Text" value="@Model.Tags[i].Text" />
+		}
+	</div>
+}

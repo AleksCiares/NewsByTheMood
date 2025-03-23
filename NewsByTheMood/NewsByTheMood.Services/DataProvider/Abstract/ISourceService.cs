@@ -11,6 +11,9 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
         // Get source range
         public Task<Source[]> GetRangeAsync(int pageNumber, int pageSize);
 
+        // Get all sources
+        public Task<Source[]> GetAllAsync();
+
         // Get source count 
         public Task<int> CountAsync();
 
@@ -25,5 +28,6 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
 
         // Delete source
         public Task DeleteAsync(Source source);
+
     }
 }

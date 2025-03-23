@@ -51,7 +51,7 @@ namespace NewsByTheMood.Services.ScrapeProvider.Implement
                     articlesUrls[i] = new Uri(new Uri(source.Url), articlesUrls[i]).ToString();
                 }
 
-                if (await _articleService.IsExistByUrlAsync(articlesUrls[i]))
+                if (await _articleService.IsExistsByUrlAsync(articlesUrls[i]))
                 {
                     articlesUrls.RemoveAt(i);
                 }

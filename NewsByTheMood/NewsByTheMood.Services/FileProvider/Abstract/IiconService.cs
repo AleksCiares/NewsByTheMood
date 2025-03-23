@@ -6,6 +6,6 @@ namespace NewsByTheMood.Services.FileProvider.Abstract
     public interface IiconService
     {
         // Get all icon css classes
-        public Task<string[]> GetIconsCssClasses();
+        public Task<string[]> GetIconsCssClassesAsync();
     }
 }

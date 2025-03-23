@@ -4,9 +4,9 @@ namespace NewsByTheMood.Services.FileProvider.Implement
 {
     public class EmptyIconService : IiconService
     {
-        public async Task<string[]> GetIconsCssClasses()
+        public async Task<string[]> GetIconsCssClassesAsync()
         {
-            return new List<string>().ToArray();
+            return await Task.FromResult(new List<string>().ToArray());
         }
     }
 }

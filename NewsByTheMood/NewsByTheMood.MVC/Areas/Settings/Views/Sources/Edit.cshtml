@@ -4,8 +4,8 @@
 }
 
 <div class="source container">
-	<div class="topic__header d-flex row mb-5">
-		<h4 class="mb-0">Edit topic @Model.Source.Name</h4>
+	<div class="source__header d-flex row mb-5">
+		<h4 class="mb-0">Edit source @Model.Source.Name</h4>
 	</div>
 	<form asp-antiforgery="true" method="post">
 		<div class="form__panel row align-items-start justify-content-between mb-4">
@@ -26,24 +26,9 @@
 						<input asp-for="@Model.RelatedArticlesCount" type="hidden" class="invisible" />
 					</div>
 				</div>
-				@if (Model.Topics.Count > 0)
-				{
-					<div class="topics">
-						@for (int i = 0; i < Model.Topics.Count; i++)
-						{
-							<input type="hidden" name="Topics[@i].Value" value="@Model.Topics[i].Value" />
-							<input type="hidden" name="Topics[@i].Text" value="@Model.Topics[i].Text" />
-						}
-					</div>
-				}
-				<div class="topic form-floating mb-3">
-					<select asp-for="@Model.Source.TopicId" asp-items="@Model.Topics" class="form-select"></select>
-					<label asp-for="@Model.Source.TopicId" class="form-label">@nameof(Model.Source.TopicId)</label>
-					<span asp-validation-for="@Model.Source.TopicId" class="error-feedback invalid-feedback"></span>
-				</div>
 				<partial name="_SourceFormPartial" model="new SourceCreateModel(){Source = Model.Source, Topics = Model.Topics}" />
 				<div class="id form-floating mb-3" style="display:none;">
-					<input asp-for="@Model.Source.Id" type="number" value="0" class="form-control" />
+					<input asp-for="@Model.Source.Id" type="number" value="@Model.Source.Id" class="form-control" />
 				</div>
 			</div>
 		</div>

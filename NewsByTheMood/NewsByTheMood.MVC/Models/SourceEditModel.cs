@@ -12,6 +12,7 @@ namespace NewsByTheMood.MVC.Models
         public required List<SelectListItem> Topics { get; set; }
 
         [Required]
+        [Range(0, Int64.MaxValue)]
         public required int RelatedArticlesCount { get; set; }
     }
 }

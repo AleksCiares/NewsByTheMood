@@ -12,95 +12,131 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
     {
         private readonly ISourceService _sourceService;
         private readonly ITopicService _topicService;
+        private readonly ILogger<SourcesController> _logger;
 
-        public SourcesController(ISourceService sourceService, ITopicService topicService)
+        public SourcesController(ISourceService sourceService, ITopicService topicService, ILogger<SourcesController> logger)
         {
             _sourceService = sourceService;
             _topicService = topicService;
+            _logger = logger;
         }
 
         // Get range of sources previews
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery] PaginationModel pagination)
         {
-            var totalSources = await _sourceService.CountAsync();
-            var sources = Array.Empty<SourcePreviewModel>();
-
-            if (totalSources > 0)
+            try
             {
-                sources = (await _sourceService.GetRangeAsync(
-                    pagination.Page,
-                    pagination.PageSize))
-                    .Select(source => new SourcePreviewModel()
-                    {
-                        Id = source.Id.ToString(),
-                        Name = source.Name,
-                        Url = source.Url,
-                        Topic = source.Topic.Name,
-                    })
-                    .ToArray();
-            }
+                var totalSources = await _sourceService.CountAsync();
+                var sources = Array.Empty<SourcePreviewModel>();
 
-            return View(new SourceCollectionModel()
-            {
-                SourcePreviews = sources,
-                PageInfo = new PageInfoModel()
+                if (totalSources > 0)
                 {
-                    Page = pagination.Page,
-                    PageSize = pagination.PageSize,
-                    TotalItems = totalSources
+                    sources = (await _sourceService.GetRangeAsync(
+                        pagination.Page,
+                        pagination.PageSize))
+                        .Select(source => new SourcePreviewModel()
+                        {
+                            Id = source.Id.ToString(),
+                            Name = source.Name,
+                            Url = source.Url,
+                            Topic = source.Topic.Name,
+                        })
+                        .ToArray();
+
+                    _logger.LogDebug($"Sources were fetch successfully");
                 }
-            });
+                else
+                {
+                    _logger.LogDebug("No sources were found");
+                }
+
+                return View(new SourceCollectionModel()
+                {
+                    SourcePreviews = sources,
+                    PageInfo = new PageInfoModel()
+                    {
+                        Page = pagination.Page,
+                        PageSize = pagination.PageSize,
+                        TotalItems = totalSources
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error while fetching sources " +
+                    $"Page: {pagination.Page}, " +
+                    $"PageSize: {pagination.PageSize}, ");
+                return StatusCode(500);
+            }
         }
 
         // Create source item 
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            return View(new SourceCreateModel()
+            try
             {
-                Topics = await GetTopicsAsync(),
-            });
+                return View(new SourceCreateModel()
+                {
+                    Topics = await GetTopicsAsync(),
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while getting create source page");
+                return StatusCode(500);
+            }
         }
 
         // Create source item proccessing
         [HttpPost]
         public async Task<IActionResult> Create([FromForm] SourceCreateModel sourceCreate)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return View(sourceCreate);
-            }
-            if (await _sourceService.IsExistsByNameAsync(sourceCreate.Source!.Name))
-            {
-                ModelState.AddModelError("Source.Name", "A source with the same name already exists");
-                return View(sourceCreate);
-            }
+                if (!ModelState.IsValid)
+                {
+                    return View(sourceCreate);
+                }
+                if (await _sourceService.IsExistsByNameAsync(sourceCreate.Source!.Name))
+                {
+                    ModelState.AddModelError("Source.Name", "A source with the same name already exists");
+                    return View(sourceCreate);
+                }
 
-            await _sourceService.AddAsync(new Source()
-            {
-                Name = sourceCreate.Source.Name,
-                Url = sourceCreate.Source.Url,
-                SurveyPeriod = sourceCreate.Source.SurveyPeriod,
-                IsRandomPeriod = sourceCreate.Source.IsRandomPeriod,
-                HasDynamicPage = sourceCreate.Source.HasDynamicPage,
-                AcceptInsecureCerts = sourceCreate.Source.AcceptInsecureCerts,
-                PageElementLoaded = sourceCreate.Source.PageElementLoaded,
-                PageLoadTimeout = sourceCreate.Source.PageLoadTimeout,
-                ElementLoadTimeout = sourceCreate.Source.ElementLoadTimeout,
-                ArticleCollectionsPath = sourceCreate.Source.ArticleCollectionsPath,
-                ArticleItemPath = sourceCreate.Source.ArticleItemPath,
-                ArticleUrlPath = sourceCreate.Source.ArticleUrlPath,
-                ArticleTitlePath = sourceCreate.Source.ArticleTitlePath,
-                ArticlePreviewImgPath = sourceCreate.Source.ArticlePreviewImgPath,
-                ArticleBodyCollectionsPath = sourceCreate.Source.ArticleBodyCollectionsPath,
-                ArticleBodyItemPath = sourceCreate.Source.ArticleBodyItemPath,
-                ArticlePdatePath = sourceCreate.Source.ArticlePdatePath,
-                ArticleTagPath = sourceCreate.Source.ArticleTagPath,
-                TopicId = long.Parse(sourceCreate.Source.TopicId),
-            });
+                await _sourceService.AddAsync(new Source()
+                {
+                    Name = sourceCreate.Source.Name,
+                    Url = sourceCreate.Source.Url,
+                    SurveyPeriod = sourceCreate.Source.SurveyPeriod,
+                    IsRandomPeriod = sourceCreate.Source.IsRandomPeriod,
+                    HasDynamicPage = sourceCreate.Source.HasDynamicPage,
+                    AcceptInsecureCerts = sourceCreate.Source.AcceptInsecureCerts,
+                    PageElementLoaded = sourceCreate.Source.PageElementLoaded,
+                    PageLoadTimeout = sourceCreate.Source.PageLoadTimeout,
+                    ElementLoadTimeout = sourceCreate.Source.ElementLoadTimeout,
+                    ArticleCollectionsPath = sourceCreate.Source.ArticleCollectionsPath,
+                    ArticleItemPath = sourceCreate.Source.ArticleItemPath,
+                    ArticleUrlPath = sourceCreate.Source.ArticleUrlPath,
+                    ArticleTitlePath = sourceCreate.Source.ArticleTitlePath,
+                    ArticlePreviewImgPath = sourceCreate.Source.ArticlePreviewImgPath,
+                    ArticleBodyCollectionsPath = sourceCreate.Source.ArticleBodyCollectionsPath,
+                    ArticleBodyItemPath = sourceCreate.Source.ArticleBodyItemPath,
+                    ArticlePdatePath = sourceCreate.Source.ArticlePdatePath,
+                    ArticleTagPath = sourceCreate.Source.ArticleTagPath,
+                    TopicId = long.Parse(sourceCreate.Source.TopicId),
+                });
 
-            return RedirectToAction("Index");
+                _logger.LogInformation($"Source {sourceCreate.Source.Name} was created successfully");
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating source");
+                return StatusCode(500);
+            }
         }
 
 
@@ -108,110 +144,141 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         [HttpGet("{Controller}/{Action}/{id:required}")]
         public async Task<IActionResult> Edit([FromRoute] string id)
         {
-            var source = await _sourceService.GetByIdAsync(long.Parse(id));
-            if (source == null)
+            try
             {
-                return BadRequest();
-            }
-
-            return View(new SourceEditModel()
-            {
-                Source = new SourceModel()
+                var source = await _sourceService.GetByIdAsync(long.Parse(id));
+                if (source == null)
                 {
-                    Id = source.Id.ToString(),
-                    Name = source.Name,
-                    Url = source.Url,
-                    SurveyPeriod = source.SurveyPeriod,
-                    IsRandomPeriod = source.IsRandomPeriod,
-                    HasDynamicPage = source.HasDynamicPage,
-                    AcceptInsecureCerts = source.AcceptInsecureCerts,
-                    PageElementLoaded = source.PageElementLoaded,
-                    PageLoadTimeout = source.PageLoadTimeout,
-                    ElementLoadTimeout = source.ElementLoadTimeout,
-                    ArticleCollectionsPath = source.ArticleCollectionsPath,
-                    ArticleItemPath = source.ArticleItemPath,
-                    ArticleUrlPath = source.ArticleUrlPath,
-                    ArticleTitlePath = source.ArticleTitlePath,
-                    ArticlePreviewImgPath = source.ArticlePreviewImgPath,
-                    ArticleBodyCollectionsPath = source.ArticleBodyCollectionsPath,
-                    ArticleBodyItemPath = source.ArticleBodyItemPath,
-                    ArticlePdatePath = source.ArticlePdatePath,
-                    ArticleTagPath = source.ArticleTagPath,
-                    TopicId = source.TopicId.ToString(),
-                },
-                Topics = await GetTopicsAsync(),
-                RelatedArticlesCount = source.Articles.Count,
-            });
+                    _logger.LogWarning($"Source with id {id} was not found");
+                    return BadRequest();
+                }
+
+                return View(new SourceEditModel()
+                {
+                    Source = new SourceModel()
+                    {
+                        Id = source.Id.ToString(),
+                        Name = source.Name,
+                        Url = source.Url,
+                        SurveyPeriod = source.SurveyPeriod,
+                        IsRandomPeriod = source.IsRandomPeriod,
+                        HasDynamicPage = source.HasDynamicPage,
+                        AcceptInsecureCerts = source.AcceptInsecureCerts,
+                        PageElementLoaded = source.PageElementLoaded,
+                        PageLoadTimeout = source.PageLoadTimeout,
+                        ElementLoadTimeout = source.ElementLoadTimeout,
+                        ArticleCollectionsPath = source.ArticleCollectionsPath,
+                        ArticleItemPath = source.ArticleItemPath,
+                        ArticleUrlPath = source.ArticleUrlPath,
+                        ArticleTitlePath = source.ArticleTitlePath,
+                        ArticlePreviewImgPath = source.ArticlePreviewImgPath,
+                        ArticleBodyCollectionsPath = source.ArticleBodyCollectionsPath,
+                        ArticleBodyItemPath = source.ArticleBodyItemPath,
+                        ArticlePdatePath = source.ArticlePdatePath,
+                        ArticleTagPath = source.ArticleTagPath,
+                        TopicId = source.TopicId.ToString(),
+                    },
+                    Topics = await GetTopicsAsync(),
+                    RelatedArticlesCount = source.Articles.Count,
+                });
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, $"Error while getting source {id}");
+                return StatusCode(500);
+            }
         }
 
         // Edit source item proccessing
         [HttpPost("{Controller}/{Action}/{id:required}")]
         public async Task<IActionResult> Edit([FromRoute] string id, [FromForm] SourceEditModel sourceEdit)
         {
-            var source = await _sourceService.GetByIdAsync(long.Parse(id));
-            if (source == null)
+            try
             {
-                return BadRequest();
-            }
-            if (!ModelState.IsValid)
-            {
-                return View(sourceEdit);
-            }
-            if (await _sourceService.IsExistsByNameAsync(sourceEdit.Source.Name) && !sourceEdit.Source.Name.Equals(source.Name))
-            {
-                ModelState.AddModelError("Source.Name", "A source with the same name already exists");
-                sourceEdit.Source.Name = source.Name;
-                return View(sourceEdit);
-            }
+                var source = await _sourceService.GetByIdAsync(long.Parse(id));
+                if (source == null)
+                {
+                    _logger.LogWarning($"Source with id {id} was not found");
+                    return BadRequest();
+                }
+                if (!ModelState.IsValid)
+                {
+                    return View(sourceEdit);
+                }
+                if (await _sourceService.IsExistsByNameAsync(sourceEdit.Source.Name) && !sourceEdit.Source.Name.Equals(source.Name))
+                {
+                    ModelState.AddModelError("Source.Name", "A source with the same name already exists");
+                    sourceEdit.Source.Name = source.Name;
+                    return View(sourceEdit);
+                }
 
-            await _sourceService.UpdateAsync(new Source()
-            {
-                Id = long.Parse(id),
-                Name = sourceEdit.Source.Name,
-                Url = sourceEdit.Source.Url,
-                SurveyPeriod = sourceEdit.Source.SurveyPeriod,
-                IsRandomPeriod = sourceEdit.Source.IsRandomPeriod,
-                HasDynamicPage = sourceEdit.Source.HasDynamicPage,
-                AcceptInsecureCerts = sourceEdit.Source.AcceptInsecureCerts,
-                PageElementLoaded = sourceEdit.Source.PageElementLoaded,
-                PageLoadTimeout = sourceEdit.Source.PageLoadTimeout,
-                ElementLoadTimeout = sourceEdit.Source.ElementLoadTimeout,
-                ArticleCollectionsPath = sourceEdit.Source.ArticleCollectionsPath,
-                ArticleItemPath = sourceEdit.Source.ArticleItemPath,
-                ArticleUrlPath = sourceEdit.Source.ArticleUrlPath,
-                ArticleTitlePath = sourceEdit.Source.ArticleTitlePath,
-                ArticlePreviewImgPath = sourceEdit.Source.ArticlePreviewImgPath,
-                ArticleBodyCollectionsPath = sourceEdit.Source.ArticleBodyCollectionsPath,
-                ArticleBodyItemPath = sourceEdit.Source.ArticleBodyItemPath,
-                ArticlePdatePath = sourceEdit.Source.ArticlePdatePath,
-                ArticleTagPath = sourceEdit.Source.ArticleTagPath,
-                TopicId = long.Parse(sourceEdit.Source.TopicId),
-            });
+                await _sourceService.UpdateAsync(new Source()
+                {
+                    Id = long.Parse(id),
+                    Name = sourceEdit.Source.Name,
+                    Url = sourceEdit.Source.Url,
+                    SurveyPeriod = sourceEdit.Source.SurveyPeriod,
+                    IsRandomPeriod = sourceEdit.Source.IsRandomPeriod,
+                    HasDynamicPage = sourceEdit.Source.HasDynamicPage,
+                    AcceptInsecureCerts = sourceEdit.Source.AcceptInsecureCerts,
+                    PageElementLoaded = sourceEdit.Source.PageElementLoaded,
+                    PageLoadTimeout = sourceEdit.Source.PageLoadTimeout,
+                    ElementLoadTimeout = sourceEdit.Source.ElementLoadTimeout,
+                    ArticleCollectionsPath = sourceEdit.Source.ArticleCollectionsPath,
+                    ArticleItemPath = sourceEdit.Source.ArticleItemPath,
+                    ArticleUrlPath = sourceEdit.Source.ArticleUrlPath,
+                    ArticleTitlePath = sourceEdit.Source.ArticleTitlePath,
+                    ArticlePreviewImgPath = sourceEdit.Source.ArticlePreviewImgPath,
+                    ArticleBodyCollectionsPath = sourceEdit.Source.ArticleBodyCollectionsPath,
+                    ArticleBodyItemPath = sourceEdit.Source.ArticleBodyItemPath,
+                    ArticlePdatePath = sourceEdit.Source.ArticlePdatePath,
+                    ArticleTagPath = sourceEdit.Source.ArticleTagPath,
+                    TopicId = long.Parse(sourceEdit.Source.TopicId),
+                });
 
-            return RedirectToAction("Index");
+                _logger.LogInformation($"Source {sourceEdit.Source.Name} was updated successfully");
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error while updating source {id}");
+                return StatusCode(500);
+            }
         }
 
         // Delete source utem
         [HttpPost("{Controller}/{Action}/{id:required}")]
         public async Task<IActionResult> Delete([FromRoute] string id, [FromForm] SourceEditModel sourceEdit)
         {
-            var source = await _sourceService.GetByIdAsync(long.Parse(id));
-            if (source == null)
+            try
             {
-                return BadRequest();
-            }
-            if (source.Articles.Count > 0)
-            {
-                ModelState.AddModelError("Source.Name", "Can not delete source with related articles. First of all delete all related articles");
-                return View("Edit", sourceEdit);
-            }
+                var source = await _sourceService.GetByIdAsync(long.Parse(id));
+                if (source == null)
+                {
+                    _logger.LogWarning($"Source with id {id} was not found");
+                    return BadRequest();
+                }
+                if (source.Articles.Count > 0)
+                {
+                    ModelState.AddModelError("Source.Name", "Can not delete source with related articles. First of all delete all related articles");
+                    return View("Edit", sourceEdit);
+                }
 
-            await _sourceService.DeleteAsync(new Source()
-            {
-                Id = source.Id,
-            });
+                await _sourceService.DeleteAsync(new Source()
+                {
+                    Id = source.Id,
+                });
 
-            return RedirectToAction("Index");
+                _logger.LogInformation($"Source {source.Name} was deleted successfully");
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error while deleting source {id}");
+                return StatusCode(500);
+            }
         }
 
         [NonAction]
