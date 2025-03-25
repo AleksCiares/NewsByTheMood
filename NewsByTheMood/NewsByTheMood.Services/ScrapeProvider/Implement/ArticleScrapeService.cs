@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NewsByTheMood.Data.Entities;
@@ -15,35 +16,58 @@ namespace NewsByTheMood.Services.ScrapeProvider.Implement
     {
         private readonly WebScrapeOptions _options;
         private readonly IArticleService _articleService;
-        private readonly ITagService _tagService;
+        private readonly ILogger<ArticleScrapeService> _logger;
 
-        public ArticleScrapeService(IOptions<WebScrapeOptions> options, IArticleService articleService, ITagService tagService)
+        public ArticleScrapeService(IOptions<WebScrapeOptions> options, IArticleService articleService, ILogger<ArticleScrapeService> logger)
         {
             _options = options.Value;
             _articleService = articleService;
-            _tagService = tagService;
+            _logger = logger;
         }
 
         public async Task LoadArticle(Source source, string articleUrl)
         {
             var scraper = CreateScraper(source);
-            await scraper.GetPageAsync(articleUrl);
+            try
+            {
+                await scraper.GetPageAsync(articleUrl);
+                var article = ParseArticle(source, scraper);
+                article.Url = articleUrl;
 
-            var article = ParseArticle(source, scraper);
-            article.Url = articleUrl;
-
-            scraper.Dispose();
-            await _articleService.AddAsync(article);
+                await _articleService.AddAsync(article);
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Error while loading article from {articleUrl} with source id {source.Id}", e);
+            }
+            finally
+            {
+                scraper.Dispose();
+            }
         }
 
         public async Task LoadArticles(Source source)
         {
             var scraper = CreateScraper(source);
 
-            await scraper.GetPageAsync(source.Url);
-            var articlesUrls = scraper.Parser.Init(source.ArticleCollectionsPath).SelectAll(source.ArticleItemPath).SelectAll(source.ArticleUrlPath).GetAttributes("href");
+            try
+            {
+                await scraper.GetPageAsync(source.Url);
+            }
+            catch (Exception e)
+            {
+                scraper.Dispose();
+                throw new Exception($"Error while loading source {source.Name}", e);
+            }
 
+            var articlesUrls = scraper.Parser.Init(source.ArticleCollectionsPath)
+                .SelectAll(source.ArticleItemPath)
+                .SelectAll(source.ArticleUrlPath)
+                .GetAttributes("href");
             articlesUrls.Reverse();
+
+            _logger.LogDebug($"Parsed {articlesUrls.Count} artticles from source {source.Name} with id {source.Id}");
+
             for (var i = articlesUrls.Count - 1; i >= 0; i--)
             {
                 if (!Uri.IsWellFormedUriString(articlesUrls[i], uriKind: UriKind.Absolute))
@@ -60,12 +84,32 @@ namespace NewsByTheMood.Services.ScrapeProvider.Implement
             var articles = new List<Article>();
             foreach (var url in articlesUrls)
             {
-                await scraper.GetPageAsync(url);
-                var article = ParseArticle(source, scraper);
-                article.Url = url;
+                Article? article = null;
 
+                try
+                {
+                    await scraper.GetPageAsync(url);
+                    article = ParseArticle(source, scraper);
+
+                    article.IsActive = true;
+                    article.FailedLoaded = false;
+                }
+                catch(Exception e)
+                {
+                    article = new Article();
+                    article.Positivity = 0;
+                    article.Rating = 0;
+                    article.Title = "Error while loading article";
+                    article.SourceId = source.Id;
+
+                    article.FailedLoaded = true;
+                    article.IsActive = false;
+
+                    _logger.LogError(e, $"Error while loading article from {url} with source id {source.Id}");
+                }
+
+                article.Url = url;
                 articles.Add(article);
-                //await _articleService.AddAsync(article);
             }
 
             scraper.Dispose();
@@ -113,9 +157,9 @@ namespace NewsByTheMood.Services.ScrapeProvider.Implement
         {
             return new Article()
             {
-                Title = scraper.Parser.Init(source.ArticleTitlePath).TextContent().ElementAtOrDefault(0)! ?? "No found title",
+                Title = GetTitle(source, scraper),
                 PreviewImgUrl = GetPreviewImageUrl(source, scraper),
-                PublishDate = GetPublishDateDate(source, scraper),
+                PublishDate = GetPublishDate(source, scraper),
                 Positivity = 0,
                 Rating = 0,
                 SourceId = source.Id,
@@ -124,8 +168,14 @@ namespace NewsByTheMood.Services.ScrapeProvider.Implement
             };
         }
 
+        private string GetTitle(Source source, PrettyScraper scraper)
+        {
+            var title = scraper.Parser.Init(source.ArticleTitlePath).TextContent().ElementAtOrDefault(0);
+            return title ?? "No found title";
+        }
+
         private string? GetPreviewImageUrl(Source source, PrettyScraper scraper)
-         {
+        {
             if (source.ArticlePreviewImgPath.IsNullOrEmpty())
             {
                 return null;
@@ -158,7 +208,7 @@ namespace NewsByTheMood.Services.ScrapeProvider.Implement
             return path;
         }
 
-        private DateTime? GetPublishDateDate(Source source, PrettyScraper scraper)
+        private DateTime? GetPublishDate(Source source, PrettyScraper scraper)
         {
             if (source.ArticlePdatePath.IsNullOrEmpty())
             {
@@ -203,9 +253,3 @@ namespace NewsByTheMood.Services.ScrapeProvider.Implement
         }
     }
 }
-
-/*
- href
-src
-style="background: url(image.png)"
- */

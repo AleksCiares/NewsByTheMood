@@ -13,6 +13,8 @@ namespace NewsByTheMood.Data.Entities
         public DateTime? PublishDate { get; set; }
         public short Positivity { get; set; }
         public int Rating { get; set; }
+        public bool IsActive { get; set; }
+        public bool FailedLoaded { get; set; }
         // FK
         public Int64 SourceId { get; set; }
 

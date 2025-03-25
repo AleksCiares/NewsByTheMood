@@ -50,12 +50,39 @@ namespace WebScraper.Core.Loaders.Implement
 
         async Task<string> IWebLoader.LoadAsync(string url)
         {
-            await _webDriver.Navigate().GoToUrlAsync(url);
-            ((IJavaScriptExecutor)this._webDriver).ExecuteScript(this._jsScrollScript);
-            var wait = new WebDriverWait(this._webDriver, this._settings.ElementLoadTimeout);
-            var controlledElement = wait.Until(
-                c => c.FindElement(By.CssSelector(this._settings.SignalElement)));
+            int attempts = 0;
+            bool failed = true;
+            var elementLoadTimeout = _settings.ElementLoadTimeout;
+            var pageLoadTimeout = _settings.PageLoadTimeout;
 
+            do
+            {
+                try
+                {
+                    await _webDriver.Navigate().GoToUrlAsync(url);
+                    ((IJavaScriptExecutor)_webDriver).ExecuteScript(_jsScrollScript);
+                    var wait = new WebDriverWait(_webDriver, _settings.ElementLoadTimeout);
+                    var controlledElement = wait.Until(
+                        c => c.FindElement(By.CssSelector(_settings.SignalElement)));
+                    
+                    failed = false;
+                }
+                catch (Exception ex)
+                {
+                    if (attempts >= 3)
+                    {
+                        _settings.ElementLoadTimeout = elementLoadTimeout;
+                        _settings.PageLoadTimeout = pageLoadTimeout;
+                        throw new Exception($"Failed to load page {url} after {attempts} attempts", ex);
+                    }
+
+                    _settings.ElementLoadTimeout *= 2;
+                    _settings.PageLoadTimeout *= 2;
+                    attempts++;
+                    
+                }
+            } while (failed);
+            
             return _webDriver.PageSource;
         }
 
