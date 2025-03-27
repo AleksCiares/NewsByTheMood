@@ -11,9 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NewsByTheMood.CQS\NewsByTheMood.CQS.csproj" />
     <ProjectReference Include="..\NewsByTheMood.Data\NewsByTheMood.Data.csproj" />
-    <ProjectReference Include="..\WebScraper\WebScraper.csproj" />
   </ItemGroup>
 
 </Project>

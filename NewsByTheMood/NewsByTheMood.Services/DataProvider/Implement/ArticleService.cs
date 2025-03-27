@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MediatR;
 using Microsoft.IdentityModel.Tokens;
-using NewsByTheMood.Data;
+using NewsByTheMood.CQS.Commands;
+using NewsByTheMood.CQS.Queries;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.DataProvider.Abstract;
 
@@ -8,191 +9,104 @@ namespace NewsByTheMood.Services.DataProvider.Implement
 {
     public class ArticleService : IArticleService
     {
-        private readonly NewsByTheMoodDbContext _dbContext;
+        /*private readonly NewsByTheMoodDbContext _dbContext;*/
+        private readonly IMediator _mediator;
 
-        public ArticleService(NewsByTheMoodDbContext dbContext)
+        public ArticleService(/*NewsByTheMoodDbContext dbContext, */IMediator mediator)
         {
-            _dbContext = dbContext;
+            /*_dbContext = dbContext;*/
+            _mediator = mediator;
         }
 
-        public async Task<int> CountAsync(short positivity)
+        public async Task<int> CountAsync(short positivity, CancellationToken cancellationToken = default)
         {
             if (positivity < 0)
             {
                 return 0;
             }
 
-            return await _dbContext.Articles
-                .AsNoTracking()
-                .Where(article => article.Positivity >= positivity)
-                .CountAsync();
+            return await _mediator.Send(new GetArticlesCountQuery() { Positivity = positivity }, cancellationToken);
         }
 
-        public async Task<Article[]> GetRangeLatestAsync(short positivity, int pageNumber, int pageSize)
+        public async Task<IEnumerable<Article>> GetRangeLatestAsync(short positivity, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             if (positivity < 0 || pageNumber <= 0 || pageSize <= 0)
             {
                 return Array.Empty<Article>();
             }
 
-            return await _dbContext.Articles
-                .AsNoTracking()
-                .Where(article => article.Positivity >= positivity)
-                .Include(article => article.Source)
-                    .ThenInclude(source => source.Topic)
-                .OrderByDescending(article => article.Id)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToArrayAsync();
+            return await _mediator.Send(new GetLatestArticlesRangeQuery() 
+            { 
+                Positivity = positivity, 
+                Page = pageNumber, 
+                PageSize = pageSize }
+            ,cancellationToken);
         }
 
-        public async Task<int> CountByTopicAsync(short positivity, Int64 topicId)
+        public async Task<int> CountByTopicAsync(short positivity, Int64 topicId, CancellationToken cancellationToken = default)
         {
             if (positivity < 0 || topicId <= 0)
             {
                 return 0;
             }
 
-            return await _dbContext.Articles
-                .AsNoTracking()
-                .Where(article => article.Positivity >= positivity)
-                .Where(article => article.Source.TopicId == topicId)
-                .CountAsync();
+            return await _mediator.Send(new GetArticlesCountByTopicQuery() { Positivity = positivity, TopicId = topicId }, cancellationToken);
         }
 
-        public async Task<Article[]> GetRangeByTopicAsync(short positivity, Int64 topicId, int pageNumber, int pageSize)
+        public async Task<IEnumerable<Article>> GetRangeByTopicAsync(short positivity, Int64 topicId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             if (positivity < 0 || topicId <= 0 || pageNumber <= 0 || pageSize <= 0)
             {
                 return Array.Empty<Article>();
             }
 
-            return await _dbContext.Articles
-                .AsNoTracking()
-                .Where(article => article.Positivity >= positivity)
-                .Where(article => article.Source.TopicId == topicId)
-                .Include(article => article.Source)
-                    .ThenInclude(source => source.Topic)
-                .OrderByDescending(article => article.Id)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToArrayAsync();
+            return await _mediator.Send(new GetArticlesRangeByTopicQuery() 
+            { 
+                Positivity = positivity, 
+                TopicId = topicId, Page = pageNumber, 
+                PageSize = pageSize 
+            }, 
+            cancellationToken);
         }
 
-        public async Task<Article?> GetByIdAsync(Int64 id)
+        public async Task<Article?> GetByIdAsync(Int64 id, CancellationToken cancellationToken = default)
         {
             if (id <= 0)
             {
                 return null;
             }
 
-            var article = await _dbContext.Articles
-                .Where(article => article.Id == id)
-                .SingleOrDefaultAsync();
-            if (article != null)
-            {
-                await _dbContext.Entry(article)
-                    .Reference(article => article.Source)
-                    .LoadAsync();
-                await _dbContext.Entry(article.Source)
-                    .Reference(source => source.Topic)
-                    .LoadAsync();
-                await _dbContext.Entry(article)
-                    .Collection(article => article.Tags)
-                    .LoadAsync();
-
-                _dbContext.Entry(article)
-                    .State = EntityState.Detached;
-
-                return article;
-            }
-            else
-            {
-                return null;
-            }
-
-            /*return await _dbContext.Articles
-                .AsNoTracking()
-                .Where(article => article.Id == id)
-                .Include(article => article.Source)
-                    .ThenInclude(source => source.Topic)
-                .Include(article => article.Tags)
-                .SingleOrDefaultAsync();*/
+           return await _mediator.Send(new GetArticleByIdQuery() { Id = id }, cancellationToken);
         }
 
-        public async Task<bool> IsExistsByUrlAsync(string articleUrl)
+        public async Task<bool> IsExistsByUrlAsync(string articleUrl, CancellationToken cancellationToken = default)
         {
             if (articleUrl.IsNullOrEmpty())
             {
                 return false;
             }
 
-            return await _dbContext.Articles
-                .AsNoTracking()
-                .Where (article => article.Url.Equals(articleUrl))
-                .AnyAsync();
+            return await _mediator.Send(new IsExistsArticleByUrlQuery() { ArticleUrl = articleUrl }, cancellationToken);
         }
 
-        public async Task AddAsync(Article article)
+        public async Task AddAsync(Article article, CancellationToken cancellationToken = default)
         {
-            var tagNames = article.Tags.Select(tag => tag.Name).ToList().Distinct().ToList();
-            article.Tags = new();
-
-            await _dbContext.Articles.AddAsync(article);
-            foreach (var tagName in tagNames)
-            {
-                var tag = await _dbContext.Tags.SingleOrDefaultAsync(tag => tag.Name.Equals(tagName));
-                if (tag == null)
-                {
-                    tag = new Tag() { Name = tagName };
-                    await _dbContext.Tags.AddAsync(tag);
-                }
-                article.Tags.Add(tag);
-            }
-
-            await _dbContext.SaveChangesAsync();
+            await _mediator.Send(new AddArticleCommand() { Article = article }, cancellationToken);
         }
 
-        public async Task AddRangeAsync(Article[] articles)
+        public async Task AddRangeAsync(IEnumerable<Article> articles, CancellationToken cancellationToken = default)
         {
-            var tags = new Dictionary<string, Tag>();
-
-            foreach (var article in articles)
-            {
-                var tagNames = article.Tags.Select(tag => tag.Name).ToList().Distinct().ToList();
-                article.Tags = new();
-
-                foreach (var tagName in tagNames)
-                {
-                    if (!tags.ContainsKey(tagName))
-                    {
-                        var tag = await _dbContext.Tags.SingleOrDefaultAsync(tag => tag.Name.Equals(tagName));
-                        if (tag == null)
-                        {
-                            tag = new Tag() { Name = tagName };
-                            await _dbContext.Tags.AddAsync(tag);
-                        }
-                        tags.Add(tagName, tag);
-                    }
-
-                    article.Tags.Add(tags[tagName]);
-                }
-            }
-
-            await _dbContext.Articles.AddRangeAsync(articles);
-            await _dbContext.SaveChangesAsync();
+            await _mediator.Send(new AddArticlesRangeCommand() { Articles = articles }, cancellationToken);
         }
 
-        public async Task UpdateAsync(Article article)
+        public async Task UpdateAsync(Article article, CancellationToken cancellationToken = default)
         {
-            this._dbContext.Articles.Update(article);
-            await this._dbContext.SaveChangesAsync();
+            await _mediator.Send(new UpdateArticleCommand() { Article = article }, cancellationToken);
         }
 
-        public async Task DeleteAsync(Article article)
+        public async Task DeleteAsync(Article article, CancellationToken cancellationToken = default)
         {
-            _dbContext.Articles.Remove(article);
-            await _dbContext.SaveChangesAsync();
+            await _mediator.Send(new DeleteArticleCommand() { Article = article }, cancellationToken);
         }
     }
 

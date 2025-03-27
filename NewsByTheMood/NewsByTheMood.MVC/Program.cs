@@ -50,6 +50,9 @@ namespace NewsByTheMood.MVC
                 // User service
                 builder.Services.AddScoped<IUserService, UserService>();
 
+                //CQS services
+                builder.Services.AddMediatR(sc => sc.RegisterServicesFromAssembly(typeof(NewsByTheMood.CQS.Commands.AddArticleCommand).Assembly));
+
                 // File provider services
                 // Icons service
                 if (builder.Configuration.GetValue<bool>("UseUserIcons"))

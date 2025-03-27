@@ -6,33 +6,33 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
     public interface IArticleService
     {
         // Get article count with certain positivity
-        public Task<int> CountAsync(short positivity);
+        public Task<int> CountAsync(short positivity, CancellationToken cancellationToken = default);
 
         // Get latest articles range with certain positivity
-        public Task<Article[]> GetRangeLatestAsync(short positivity, int pageNumber, int pageSize);
+        public Task<IEnumerable<Article>> GetRangeLatestAsync(short positivity, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 
         // Get article count with certain positivity and topic
-        public Task<int> CountByTopicAsync(short positivity, Int64 topicId);
+        public Task<int> CountByTopicAsync(short positivity, Int64 topicId, CancellationToken cancellationToken = default);
 
         // Get latest articles range with certain positivity and topic
-        public Task<Article[]> GetRangeByTopicAsync(short positivity, Int64 topicId, int pageNumber, int pageSize);
+        public Task<IEnumerable<Article>> GetRangeByTopicAsync(short positivity, Int64 topicId, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 
         // Get article by certain id
-        public Task<Article?> GetByIdAsync(Int64 id);
+        public Task<Article?> GetByIdAsync(Int64 id, CancellationToken cancellationToken = default);
 
         // Is exist article with current url
-        public Task<bool> IsExistsByUrlAsync(string articleUrl);
+        public Task<bool> IsExistsByUrlAsync(string articleUrl, CancellationToken cancellationToken = default);
 
         // Create article
-        public Task AddAsync(Article article);
+        public Task AddAsync(Article article, CancellationToken cancellationToken = default);
 
         // Create range articles
-        public Task AddRangeAsync(Article[] articles);
+        public Task AddRangeAsync(IEnumerable<Article> articles, CancellationToken cancellationToken = default);
 
         // Update article item
-        public Task UpdateAsync(Article article);
+        public Task UpdateAsync(Article article, CancellationToken cancellationToken = default);
 
         // Delete article
-        public Task DeleteAsync(Article article);
+        public Task DeleteAsync(Article article, CancellationToken cancellationToken = default);
     }
 }
