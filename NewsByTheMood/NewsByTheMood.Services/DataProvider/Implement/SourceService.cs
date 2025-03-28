@@ -1,5 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using NewsByTheMood.CQS.Commands;
+using NewsByTheMood.CQS.Queries;
 using NewsByTheMood.Data;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.DataProvider.Abstract;
@@ -8,112 +11,72 @@ namespace NewsByTheMood.Services.DataProvider.Implement
 {
     public class SourceService : ISourceService
     {
-        private readonly NewsByTheMoodDbContext _dbContext;
+        //private readonly NewsByTheMoodDbContext _dbContext;
+        private readonly IMediator _mediator;
 
-        public SourceService(NewsByTheMoodDbContext dbContext)
+        public SourceService(/*NewsByTheMoodDbContext dbContext,*/ IMediator mediator)
         {
-            _dbContext = dbContext;
+            //_dbContext = dbContext;
+            _mediator = mediator;
         }
 
-        public async Task<Source?> GetByIdAsync(Int64 id)
+        public async Task<Source?> GetByIdAsync(Int64 id, CancellationToken cancellationToken = default)
         {
             if (id <= 0)
             {
                 return null;
             }
 
-            var source = await _dbContext.Sources
-                .Where(source => source.Id == id)
-                .SingleOrDefaultAsync();
-            if (source != null)
-            {
-                await _dbContext.Entry(source)
-                    .Reference(source => source.Topic)
-                    .LoadAsync();
-
-                await _dbContext.Entry(source)
-                    .Collection(source => source.Articles)
-                    .LoadAsync();
-
-
-                _dbContext.Entry(source)
-                    .State = EntityState.Detached;
-
-                return source;
-            }
-            else
-            {
-                return null;
-            }
-
-            /*return await this._dbContext.Sources
-                .AsNoTracking()
-                .Where(source => source.Id == id)
-                .Include(source => source.Topic)
-                .Include(source => source.Articles)
-                .SingleOrDefaultAsync();*/
+            return await _mediator.Send(new GetSourceByIdQuery() { Id = id }, cancellationToken);
         }
 
-        public async Task<Source[]> GetRangeAsync(int pageNumber, int pageSize)
+        public async Task<IEnumerable<Source>> GetRangeAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             if (pageSize <= 0 || pageNumber <= 0)
             {
                 return Array.Empty<Source>();
             }
 
-            return await _dbContext.Sources
-                .AsNoTracking()
-                .Include(source => source.Topic)
-                .Include(source => source.Articles)
-                .OrderByDescending(source => source.Id)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToArrayAsync();
+            return await _mediator.Send(new GetSourcesRangeQuery() 
+            { 
+                Page = pageNumber, 
+                PageSize = pageSize 
+            }, cancellationToken);
         }
 
-        public async Task<Source[]> GetAllAsync()
+        public async Task<IEnumerable<Source>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Sources
-                .AsNoTracking()
-                .ToArrayAsync();
+            return await _mediator.Send(new GetAllSourcesQuery(), cancellationToken);
         }
 
-        public async Task<int> CountAsync()
+        public async Task<int> CountAsync(CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Sources
-                .AsNoTracking()
-                .CountAsync();
+            return await _mediator.Send(new GetSourcesCountQuery(), cancellationToken);
         }
 
-        public async Task<bool> IsExistsByNameAsync(string sourceName)
+        public async Task<bool> IsExistsByNameAsync(string sourceName, CancellationToken cancellationToken = default)
         {
             if (sourceName.IsNullOrEmpty())
             {
                 return false;
             }
 
-            return await _dbContext.Sources
-                .AsNoTracking()
-                .Where(source => source.Name.Equals(sourceName))
-                .AnyAsync();
+            return await _mediator.Send(new IsExistsSourceByNameQuery() { SourceName = sourceName }, cancellationToken);
         }
 
-        public async Task AddAsync(Source source)
+        public async Task AddAsync(Source source, CancellationToken cancellationToken = default)
         {
-            await _dbContext.Sources.AddAsync(source);
-            await _dbContext.SaveChangesAsync();
+            await _mediator.Send(new AddSourceCommand() { Source = source }, cancellationToken);
         }
 
-        public async Task UpdateAsync(Source source)
+        public async Task UpdateAsync(Source source, CancellationToken cancellationToken = default)
         {
-            _dbContext.Sources.Update(source);
-            await _dbContext.SaveChangesAsync();
+            await _mediator.Send(new UpdateSourceCommand() { Source = source }, cancellationToken);
         }
 
-        public async Task DeleteAsync(Source source)
+        public async Task DeleteAsync(Source source, CancellationToken cancellationToken = default)
         {
-            _dbContext.Sources.Remove(source);
-            await _dbContext.SaveChangesAsync();
+            await _mediator.Send(new DeleteSourceCommand() { Source = source }, cancellationToken);
         }
     }
 }

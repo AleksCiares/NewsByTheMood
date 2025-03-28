@@ -1,57 +1,54 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using NewsByTheMood.CQS.Commands;
+using NewsByTheMood.CQS.Queries;
 using NewsByTheMood.Data;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.DataProvider.Abstract;
+using System.Collections.Generic;
 
 namespace NewsByTheMood.Services.DataProvider.Implement
 {
     public class TagService : ITagService
     {
-        private readonly NewsByTheMoodDbContext _dbContext;
+        //private readonly NewsByTheMoodDbContext _dbContext;
+        private readonly IMediator _mediatR;
 
-        public TagService(NewsByTheMoodDbContext dbContext)
+        public TagService(/*NewsByTheMoodDbContext dbContext,*/ IMediator mediator)
         {
-            _dbContext = dbContext;
+            //_dbContext = dbContext;
+            _mediatR = mediator;
         }
 
-        public async Task<Tag?> GetByNameAsync(string tagName)
+        public async Task<Tag?> GetByNameAsync(string tagName, CancellationToken cancellationToken = default)
         {
             if (tagName.IsNullOrEmpty())
             {
                 return null;
             }
 
-            return await _dbContext.Tags
-                .AsNoTracking()
-                .Where(tag => tag.Name.Equals(tagName))
-                .SingleOrDefaultAsync();
+            return await _mediatR.Send(new GetTagByNameQuery() { TagName = tagName }, cancellationToken);
         }
 
-        public async Task<Tag[]> GetAllAsync()
+        public async Task<IEnumerable<Tag>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Tags
-                .AsNoTracking()
-                .ToArrayAsync();
+            return await _mediatR.Send(new GetAllTagsQuery(), cancellationToken);
         }
 
-        public async Task<bool> IsExistsByNameAsync(string tagName)
+        public async Task<bool> IsExistsByNameAsync(string tagName, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(tagName))
             {
                 return false;
             }
 
-            return await _dbContext.Tags
-                .AsNoTracking()
-                .Where(tag => tag.Name == tagName)
-                .AnyAsync();
+            return await _mediatR.Send(new IsExistsTagByNameQuery() { TagName = tagName }, cancellationToken);
         }
 
-        public async Task AddAsync(Tag tag)
+        public async Task AddAsync(Tag tag, CancellationToken cancellationToken = default)
         {
-            await _dbContext.Tags.AddAsync(tag);
-            await _dbContext.SaveChangesAsync();
+           await _mediatR.Send(new AddTagCommand() { Tag = tag }, cancellationToken);
         }
     }
 }

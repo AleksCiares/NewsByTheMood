@@ -6,30 +6,30 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
     public interface ITopicService
     {
         // Get certain topic by id
-        public Task<Topic?> GetByIdAsync(Int64 id);
+        public Task<Topic?> GetByIdAsync(Int64 id, CancellationToken cancellationToken = default);
 
         // Get certain topic by name
-        public Task<Topic?> GetByNameAsync(string topicName);
+        public Task<Topic?> GetByNameAsync(string topicName, CancellationToken cancellationToken = default);
 
         // Get range topics
-        public Task<Topic[]> GetRangeAsync(int pageNumber, int pageSize);
+        public Task<IEnumerable<Topic>> GetRangeAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 
         // Get all topics
-        public Task<Topic[]> GetAllAsync();
+        public Task<IEnumerable<Topic>> GetAllAsync(CancellationToken cancellationToken = default);
 
         // Check if topic exist by name
-        public Task<bool> IsExistsByNameAsync(string topicName);
+        public Task<bool> IsExistsByNameAsync(string topicName, CancellationToken cancellationToken = default);
 
         // Count of topics
-        public Task<int> CountAsync();
+        public Task<int> CountAsync(CancellationToken cancellationToken = default);
 
         // Add topic
-        public Task AddAsync(Topic topic);
+        public Task AddAsync(Topic topic, CancellationToken cancellationToken = default);
 
         // Update topic
-        public Task UpdateAsync(Topic topic);
+        public Task UpdateAsync(Topic topic, CancellationToken cancellationToken = default);
 
         // Delete topic
-        public Task DeleteAsync(Topic topic);
+        public Task DeleteAsync(Topic topic, CancellationToken cancellationToken = default);
     }
 }
