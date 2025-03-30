@@ -8,7 +8,7 @@ namespace NewsByTheMood.MVC.Models
         public required string Title { get; set; }
         public string? PreviewImgUrl { get; set; }
         public string? Body { get; set; }
-        public string? PublishDate { get; set; }
+        public DateTime? PublishDate { get; set; }
         public required short Positivity { get; set; }
         public required int Rating { get; set; }
         public required string SourceName { get; set; }

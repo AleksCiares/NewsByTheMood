@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using NewsByTheMood.MVC.Mappers;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
 
@@ -11,13 +12,15 @@ namespace NewsByTheMood.MVC.Controllers
         private readonly IArticleService _articleService;
         private readonly ITopicService _topicService;
         private readonly ILogger<HomeController> _logger;
+        private readonly ArticleMapper _articleMapper;
         private readonly short _defaultPositivity = 0;
 
-        public HomeController(IArticleService articleService, ITopicService topicService, ILogger<HomeController> logger)
+        public HomeController(IArticleService articleService, ITopicService topicService, ILogger<HomeController> logger, ArticleMapper articleMapper)
         {
             _articleService = articleService;
             _topicService = topicService;
             _logger = logger;
+            _articleMapper = articleMapper;
         }
 
         // Get range of articles previews
@@ -31,7 +34,7 @@ namespace NewsByTheMood.MVC.Controllers
 
                 if (totalArticles > 0)
                 {
-                    articlesPreviews = (await _articleService.GetRangeLatestAsync(
+                    /*articlesPreviews = (await _articleService.GetRangeLatestAsync(
                         _defaultPositivity,
                         pagination.Page,
                         pagination.PageSize)) // replaced with mapper
@@ -47,6 +50,13 @@ namespace NewsByTheMood.MVC.Controllers
                             SourceUrl = article.Source.Url,
                             TopicName = article.Source.Topic.Name
                         })
+                        .ToArray();*/
+
+                    articlesPreviews = (await _articleService.GetRangeLatestAsync(
+                        _defaultPositivity,
+                        pagination.Page,
+                        pagination.PageSize))
+                        .Select(article => _articleMapper.ArticleToArticleDisplayPreviewModel(article))
                         .ToArray();
 
                     _logger.LogDebug($"Articles were fetch successfully");
@@ -95,7 +105,7 @@ namespace NewsByTheMood.MVC.Controllers
 
                 if (totalArticles > 0)
                 {
-                    articlesPreviews = (await _articleService.GetRangeByTopicAsync(
+                    /*articlesPreviews = (await _articleService.GetRangeByTopicAsync(
                         _defaultPositivity,
                         topic.Id,
                         pagination.Page,
@@ -112,6 +122,14 @@ namespace NewsByTheMood.MVC.Controllers
                             SourceUrl = a.Source.Url,
                             TopicName = a.Source.Topic.Name
                         })
+                        .ToArray();*/
+
+                    articlesPreviews = (await _articleService.GetRangeByTopicAsync(
+                        _defaultPositivity,
+                        topic.Id,
+                        pagination.Page,
+                        pagination.PageSize)) // replaced with mapper
+                        .Select(article => _articleMapper.ArticleToArticleDisplayPreviewModel(article))
                         .ToArray();
 
                     _logger.LogDebug($"Articles by topic {topic.Name} were fetch successfully");
@@ -155,7 +173,7 @@ namespace NewsByTheMood.MVC.Controllers
                     return BadRequest();
                 }
 
-                return View(new ArticleDisplayModel()
+                /*return View(new ArticleDisplayModel()
                 {
                     Url = article.Url,
                     Title = article.Title,
@@ -167,7 +185,9 @@ namespace NewsByTheMood.MVC.Controllers
                     SourceName = article.Source.Name,
                     TopicName = article.Source.Topic.Name,
                     ArticleTags = article.Tags.Select(t => t.Name).ToArray()
-                });
+                });*/
+
+                return View(_articleMapper.ArticleToArticleDisplayModel(article));
             }
             catch (Exception ex)
             {

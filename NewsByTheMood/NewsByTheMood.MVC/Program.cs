@@ -34,7 +34,7 @@ namespace NewsByTheMood.MVC
 
                 // Db provider service
                 builder.Services.AddDbContext<NewsByTheMoodDbContext>(
-                    opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default1")));
+                    opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
                 // Data provider services
                 // Article service
@@ -52,6 +52,9 @@ namespace NewsByTheMood.MVC
 
                 //CQS services
                 builder.Services.AddMediatR(sc => sc.RegisterServicesFromAssembly(typeof(NewsByTheMood.CQS.Commands.AddArticleCommand).Assembly));
+
+                //Mapper services
+                builder.Services.AddTransient<NewsByTheMood.MVC.Mappers.ArticleMapper>();
 
                 // File provider services
                 // Icons service
