@@ -3,9 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace NewsByTheMood.MVC.Models
 {
-    public class ArticleCreateModel
+    public class ArticleSettingsCreateModel
     {
-        public ArticleModel? Article { get; set; }
+        public ArticleSettingsModel? Article { get; set; }
 
         [Required]
         public required List<SelectListItem> Tags { get; set; }

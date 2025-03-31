@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NewsByTheMood.Data.Entities;
+using NewsByTheMood.MVC.Mappers;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
 
@@ -8,20 +9,26 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 {
     // Articles controller
     [Area("Settings")]
+    [Route("Settings/[controller]/[action]")]
     public class ArticlesController : Controller
     {
         private readonly IArticleService _articleService;
         private readonly ISourceService _sourceService;
         private readonly ITagService _tagService;
         private readonly ILogger<ArticlesController> _logger;
+        private readonly ArticleMapper _articleMapper;
         private readonly short _defaultPositivity = 0;
 
-        public ArticlesController(IArticleService articleService, ISourceService sourceService, ITagService tagService, ILogger<ArticlesController> logger)
+        public ArticlesController(IArticleService articleService, 
+            ISourceService sourceService, ITagService tagService, 
+            ILogger<ArticlesController> logger, 
+            ArticleMapper articleMapper)
         {
             _articleService = articleService;
             _sourceService = sourceService;
             _tagService = tagService;
             _logger = logger;
+            _articleMapper = articleMapper;
         }
 
         // Get range of articles previews
@@ -31,21 +38,28 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             try
             {
                 var totalArticles = await _articleService.CountAsync(_defaultPositivity);
-                var articles = Array.Empty<ArticlePreviewModel>();
+                var articles = Array.Empty<ArticleSettingsPreviewModel>();
 
                 if (totalArticles > 0)
                 {
-                    articles = (await _articleService.GetRangeLatestAsync(
+                    /*articles = (await _articleService.GetRangeLatestAsync(
                         _defaultPositivity,
                         pagination.Page,
                         pagination.PageSize)) // replaced with mapper
-                        .Select(article => new ArticlePreviewModel()
+                        .Select(article => new ArticleSettingsPreviewModel()
                         {
                             Id = article.Id.ToString(),
                             Title = article.Title,
                             SourceName = article.Source.Name,
                             TopicName = article.Source.Topic.Name
                         })
+                        .ToArray();*/
+
+                    articles = (await _articleService.GetRangeLatestAsync(
+                        _defaultPositivity,
+                        pagination.Page,
+                        pagination.PageSize)) // replaced with mapper
+                        .Select(article => _articleMapper.ArticleToArticleSettingsPreviewModel(article))
                         .ToArray();
 
                     _logger.LogDebug($"Articles were fetch successfully");
@@ -55,9 +69,9 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                     _logger.LogDebug("No articles were found");
                 }
 
-                return View(new ArticlePreviewCollectionModel()
+                return View(new ArticleSettingsCollectionModel()
                 {
-                    ArticleShortPreviews = articles!,
+                    Articles = articles!,
                     PageInfo = new PageInfoModel()
                     {
                         Page = pagination.Page,
@@ -81,7 +95,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         {
             try
             {
-                return View(new ArticleCreateModel()
+                return View(new ArticleSettingsCreateModel()
                 {
                     Sources = await GetSourceAsync(),
                     Tags = await GetTagsAsync(),
@@ -96,7 +110,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 
         // Create article item proccessing
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] ArticleCreateModel articleCreate)
+        public async Task<IActionResult> Create([FromForm] ArticleSettingsCreateModel articleCreate)
         {
             try
             {
@@ -110,13 +124,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                     return View(articleCreate);
                 }
 
-                var tags = articleCreate.Tags.Select(tag => new Tag
-                {
-                    Name = tag.Value
-                })
-                .ToList();
-
-                await _articleService.AddAsync(new Article()
+                /*await _articleService.AddAsync(new Article()
                 {
                     Url = articleCreate.Article!.Url,
                     Title = articleCreate.Article!.Title,
@@ -126,8 +134,14 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                     Positivity = articleCreate.Article!.Positivity,
                     Rating = articleCreate.Article!.Rating,
                     SourceId = articleCreate.Article!.SourceId,
-                    Tags = tags
-                });
+                    Tags = articleCreate.Article.Tags.Select(tag => new Tag
+                    {
+                        Name = tag
+                    })
+                    .ToList()
+                });*/
+
+                await _articleService.AddAsync(_articleMapper.ArticleSettingsModelToArticle(articleCreate.Article));
 
                 _logger.LogInformation($"Article {articleCreate.Article!.Title} was created successfully");
 
@@ -141,12 +155,15 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         }
 
         // Edit article item
-        [HttpGet("{Controller}/{Action}/{id:required}")]
+        [HttpGet("{id:required}")]
         public async Task<IActionResult> Edit([FromRoute] string id)
         {
             try
             {
-                var article = await _articleService.GetByIdAsync(long.Parse(id));
+                //var article = await _articleService.GetByIdAsync(long.Parse(id));
+
+                var article = _articleMapper.ArticleToArticleSettingsModel(
+                    await  _articleService.GetByIdAsync(long.Parse(id)));
                 if (article == null)
                 {
                     _logger.LogWarning($"Article {id} was not found");
@@ -156,12 +173,12 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                 var tags = await GetTagsAsync();
                 foreach (var tag in tags)
                 {
-                    tag.Selected = article.Tags.Any(articleTag => articleTag.Name.Equals(tag.Value));
+                    tag.Selected = article.Tags.Any(articleTag => articleTag.Equals(tag.Value));
                 }
 
-                return View(new ArticleEditModel()
+                /*return View(new ArticleSettingsEditModel()
                 {
-                    Article = new ArticleModel()
+                    Article = new ArticleSettingsModel()
                     {
                         Id = article.Id.ToString(),
                         Title = article.Title,
@@ -172,7 +189,15 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                         Positivity = article.Positivity,
                         Rating = article.Rating,
                         SourceId = article.SourceId,
+                        IsActive = article.IsActive,
                     },
+                    Sources = await GetSourceAsync(),
+                    Tags = tags
+                });*/
+
+                return View(new ArticleSettingsEditModel()
+                {
+                    Article = article,
                     Sources = await GetSourceAsync(),
                     Tags = tags
                 });
@@ -185,12 +210,15 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         }
 
         // Edit article item proccessing
-        [HttpPost("{Controller}/{Action}/{id:required}")]
-        public async Task<IActionResult> Edit([FromRoute] string id, [FromForm] ArticleEditModel articleEdit)
+        [HttpPost("{id:required}")]
+        public async Task<IActionResult> Edit([FromRoute] string id, [FromForm] ArticleSettingsEditModel articleEdit)
         {
             try
             {
-                var article = await _articleService.GetByIdAsync(long.Parse(id));
+                /*var article = await _articleService.GetByIdAsync(long.Parse(id));*/
+
+                var article = _articleMapper.ArticleToArticleSettingsModel(
+                    await _articleService.GetByIdAsync(long.Parse(id)));
                 if (article == null)
                 {
                     _logger.LogWarning($"Article {id} was not found");
@@ -200,14 +228,15 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                 {
                     return View(articleEdit);
                 }
-                if (await _articleService.IsExistsByUrlAsync(articleEdit.Article.Url) && !articleEdit.Article.Url.Equals(article.Url))
+                if (await _articleService.IsExistsByUrlAsync(articleEdit.Article.Url) && 
+                    !articleEdit.Article.Url.Equals(article.Url))
                 {
                     ModelState.AddModelError("Article.Url", "A url with the same url already exists");
                     articleEdit.Article.Url = article.Url;
                     return View(articleEdit);
                 }
 
-                await _articleService.UpdateAsync(new Article()
+                /*await _articleService.UpdateAsync(new Article()
                 {
                     Id = long.Parse(id),
                     Title = articleEdit.Article.Title,
@@ -224,7 +253,9 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                         Name = tag.Text
                     })
                     .ToList()
-                });
+                });*/
+
+                await _articleService.UpdateAsync(_articleMapper.ArticleSettingsModelToArticle(articleEdit.Article));
 
                 _logger.LogInformation($"Article {articleEdit.Article.Title} was updated successfully");
 
@@ -238,8 +269,8 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         }
 
         // Delete article item
-        [HttpPost("{Controller}/{Action}/{id:required}")]
-        public async Task<IActionResult> Delete([FromRoute] string id, [FromForm] ArticleEditModel articleEdit)
+        [HttpPost("{id:required}")]
+        public async Task<IActionResult> Delete([FromRoute] string id, [FromForm] ArticleSettingsEditModel articleEdit)
         {
             try
             {
@@ -279,7 +310,8 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 
             if (sources.Count <= 0)
             {
-                ModelState.AddModelError("Article.SourceId", "No source have been created, to create a article you must first create a source");
+                ModelState.AddModelError("Article.SourceId", "No source have been created, " +
+                    "to create a article you must first create a source");
             }
 
             return sources;

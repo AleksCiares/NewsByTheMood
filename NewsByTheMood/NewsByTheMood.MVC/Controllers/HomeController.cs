@@ -15,7 +15,9 @@ namespace NewsByTheMood.MVC.Controllers
         private readonly ArticleMapper _articleMapper;
         private readonly short _defaultPositivity = 0;
 
-        public HomeController(IArticleService articleService, ITopicService topicService, ILogger<HomeController> logger, ArticleMapper articleMapper)
+        public HomeController(IArticleService articleService, 
+            ITopicService topicService, ILogger<HomeController> 
+            logger, ArticleMapper articleMapper)
         {
             _articleService = articleService;
             _topicService = topicService;
@@ -30,7 +32,7 @@ namespace NewsByTheMood.MVC.Controllers
             try
             {
                 var totalArticles = await _articleService.CountAsync(_defaultPositivity);
-                var articlesPreviews = Array.Empty<ArticleDisplayPreviewModel>();
+                var articlesPreviews = Array.Empty<ArticlePreviewModel>();
 
                 if (totalArticles > 0)
                 {
@@ -56,7 +58,7 @@ namespace NewsByTheMood.MVC.Controllers
                         _defaultPositivity,
                         pagination.Page,
                         pagination.PageSize))
-                        .Select(article => _articleMapper.ArticleToArticleDisplayPreviewModel(article))
+                        .Select(article => _articleMapper.ArticleToArticlePreviewModel(article))
                         .ToArray();
 
                     _logger.LogDebug($"Articles were fetch successfully");
@@ -66,9 +68,9 @@ namespace NewsByTheMood.MVC.Controllers
                     _logger.LogDebug("No articles were found");
                 }
 
-                return View(new ArticleDisplayPreviewCollectionModel()
+                return View(new ArticlePreviewCollectionModel()
                 {
-                    ArticlePreviews = articlesPreviews!,
+                    Articles = articlesPreviews!,
                     PageInfo = new PageInfoModel()
                     {
                         Page = pagination.Page,
@@ -101,7 +103,7 @@ namespace NewsByTheMood.MVC.Controllers
                 }
 
                 var totalArticles = await _articleService.CountByTopicAsync(_defaultPositivity, topic.Id);
-                var articlesPreviews = Array.Empty<ArticleDisplayPreviewModel>();
+                var articlesPreviews = Array.Empty<ArticlePreviewModel>();
 
                 if (totalArticles > 0)
                 {
@@ -128,8 +130,8 @@ namespace NewsByTheMood.MVC.Controllers
                         _defaultPositivity,
                         topic.Id,
                         pagination.Page,
-                        pagination.PageSize)) // replaced with mapper
-                        .Select(article => _articleMapper.ArticleToArticleDisplayPreviewModel(article))
+                        pagination.PageSize))
+                        .Select(article => _articleMapper.ArticleToArticlePreviewModel(article))
                         .ToArray();
 
                     _logger.LogDebug($"Articles by topic {topic.Name} were fetch successfully");
@@ -139,9 +141,9 @@ namespace NewsByTheMood.MVC.Controllers
                     _logger.LogDebug($"No articles with topic {topic.Name} were found");
                 }
 
-                return View("Index", new ArticleDisplayPreviewCollectionModel()
+                return View("Index", new ArticlePreviewCollectionModel()
                 {
-                    ArticlePreviews = articlesPreviews!,
+                    Articles = articlesPreviews!,
                     PageInfo = new PageInfoModel()
                     {
                         Page = pagination.Page,
@@ -187,7 +189,7 @@ namespace NewsByTheMood.MVC.Controllers
                     ArticleTags = article.Tags.Select(t => t.Name).ToArray()
                 });*/
 
-                return View(_articleMapper.ArticleToArticleDisplayModel(article));
+                return View(_articleMapper.ArticleToArticleModel(article));
             }
             catch (Exception ex)
             {

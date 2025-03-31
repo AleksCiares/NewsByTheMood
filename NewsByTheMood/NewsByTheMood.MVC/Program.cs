@@ -34,7 +34,7 @@ namespace NewsByTheMood.MVC
 
                 // Db provider service
                 builder.Services.AddDbContext<NewsByTheMoodDbContext>(
-                    opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+                    opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default1")));
 
                 // Data provider services
                 // Article service
@@ -79,6 +79,8 @@ namespace NewsByTheMood.MVC
                 /*builder.Services.Configure<SpoofOptions>(
                     builder.Configuration.GetSection(SpoofOptions.Position));*/
 
+                builder.Services.AddRouting(options => options.LowercaseUrls = true);
+                
                 var app = builder.Build();
 
                 // Configure the HTTP request pipeline.
@@ -99,7 +101,7 @@ namespace NewsByTheMood.MVC
                 app.MapAreaControllerRoute(
                     name: "AreaSettings",
                     areaName: "Settings",
-                    pattern: "settings/{controller=Home}/{action=Index}/{id?}");
+                    pattern: "Settings/{controller=Home}/{action=Index}/{id?}");
 
                 app.MapControllerRoute(
                     name: "default",

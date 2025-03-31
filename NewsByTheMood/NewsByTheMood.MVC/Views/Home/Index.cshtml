@@ -1,11 +1,11 @@
-﻿@model NewsByTheMood.MVC.Models.ArticleDisplayPreviewCollectionModel
+﻿@model NewsByTheMood.MVC.Models.ArticlePreviewCollectionModel
 @{
     ViewData["PageTitle"] = Model.PageTitle;
 }
 
 <div class="articles container">
     <div class="articles__list row justify-content-start row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-3 row-cols-xxl-3 mb-4">
-        @foreach (var articlePreview in Model.ArticlePreviews)
+        @foreach (var articlePreview in Model.Articles)
         {
             <div class="articles__preview col mb-4">
                 <div class="articles__card card bg-dark text-white rounded-5" style="background-image: url(@articlePreview.PreviewImgUrl)">

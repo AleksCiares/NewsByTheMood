@@ -1,11 +1,11 @@
-﻿@model ArticlePreviewCollectionModel
+﻿@model ArticleSettingsCollectionModel
 @{
     ViewData["PageTitle"] = "Articles";
 }
 
 <div class="articles container">
     <div class="articles__header d-flex row mb-5">
-        <h4 class="mb-0">Sources</h4>
+        <h4 class="mb-0">Articles</h4>
     </div>
     <div class="articles__panel row align-items-start justify-content-start mb-4">
         <div class="col-auto">
@@ -20,10 +20,12 @@
                     <th scope="col">Title</th>
                     <th scope="col">Source</th>
                     <th scope="col">Topic</th>
+                    <th scope="col">Is active</th>
+                    <th scope="col">Full loaded</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var articlePreview in Model.ArticleShortPreviews)
+                @foreach (var articlePreview in Model.Articles)
                 {
                     <tr>
                         <th scope="row">
@@ -32,6 +34,22 @@
                         <td>@articlePreview.Title</td>
                         <td>@articlePreview.SourceName</td>
                         <td>@articlePreview.TopicName</td>
+                        <td>
+                            @if (articlePreview.IsActive)
+                            {
+                                <div style="color: green"><i class="bi bi-check"></i></div>
+                            }
+                        </td>
+                        <td>
+                            @if (!articlePreview.FailedLoaded)
+                            {
+                                <div style="color: green"><i class="bi bi-check"></i></div>
+                            }
+                            else
+                            {
+                                <div style="color: orangered"><i class="bi bi-x"></i></div>
+                            }
+                        </td>
                     </tr>
                 }
             </tbody>

@@ -1,4 +1,4 @@
-﻿@model NewsByTheMood.MVC.Models.ArticleDisplayModel
+﻿@model NewsByTheMood.MVC.Models.ArticleModel
 @{
     ViewData["PageTitle"] = Model.Title;
 }
@@ -24,7 +24,7 @@
                 </div>
             </div>
             <div class="article__tags row align-items-center justify-content-start mb-3">
-                @foreach (var tag in Model.ArticleTags)
+                @foreach (var tag in Model.Tags)
                 {
                     <div class="col-auto px-1 mb-2">
                         <div class="border rounded-3">

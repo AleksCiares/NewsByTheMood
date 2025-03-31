@@ -1,11 +1,11 @@
-﻿@model ArticleEditModel
+﻿@model ArticleSettingsEditModel
 @{
 	ViewData["PageTitle"] = $"{Model.Article.Title} - Editing";
 }
 
 <div class="article container">
 	<div class="article__header d-flex row mb-5">
-		<h4 class="mb-0">Create a source</h4>
+		<h4 class="mb-0">@(Model.Article.Title)</h4>
 	</div>
 	<form asp-antiforgery="true" method="post">
 		<div class="form__panel row align-items-start justify-content-between mb-4">
@@ -19,7 +19,7 @@
 		</div>
 		<div class="form__body row align-items-start justify-content-start mb-4">
 			<div class="form__warp">
-				<partial name="_ArticleFormPartial" model="@(new ArticleCreateModel(){ Article = Model.Article, Sources = Model.Sources, Tags = Model.Tags})" />
+				<partial name="_ArticleFormPartial" model="@(new ArticleSettingsCreateModel(){ Article = Model.Article, Sources = Model.Sources, Tags = Model.Tags})" />
 				<div class="id form-floating mb-3" style="display:none;">
 					<input asp-for="@Model.Article.Id" type="number" value="@Model.Article.Id" class="form-control" />
 				</div>

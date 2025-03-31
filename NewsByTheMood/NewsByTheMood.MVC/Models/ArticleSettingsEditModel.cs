@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace NewsByTheMood.MVC.Models
 {
-    public class ArticleEditModel
+    public class ArticleSettingsEditModel
     {
         [Required]
-        public required ArticleModel Article { get; set; }
+        public required ArticleSettingsModel Article { get; set; }
 
         [Required]
         public required List<SelectListItem> Tags { get; set; }
