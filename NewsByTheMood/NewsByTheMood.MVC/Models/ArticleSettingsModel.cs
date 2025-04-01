@@ -45,6 +45,6 @@ namespace NewsByTheMood.MVC.Models
         [Range(0, Int64.MaxValue)]
         public required string SourceId { get; set; }
 
-        public string[] Tags { get; set; }
+        public required Tag[] Tags { get; set; }
     }
 }

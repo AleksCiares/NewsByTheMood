@@ -323,7 +323,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             var tags = (await _tagService.GetAllAsync())
                 .Select(tag => new SelectListItem()
                 {
-                    Value = tag.Name,
+                    Value = tag.Id.ToString(),
                     Text = tag.Name,
                 })
                 .ToList();
