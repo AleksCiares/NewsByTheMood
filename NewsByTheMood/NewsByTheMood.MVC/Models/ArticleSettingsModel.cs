@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using NewsByTheMood.Data.Entities;
+﻿using NewsByTheMood.Data.Entities;
 using System.ComponentModel.DataAnnotations;
 
 namespace NewsByTheMood.MVC.Models
@@ -42,9 +41,12 @@ namespace NewsByTheMood.MVC.Models
         public required bool IsActive { get; set; }
 
         [Required]
+        public required bool FailedLoaded { get; set; }
+
+        [Required]
         [Range(0, Int64.MaxValue)]
         public required string SourceId { get; set; }
 
-        public required Tag[] Tags { get; set; }
+        //public required Tag[] Tags { get; set; }
     }
 }

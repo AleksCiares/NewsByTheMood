@@ -97,7 +97,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             {
                 return View(new ArticleSettingsCreateModel()
                 {
-                    Sources = await GetSourceAsync(),
+                    Sources = await GetSourcesAsync(),
                     Tags = await GetTagsAsync(),
                 });
             }
@@ -141,7 +141,8 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                     .ToList()
                 });*/
 
-                await _articleService.AddAsync(_articleMapper.ArticleSettingsModelToArticle(articleCreate.Article));
+
+                await _articleService.AddAsync(_articleMapper.ArticleSettingsCreateModelToArticle(articleCreate));
 
                 _logger.LogInformation($"Article {articleCreate.Article!.Title} was created successfully");
 
@@ -170,12 +171,13 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                     return BadRequest();
                 }
 
-                var tags = await GetTagsAsync();
-                foreach (var tag in tags)
+                var tags = (await GetTagsAsync());
+                tags.ForEach(tag => tag.Selected = article.Tags.Any(articleTag => articleTag.Id.ToString().Equals(tag.Value)));
+
+                /*foreach (var tag in tags)
                 {
                     tag.Selected = article.Tags.Any(articleTag => articleTag.Equals(tag.Value));
-                }
-
+                }*/
                 /*return View(new ArticleSettingsEditModel()
                 {
                     Article = new ArticleSettingsModel()
@@ -198,7 +200,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                 return View(new ArticleSettingsEditModel()
                 {
                     Article = article,
-                    Sources = await GetSourceAsync(),
+                    Sources = await GetSourcesAsync(),
                     Tags = tags
                 });
             }
@@ -255,6 +257,15 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                     .ToList()
                 });*/
 
+                articleEdit.Article!.Tags = articleEdit.Tags
+                    .Where(tag => tag.Selected)
+                    .Select(tag => new Tag()
+                    {
+                        Id = Int64.Parse(tag.Value),
+                        Name = tag.Text
+                    })
+                    .ToArray();
+
                 await _articleService.UpdateAsync(_articleMapper.ArticleSettingsModelToArticle(articleEdit.Article));
 
                 _logger.LogInformation($"Article {articleEdit.Article.Title} was updated successfully");
@@ -298,7 +309,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         }
 
         [NonAction]
-        private async Task<List<SelectListItem>> GetSourceAsync()
+        private async Task<List<SelectListItem>> GetSourcesAsync()
         {
             var sources = (await _sourceService.GetAllAsync())
                 .Select(source => new SelectListItem()
@@ -318,7 +329,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         }
 
         [NonAction]
-        private async Task<List<SelectListItem>> GetTagsAsync() // Исправить баг мульти селекта тегов
+        private async Task<List<SelectListItem>> GetTagsAsync()
         {
             var tags = (await _tagService.GetAllAsync())
                 .Select(tag => new SelectListItem()

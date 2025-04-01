@@ -45,7 +45,7 @@
         <span asp-validation-for="@Model.Article.SourceId" class="error-feedback invalid-feedback"></span>
 	</div>
 	<div class="tags mb-3">
-		<select asp-for="@Model.Article.Tags" asp-items="@Model.Tags" id="tags-multiple-select"
+		<select asp-items="@Model.Tags" id="tags-multiple-select"
 				class="form-select" multiple="multiple" aria-label="Tags" size="5"></select>
 		<span asp-validation-for="@Model.Article.Tags" class="error-feedback invalid-feedback"></span>
 	</div>
@@ -58,7 +58,6 @@
 			<input type="hidden" name="Tags[@i].Value" value="@Model.Tags[i].Value" />
 			<input type="hidden" name="Tags[@i].Text" value="@Model.Tags[i].Text" />
 			<input type="hidden" name="Tags[@i].Selected" @(Model.Tags[i].Selected ? "value=true" : "value=false") />
-
 		}
 	</div>
 }
