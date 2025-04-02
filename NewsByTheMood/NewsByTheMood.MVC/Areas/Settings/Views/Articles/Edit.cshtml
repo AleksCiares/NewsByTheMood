@@ -5,16 +5,16 @@
 
 <div class="article container">
 	<div class="article__header d-flex row mb-5">
-		<h4 class="mb-0">@(Model.Article.Title)</h4>
+		<h4 class="mb-0">@Model.Article.Title</h4>
 	</div>
 	<form asp-antiforgery="true" method="post">
 		<div class="form__panel row align-items-start justify-content-between mb-4">
 			<div class="col-auto">
-				<button asp-area="settings" asp-controller="articles" asp-action="Edit" asp-route-id="@Model.Article.Id" class="btn btn-outline-primary" type="submit">Submit</button>
+				<button asp-area="settings" asp-controller="articles" asp-action="edit" type="submit" class="btn btn-outline-primary">Submit</button>
 				<a asp-area="settings" asp-controller="articles" asp-action="index" class="btn btn-outline-secondary">Cancel</a>
 			</div>
 			<div class="col-auto">
-				<button asp-area="settings" asp-controller="articles" asp-action="delete" asp-route-id="@Model.Article.Id" class="btn btn-danger">Delete</button>
+				<button formnovalidate asp-area="settings" asp-controller="articles" asp-action="delete" asp-route-id="@Model.Article.Id" class="btn btn-danger">Delete</button>
 			</div>
 		</div>
 		<div class="form__body row align-items-start justify-content-start mb-4">

@@ -1,5 +1,12 @@
 ﻿@model ArticleSettingsCreateModel
 
+@{
+	if(Model.Article != null &&  Model.Article.Tags != null)
+	{
+		Model.Tags.ForEach(t => t.Selected = Model.Article.Tags.Any(tag => tag.Value.Equals(t.Value)));
+	}
+}
+
 <div class="article-settings">
 	<div class="is-active form-check mb-3">
 		<input asp-for="@Model.Article.IsActive" type="checkbox" class="form-check-input"/>
@@ -24,7 +31,8 @@
 		<span asp-validation-for="@Model.Article.PreviewImgUrl" class="error-feedback invalid-feedback"></span>
 	</div>
 	<div class="body form-floating mb-3">
-		<input asp-for="@Model.Article.Body" type="text" class="form-control" placeholder="Body" />
+		<textarea asp-for="@Model.Article.Body" class="form-control" id="articleFormBody" placeholder="Body"
+				  rows="5" style="resize: none;overflow: hidden;"></textarea>
 		<label asp-for="@Model.Article.Body" class="form-label">Body</label>
 		<span asp-validation-for="@Model.Article.Body" class="error-feedback invalid-feedback"></span>
 	</div>
@@ -40,34 +48,16 @@
 		<span asp-validation-for="@Model.Article.Positivity" class=" error-feedback invalid-feedback"></span>
 	</div>
     <div class="source form-floating mb-3">
-        <select asp-for="@Model.Article.SourceId" asp-items="@Model.Sources" class="form-select"></select>
+		<select asp-for="@Model.Article.SourceId" asp-items="@Model.Sources" id="sources-single-select" class="form-select"></select>
         <label asp-for="@Model.Article.SourceId" class="form-label">Source</label>
         <span asp-validation-for="@Model.Article.SourceId" class="error-feedback invalid-feedback"></span>
 	</div>
 	<div class="tags mb-3">
-		<select asp-items="@Model.Tags" id="tags-multiple-select"
-				class="form-select" multiple="multiple" aria-label="Tags" size="5"></select>
+		<input type="text" id="articleFormTagsSearch" class="form-control mb-2" placeholder="Search tags..." />
+		<select asp-items="@Model.Tags" id="tags-multiple-select" class="form-select" 
+			multiple="multiple" aria-label="Tags" size="7">
+		</select>
 		<span asp-validation-for="@Model.Article.Tags" class="error-feedback invalid-feedback"></span>
 	</div>
 </div>
-@if (Model.Tags.Count > 0)
-{
-	<div class="tags">
-		@for (int i = 0; i < Model.Tags.Count; i++)
-		{
-			<input type="hidden" name="Tags[@i].Value" value="@Model.Tags[i].Value" />
-			<input type="hidden" name="Tags[@i].Text" value="@Model.Tags[i].Text" />
-			<input type="hidden" name="Tags[@i].Selected" @(Model.Tags[i].Selected ? "value=true" : "value=false") />
-		}
-	</div>
-}
-@if (Model.Sources.Count > 0)
-{
-	<div class="sources">
-		@for (int i = 0; i < Model.Sources.Count; i++)
-		{
-			<input type="hidden" name="Sources[@i].Value" value="@Model.Sources[i].Value" />
-			<input type="hidden" name="Sources[@i].Text" value="@Model.Sources[i].Text" />
-		}
-	</div>
-}
+<div class="hidden-data"></div>

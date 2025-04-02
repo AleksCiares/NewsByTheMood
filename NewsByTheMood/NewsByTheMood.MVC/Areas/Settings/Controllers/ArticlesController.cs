@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using NewsByTheMood.Data.Entities;
 using NewsByTheMood.MVC.Mappers;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
+using NuGet.Protocol;
 
 namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 {
@@ -42,23 +42,10 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 
                 if (totalArticles > 0)
                 {
-                    /*articles = (await _articleService.GetRangeLatestAsync(
-                        _defaultPositivity,
-                        pagination.Page,
-                        pagination.PageSize)) // replaced with mapper
-                        .Select(article => new ArticleSettingsPreviewModel()
-                        {
-                            Id = article.Id.ToString(),
-                            Title = article.Title,
-                            SourceName = article.Source.Name,
-                            TopicName = article.Source.Topic.Name
-                        })
-                        .ToArray();*/
-
                     articles = (await _articleService.GetRangeLatestAsync(
                         _defaultPositivity,
                         pagination.Page,
-                        pagination.PageSize)) // replaced with mapper
+                        pagination.PageSize))
                         .Select(article => _articleMapper.ArticleToArticleSettingsPreviewModel(article))
                         .ToArray();
 
@@ -103,7 +90,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while getting create article page");
+                _logger.LogError(ex, "Error while preparing to create article");
                 return StatusCode(500);
             }
         }
@@ -114,43 +101,27 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
+                if (!ModelState.IsValid || articleCreate.Article == null)
                 {
                     return View(articleCreate);
                 }
-                if (await _articleService.IsExistsByUrlAsync(articleCreate.Article!.Url))
+
+                _logger.LogInformation($"Creating article {articleCreate.Article!.Title}");
+
+                if (await _articleService.AddAsync(_articleMapper.ArticleSettingsModelToArticle(articleCreate.Article)))
                 {
-                    ModelState.AddModelError("Article.Url", "A article with the same url already exists");
-                    return View(articleCreate);
+                    _logger.LogInformation($"Article {articleCreate.Article!.Title} was created successfully");
+                    return RedirectToAction("Index");
                 }
-
-                /*await _articleService.AddAsync(new Article()
+                else
                 {
-                    Url = articleCreate.Article!.Url,
-                    Title = articleCreate.Article!.Title,
-                    PreviewImgUrl = articleCreate.Article?.PreviewImgUrl,
-                    Body = articleCreate.Article?.Body,
-                    PublishDate = articleCreate.Article?.PublishDate,
-                    Positivity = articleCreate.Article!.Positivity,
-                    Rating = articleCreate.Article!.Rating,
-                    SourceId = articleCreate.Article!.SourceId,
-                    Tags = articleCreate.Article.Tags.Select(tag => new Tag
-                    {
-                        Name = tag
-                    })
-                    .ToList()
-                });*/
-
-
-                await _articleService.AddAsync(_articleMapper.ArticleSettingsCreateModelToArticle(articleCreate));
-
-                _logger.LogInformation($"Article {articleCreate.Article!.Title} was created successfully");
-
-                return RedirectToAction("Index");
+                    _logger.LogWarning($"Article {articleCreate.Article!.Title} was not created");
+                    return BadRequest("Something gone wrong, while creating. Watch logs to more information");
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while creating article");
+                _logger.LogError(ex, $"Error while creating article {articleCreate.Article!.Title}");
                 return StatusCode(500);
             }
         }
@@ -161,151 +132,127 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         {
             try
             {
-                //var article = await _articleService.GetByIdAsync(long.Parse(id));
-
                 var article = _articleMapper.ArticleToArticleSettingsModel(
                     await  _articleService.GetByIdAsync(long.Parse(id)));
                 if (article == null)
                 {
                     _logger.LogWarning($"Article {id} was not found");
-                    return BadRequest();
+                    return BadRequest("Something gone wrong, while getting. Watch logs to more information");
                 }
-
-                var tags = (await GetTagsAsync());
-                tags.ForEach(tag => tag.Selected = article.Tags.Any(articleTag => articleTag.Id.ToString().Equals(tag.Value)));
-
-                /*foreach (var tag in tags)
-                {
-                    tag.Selected = article.Tags.Any(articleTag => articleTag.Equals(tag.Value));
-                }*/
-                /*return View(new ArticleSettingsEditModel()
-                {
-                    Article = new ArticleSettingsModel()
-                    {
-                        Id = article.Id.ToString(),
-                        Title = article.Title,
-                        Url = article.Url,
-                        PreviewImgUrl = article.PreviewImgUrl,
-                        Body = article.Body,
-                        PublishDate = article.PublishDate,
-                        Positivity = article.Positivity,
-                        Rating = article.Rating,
-                        SourceId = article.SourceId,
-                        IsActive = article.IsActive,
-                    },
-                    Sources = await GetSourceAsync(),
-                    Tags = tags
-                });*/
 
                 return View(new ArticleSettingsEditModel()
                 {
                     Article = article,
                     Sources = await GetSourcesAsync(),
-                    Tags = tags
+                    Tags = await GetTagsAsync(),
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error while getting article {id}");
+                _logger.LogError(ex, $"Error while preparing to update article {id}");
                 return StatusCode(500);
             }
         }
 
         // Edit article item proccessing
         [HttpPost("{id:required}")]
-        public async Task<IActionResult> Edit([FromRoute] string id, [FromForm] ArticleSettingsEditModel articleEdit)
+        public async Task<IActionResult> Edit([FromForm] ArticleSettingsEditModel articleEdit)
         {
             try
             {
-                /*var article = await _articleService.GetByIdAsync(long.Parse(id));*/
-
-                var article = _articleMapper.ArticleToArticleSettingsModel(
-                    await _articleService.GetByIdAsync(long.Parse(id)));
-                if (article == null)
-                {
-                    _logger.LogWarning($"Article {id} was not found");
-                    return BadRequest();
-                }
                 if (!ModelState.IsValid)
                 {
                     return View(articleEdit);
                 }
-                if (await _articleService.IsExistsByUrlAsync(articleEdit.Article.Url) && 
-                    !articleEdit.Article.Url.Equals(article.Url))
+
+                _logger.LogInformation($"Updating article {articleEdit.Article.Id}");
+
+                if (await _articleService.UpdateAsync(_articleMapper.ArticleSettingsModelToArticle(articleEdit.Article)))
                 {
-                    ModelState.AddModelError("Article.Url", "A url with the same url already exists");
-                    articleEdit.Article.Url = article.Url;
-                    return View(articleEdit);
+                    _logger.LogInformation($"Article {articleEdit.Article.Id} was updated successfully");
+                    return RedirectToAction("Index");
                 }
-
-                /*await _articleService.UpdateAsync(new Article()
+                else
                 {
-                    Id = long.Parse(id),
-                    Title = articleEdit.Article.Title,
-                    Url = articleEdit.Article.Url,
-                    PreviewImgUrl = articleEdit.Article.PreviewImgUrl,
-                    Body = articleEdit.Article.Body,
-                    PublishDate = articleEdit.Article.PublishDate,
-                    Positivity = articleEdit.Article.Positivity,
-                    Rating = articleEdit.Article.Rating,
-                    SourceId = articleEdit.Article.SourceId,
-                    Tags = articleEdit.Tags.Select(tag => new Tag
-                    {
-                        Id = Int64.Parse(tag.Value),
-                        Name = tag.Text
-                    })
-                    .ToList()
-                });*/
-
-                articleEdit.Article!.Tags = articleEdit.Tags
-                    .Where(tag => tag.Selected)
-                    .Select(tag => new Tag()
-                    {
-                        Id = Int64.Parse(tag.Value),
-                        Name = tag.Text
-                    })
-                    .ToArray();
-
-                await _articleService.UpdateAsync(_articleMapper.ArticleSettingsModelToArticle(articleEdit.Article));
-
-                _logger.LogInformation($"Article {articleEdit.Article.Title} was updated successfully");
-
-                return RedirectToAction("Index");
+                    _logger.LogWarning($"Article {articleEdit.Article.Id} was not found");
+                    return BadRequest("Something gone wrong, while updating. Watch logs to more information");
+                }
             }
             catch (Exception ex) 
             {
-                _logger.LogError(ex, $"Error while updating article {id}");
+                _logger.LogError(ex, $"Error while updating article {articleEdit.Article.ToJson()}");
                 return StatusCode(500);
             }
         }
 
         // Delete article item
         [HttpPost("{id:required}")]
-        public async Task<IActionResult> Delete([FromRoute] string id, [FromForm] ArticleSettingsEditModel articleEdit)
+        public async Task<IActionResult> Delete([FromRoute] string id)
         {
             try
             {
-                var article = await _articleService.GetByIdAsync(long.Parse(id));
-                if (article == null)
+                _logger.LogInformation($"Deleting article {id}");
+
+                if (await _articleService.DeleteAsync(long.Parse(id)))
+                {
+                    _logger.LogInformation($"Article {id} was deleted successfully");
+                    return RedirectToAction("Index");
+                }
+                else
                 {
                     _logger.LogWarning($"Article {id} was not found");
-                    return BadRequest();
+                    return BadRequest("Something gone wrong, while deleting. Watch logs to more information");
                 }
-
-                await _sourceService.DeleteAsync(new Source()
-                {
-                    Id = article.Id,
-                });
-
-                _logger.LogInformation($"Article {article.Id} was deleted successfully");
-
-                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error while deleting article {id}");
                 return StatusCode(500);
             }
+        }
+
+        // Delete article range
+        [HttpPost]
+        public async Task<IActionResult> Delete([FromForm] string[] ids)
+        {
+            try
+            {
+                _logger.LogInformation($"Deleting articles {string.Join(", ", ids)}");
+
+                var deletedIds = await _articleService.DeleteRangeAsync(ids.Select(id => long.Parse(id)).ToArray());
+
+                if (deletedIds.Length == ids.Length)
+                {
+                    _logger.LogInformation($"Articles {string.Join(", ", deletedIds)} were deleted successfully");
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    _logger.LogWarning($"Failed while deleting articles. Only {string.Join(", ", deletedIds)} were deleted successfully");
+                    return BadRequest("Something gone wrong, while deleting. Watch logs to more information");
+                }
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, $"Error while deleting articles {string.Join(", ", ids)}");
+                return StatusCode(500);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UrlIsAvailable(ArticleSettingsModel article)
+       {
+            var isExists = await _articleService.IsExistsByUrlAsync(article.Url);
+            if (isExists && !string.IsNullOrEmpty(article.Id))
+            {
+                var articleTemp = await _articleService.GetByIdAsync(long.Parse(article.Id));
+                if (articleTemp != null && articleTemp.Url.Equals(article.Url))
+                {
+                    isExists = false;
+                }
+            }
+
+            return Json(!isExists);
         }
 
         [NonAction]

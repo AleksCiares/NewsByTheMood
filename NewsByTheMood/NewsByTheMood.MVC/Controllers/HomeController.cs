@@ -36,24 +36,6 @@ namespace NewsByTheMood.MVC.Controllers
 
                 if (totalArticles > 0)
                 {
-                    /*articlesPreviews = (await _articleService.GetRangeLatestAsync(
-                        _defaultPositivity,
-                        pagination.Page,
-                        pagination.PageSize)) // replaced with mapper
-                        .Select(article => new ArticleDisplayPreviewModel()
-                        {
-                            Id = article.Id.ToString(),
-                            Title = article.Title,
-                            PreviewImgUrl = article.PreviewImgUrl,
-                            PublishDate = article.PublishDate.ToString(),
-                            Positivity = article.Positivity,
-                            Rating = article.Rating,
-                            SourceName = article.Source.Name,
-                            SourceUrl = article.Source.Url,
-                            TopicName = article.Source.Topic.Name
-                        })
-                        .ToArray();*/
-
                     articlesPreviews = (await _articleService.GetRangeLatestAsync(
                         _defaultPositivity,
                         pagination.Page,
@@ -107,25 +89,6 @@ namespace NewsByTheMood.MVC.Controllers
 
                 if (totalArticles > 0)
                 {
-                    /*articlesPreviews = (await _articleService.GetRangeByTopicAsync(
-                        _defaultPositivity,
-                        topic.Id,
-                        pagination.Page,
-                        pagination.PageSize)) // replaced with mapper
-                        .Select(a => new ArticleDisplayPreviewModel()
-                        {
-                            Id = a.Id.ToString(),
-                            Title = a.Title,
-                            PreviewImgUrl = a.PreviewImgUrl,
-                            PublishDate = a.PublishDate.ToString(),
-                            Positivity = a.Positivity,
-                            Rating = a.Rating,
-                            SourceName = a.Source.Name,
-                            SourceUrl = a.Source.Url,
-                            TopicName = a.Source.Topic.Name
-                        })
-                        .ToArray();*/
-
                     articlesPreviews = (await _articleService.GetRangeByTopicAsync(
                         _defaultPositivity,
                         topic.Id,
@@ -175,25 +138,29 @@ namespace NewsByTheMood.MVC.Controllers
                     return BadRequest();
                 }
 
-                /*return View(new ArticleDisplayModel()
-                {
-                    Url = article.Url,
-                    Title = article.Title,
-                    PreviewImgUrl = article.PreviewImgUrl,
-                    Body = article.Body,
-                    PublishDate = article.PublishDate.ToString(),
-                    Positivity = article.Positivity,
-                    Rating = article.Rating,
-                    SourceName = article.Source.Name,
-                    TopicName = article.Source.Topic.Name,
-                    ArticleTags = article.Tags.Select(t => t.Name).ToArray()
-                });*/
-
                 return View(_articleMapper.ArticleToArticleModel(article));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error while getting article {id}");
+                return StatusCode(500);
+            }
+        }
+
+        // Ajax load more articles
+        [HttpGet]
+        public async Task<IActionResult> LoadMore(int page, int pageSize)
+        {
+            try
+            {
+                var articles = await _articleService.GetRangeLatestAsync(_defaultPositivity, page, pageSize);
+                var articlePreviews = articles.Select(article => _articleMapper.ArticleToArticlePreviewModel(article)).ToArray();
+
+                return PartialView("_ArticlePreviewsPartial", articlePreviews);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while loading more articles");
                 return StatusCode(500);
             }
         }

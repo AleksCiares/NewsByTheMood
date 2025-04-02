@@ -1,0 +1,70 @@
+﻿@model IEnumerable<ArticlePreviewModel>
+
+@foreach (var articlePreview in Model)
+{
+    <div class="articles__preview col mb-4">
+        <div class="articles__card card bg-dark text-white rounded-5" style="background-image: url(@articlePreview.PreviewImgUrl)">
+            <div class="card-body d-flex align-content-between flex-wrap">
+                <div class="w-100">
+                    <div class="row justify-content-between mb-auto">
+                        <div class="col-auto">
+                            @articlePreview.TopicName
+                        </div>
+                        <div class="col-auto">
+                            @articlePreview.PublishDate
+                        </div>
+                    </div>
+                </div>
+                <div class="w-100">
+                    <a asp-area="" asp-controller="home" asp-action="detail" asp-route-id="@articlePreview.Id"
+                       class="card-title text-decoration-none text-white mb-2">
+                        <h5>
+                            @articlePreview.Title
+                        </h5>
+                    </a>
+                    <div class="row justify-content-between mb-2">
+                        <div class="articles__positivity col-auto" data-bs-toggle="tooltip" data-bs-placement="right"
+                             title="positivity @articlePreview.Positivity">
+                            @switch (articlePreview.Positivity)
+                            {
+                                case 10:
+                                case 9:
+                                    <i class="bi bi-emoji-smile" style="color: limegreen;"></i>
+                                    break;
+
+                                case 8:
+                                case 7:
+                                    <i class="bi bi-emoji-smile" style="color: yellowgreen;"></i>
+                                    break;
+
+                                case 6:
+                                case 5:
+                                    <i class="bi bi-emoji-neutral" style="color: orange;"></i>
+                                    break;
+
+                                case 4:
+                                case 3:
+                                    <i class="bi bi-emoji-frown" style="color: orangered;"></i>
+                                    break;
+
+                                case 2:
+                                case 1:
+                                    <i class="bi bi-emoji-frown" style="color: red;"></i>
+                                    break;
+
+                                default:
+                                    <i class="bi bi-emoji-tear" style="color: antiquewhite"></i>
+                                    break;
+                            }
+                        </div>
+                        <div class="col-auto">
+                            <a href="@articlePreview.SourceUrl" class="text-decoration-none text-white">
+                                @articlePreview.SourceName
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

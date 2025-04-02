@@ -7,53 +7,64 @@
     <div class="articles__header d-flex row mb-5">
         <h4 class="mb-0">Articles</h4>
     </div>
-    <div class="articles__panel row align-items-start justify-content-start mb-4">
-        <div class="col-auto">
-            <a asp-area="settings" asp-controller="articles" asp-action="create" class="btn btn-outline-primary">Create</a>
-        </div>
-    </div>
     <div class="articles__table mb-4">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">Id</th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Source</th>
-                    <th scope="col">Topic</th>
-                    <th scope="col">Is active</th>
-                    <th scope="col">Full loaded</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var articlePreview in Model.Articles)
-                {
+        <form asp-area="settings" asp-controller="articles" asp-action="delete" asp-antiforgery="true" method="post">
+            <div class="articles__panel row align-items-start justify-content-between mb-4">
+                <div class="col-auto">
+                    <a asp-area="settings" asp-controller="articles" asp-action="create" class="btn btn-outline-primary">Create</a>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-danger" id="deleteSelectedArticles" disabled>Delete selected</button>
+                </div>
+            </div>
+            <table class="table">
+                <thead>
                     <tr>
-                        <th scope="row">
-                            <a asp-area="settings" asp-controller="articles" asp-action="edit" asp-route-id="@articlePreview.Id">@articlePreview.Id</a>
+                        <th>
+                            <input type="checkbox" id="selectAllArticles" />
                         </th>
-                        <td>@articlePreview.Title</td>
-                        <td>@articlePreview.SourceName</td>
-                        <td>@articlePreview.TopicName</td>
-                        <td>
-                            @if (articlePreview.IsActive)
-                            {
-                                <div style="color: green"><i class="bi bi-check"></i></div>
-                            }
-                        </td>
-                        <td>
-                            @if (!articlePreview.FailedLoaded)
-                            {
-                                <div style="color: green"><i class="bi bi-check"></i></div>
-                            }
-                            else
-                            {
-                                <div style="color: orangered"><i class="bi bi-x"></i></div>
-                            }
-                        </td>
+                        <th scope="col">Id</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Source</th>
+                        <th scope="col">Topic</th>
+                        <th scope="col">Is active</th>
+                        <th scope="col">Full loaded</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var articlePreview in Model.Articles)
+                    {
+                        <tr>
+                             <td>
+                                <input type="checkbox" name="ids" value="@articlePreview.Id" class="selectArticle" />
+                            </td>
+                            <th scope="row">
+                                <a asp-area="settings" asp-controller="articles" asp-action="edit" asp-route-id="@articlePreview.Id">@articlePreview.Id</a>
+                            </th>
+                            <td>@articlePreview.Title</td>
+                            <td>@articlePreview.SourceName</td>
+                            <td>@articlePreview.TopicName</td>
+                            <td>
+                                @if (articlePreview.IsActive)
+                                {
+                                    <div style="color: green"><i class="bi bi-check"></i></div>
+                                }
+                            </td>
+                            <td>
+                                @if (!articlePreview.FailedLoaded)
+                                {
+                                    <div style="color: green"><i class="bi bi-check"></i></div>
+                                }
+                                else
+                                {
+                                    <div style="color: orangered"><i class="bi bi-x"></i></div>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </form>
     </div>
     @if (Model.PageInfo.TotalPages > 1)
     {
@@ -64,3 +75,29 @@
         </div>
     }
 </div>
+@section Scripts {
+    <script>
+        document.getElementById('selectAllArticles').addEventListener('change', function () {
+            var checkboxes = document.querySelectorAll('.selectArticle');
+            for (var checkbox of checkboxes) {
+                checkbox.checked = this.checked;
+            }
+            toggleDeleteButton();
+        });
+
+        document.querySelectorAll('.selectArticle').forEach(function (checkbox) {
+            checkbox.addEventListener('change', function () {
+                toggleDeleteButton();
+            });
+        });
+
+        function toggleDeleteButton() {
+            var selectedCheckboxes = document.querySelectorAll('.selectArticle:checked');
+            var deleteButton = document.getElementById('deleteSelectedArticles');
+            deleteButton.disabled = selectedCheckboxes.length === 0;
+        }
+
+        // Initial check
+        toggleDeleteButton();
+    </script>
+}

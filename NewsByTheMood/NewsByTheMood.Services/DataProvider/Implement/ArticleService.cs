@@ -89,24 +89,56 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             return await _mediator.Send(new IsExistsArticleByUrlQuery() { ArticleUrl = articleUrl }, cancellationToken);
         }
 
-        public async Task AddAsync(Article article, CancellationToken cancellationToken = default)
+        public async Task<bool> AddAsync(Article article, CancellationToken cancellationToken = default)
         {
             await _mediator.Send(new AddArticleCommand() { Article = article }, cancellationToken);
+            return true;
         }
 
-        public async Task AddRangeAsync(IEnumerable<Article> articles, CancellationToken cancellationToken = default)
+        public async Task<bool> AddRangeAsync(IEnumerable<Article> articles, CancellationToken cancellationToken = default)
         {
             await _mediator.Send(new AddArticlesRangeCommand() { Articles = articles }, cancellationToken);
+            return true;
         }
 
-        public async Task UpdateAsync(Article article, CancellationToken cancellationToken = default)
+        public async Task<bool> UpdateAsync(Article article, CancellationToken cancellationToken = default)
         {
+            var articleEntity = await _mediator.Send(new GetArticleByIdQuery() { Id = article.Id }, cancellationToken);
+            if (articleEntity == null)
+            {
+                return false;
+            }
             await _mediator.Send(new UpdateArticleCommand() { Article = article }, cancellationToken);
+            return true;
         }
 
-        public async Task DeleteAsync(Article article, CancellationToken cancellationToken = default)
+        public async Task<bool> DeleteAsync(long id, CancellationToken cancellationToken = default)
         {
+            var article = await _mediator.Send(new GetArticleByIdQuery() { Id = id }, cancellationToken);
+            if (article == null)
+            {
+                return false;
+            }
             await _mediator.Send(new DeleteArticleCommand() { Article = article }, cancellationToken);
+            return true;
+        }
+
+        public async Task<long[]> DeleteRangeAsync(long[] ids, CancellationToken cancellationToken = default)
+        {
+            var result = new List<long>();
+
+            foreach (var id in ids)
+            {
+                var article = await _mediator.Send(new GetArticleByIdQuery() { Id = id }, cancellationToken);
+                if (article != null)
+                {
+                    await _mediator.Send(new DeleteArticleCommand() { Article = article }, cancellationToken);
+                    result.Add(id);
+                }
+                
+            }
+          
+            return result.ToArray();
         }
     }
 

@@ -43,42 +43,17 @@ namespace NewsByTheMood.MVC.Mappers
         [MapperIgnoreSource(nameof(Article.Comments))]
         public partial ArticleSettingsPreviewModel ArticleToArticleSettingsPreviewModel(Article article);
 
-        /*[MapProperty([nameof(ArticleSettingsCreateModel.Article.Id)], nameof(Article.Id))]
-        [MapProperty([nameof(ArticleSettingsCreateModel.Article.Url)], nameof(Article.Url))]
-        [MapProperty([nameof(ArticleSettingsCreateModel.Article.Title)], nameof(Article.Title))]
-        [MapProperty([nameof(ArticleSettingsCreateModel.Article.PreviewImgUrl)], nameof(Article.PreviewImgUrl))]
-        [MapProperty([nameof(ArticleSettingsCreateModel.Article.Body)], nameof(Article.Body))]
-        [MapProperty([nameof(ArticleSettingsCreateModel.Article.PublishDate)], nameof(Article.PublishDate))]
-        [MapProperty([nameof(ArticleSettingsCreateModel.Article.Positivity)], nameof(Article.Positivity))]
-        [MapProperty([nameof(ArticleSettingsCreateModel.Article.Rating)], nameof(Article.Rating))]
-        [MapProperty([nameof(ArticleSettingsCreateModel.Article.IsActive)], nameof(Article.IsActive))]*/
-        [MapNestedProperties(nameof(ArticleSettingsCreateModel.Article))]
-        [MapValue(nameof(Article.FailedLoaded), false)]
-        [MapProperty([nameof(ArticleSettingsCreateModel.Tags)], nameof(ArticleModel.Tags),
+        [MapProperty(nameof(ArticleSettingsModel.Tags), nameof(Article.Tags), 
             Use = nameof(TagsSelectListToTagsList))]
         [MapperIgnoreTarget(nameof(Article.Source))]
         [MapperIgnoreTarget(nameof(Article.Comments))]
-        [MapperIgnoreSource(nameof(ArticleSettingsCreateModel.Sources))]
-        public partial Article ArticleSettingsCreateModelToArticle(ArticleSettingsCreateModel model);
+        public partial Article ArticleSettingsModelToArticle(ArticleSettingsModel model);
 
-        [MapPropertyFromSource(nameof(ArticleSettingsEditModel.Article))]
-        [MapProperty([nameof(Article.Tags)], nameof(ArticleSettingsEditModel.Tags),
+        [MapProperty([nameof(Article.Tags)], nameof(ArticleSettingsModel.Tags), 
             Use = nameof(TagsListToTagsSelectList))]
         [MapperIgnoreSource(nameof(Article.Source))]
         [MapperIgnoreSource(nameof(Article.Comments))]
-        public partial ArticleSettingsEditModel ArticleToArticleSettingsEditModel(Article article, List<SelectListItem> Sources);
-
-        /*        [MapProperty(nameof(ArticleSettingsModel.Tags), nameof(Article.Tags))]
-                [MapValue(nameof(Article.FailedLoaded), false)]
-                [MapperIgnoreTarget(nameof(Article.Source))]
-                [MapperIgnoreTarget(nameof(Article.Comments))]
-                public partial Article ArticleSettingsModelToArticle(ArticleSettingsModel model);
-
-                [MapProperty([nameof(Article.Tags)], nameof(ArticleSettingsModel.Tags))]
-                [MapperIgnoreSource(nameof(Article.FailedLoaded))]
-                [MapperIgnoreSource(nameof(Article.Source))]
-                [MapperIgnoreSource(nameof(Article.Comments))]
-                public partial ArticleSettingsModel? ArticleToArticleSettingsModel(Article? article);*/
+        public partial ArticleSettingsModel? ArticleToArticleSettingsModel(Article? article);
 
         [UserMapping]
         private string[] TagsListToTagsNameArray(List<Tag> tags)
@@ -106,7 +81,6 @@ namespace NewsByTheMood.MVC.Mappers
                         Value = tag.Id.ToString(),
                         Text = tag.Name,
                         Selected = true
-
                     })
                     .ToList();
         }

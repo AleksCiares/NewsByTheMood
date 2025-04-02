@@ -1,4 +1,5 @@
-﻿using NewsByTheMood.Data.Entities;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace NewsByTheMood.MVC.Models
@@ -13,6 +14,8 @@ namespace NewsByTheMood.MVC.Models
         [RegularExpression(@"^((http|https):\/\/)(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$",
             MatchTimeoutInMilliseconds = 500,
             ErrorMessage = "Url does not fit typical http or https protocol site links")]
+        [Remote(action: "UrlIsAvailable", controller: "Articles",
+            areaName: "Settings", HttpMethod = "Post", AdditionalFields = nameof(Id), ErrorMessage = "A article with the same url already exists")]
         public required string Url { get; set; }
 
         [Required]
@@ -47,6 +50,7 @@ namespace NewsByTheMood.MVC.Models
         [Range(0, Int64.MaxValue)]
         public required string SourceId { get; set; }
 
-        //public required Tag[] Tags { get; set; }
+        [Required]
+        public required List<SelectListItem> Tags { get; set; }
     }
 }

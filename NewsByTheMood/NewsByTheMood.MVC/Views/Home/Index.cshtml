@@ -4,8 +4,8 @@
 }
 
 <div class="articles container">
-    <div class="articles__list row justify-content-start row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-3 row-cols-xxl-3 mb-4">
-        @foreach (var articlePreview in Model.Articles)
+    <div class="articles__list row justify-content-start row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-3 row-cols-xxl-3 mb-4" id="articlesList">
+        @* @foreach (var articlePreview in Model.Articles)
         {
             <div class="articles__preview col mb-4">
                 <div class="articles__card card bg-dark text-white rounded-5" style="background-image: url(@articlePreview.PreviewImgUrl)">
@@ -73,19 +73,22 @@
                 </div>
             </div>
         }
+    *@ 
     </div>
-    @if (Model.PageInfo.TotalPages > 1)
+
+@*     @if (Model.PageInfo.TotalPages > 1)
     {
         <div class="articles__pagination row align-items-center justify-content-center mb-4">
             <div class="col-auto">
                 <pagination page-action="index" page-info="@Model.PageInfo"></pagination>
             </div>
         </div>
-    }
+    } *@
+
 </div>
 
 @section Scripts
-             {
+{
     <script>
         $(document).ready(function(){
             $('[data-bs-toggle="tooltip"]').tooltip({
@@ -96,6 +99,42 @@
                     hide: 500
                 }
             });
+        });
+
+        $(document).ready(function () {
+            var currentPage = 0;
+            var totalPages = @Model.PageInfo.TotalPages;
+            var pageSize = @Model.PageInfo.PageSize;
+            var isLoading = false;
+
+            function loadMoreArticles() {
+                if (isLoading || currentPage >= totalPages) return;
+
+                isLoading = true;
+                currentPage++;
+
+                $.ajax({
+                    url: '@Url.Action("LoadMore", "Home", new { area = "" })',
+                    type: 'GET',
+                    data: { page: currentPage, pageSize: pageSize },
+                    success: function (data) {
+                        $('#articlesList').append(data);
+                        isLoading = false;
+                    },
+                    error: function () {
+                        isLoading = false;
+                    }
+                });
+            }
+
+            $(window).scroll(function () {
+                if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
+                    loadMoreArticles();
+                    console.log('loading more articles');
+                }
+            });
+
+            loadMoreArticles();
         });
     </script>
 }

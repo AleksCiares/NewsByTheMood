@@ -24,15 +24,18 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
         public Task<bool> IsExistsByUrlAsync(string articleUrl, CancellationToken cancellationToken = default);
 
         // Create article
-        public Task AddAsync(Article article, CancellationToken cancellationToken = default);
+        public Task<bool> AddAsync(Article article, CancellationToken cancellationToken = default);
 
         // Create range articles
-        public Task AddRangeAsync(IEnumerable<Article> articles, CancellationToken cancellationToken = default);
+        public Task<bool> AddRangeAsync(IEnumerable<Article> articles, CancellationToken cancellationToken = default);
 
         // Update article item
-        public Task UpdateAsync(Article article, CancellationToken cancellationToken = default);
+        public Task<bool> UpdateAsync(Article article, CancellationToken cancellationToken = default);
 
         // Delete article
-        public Task DeleteAsync(Article article, CancellationToken cancellationToken = default);
+        public Task<bool> DeleteAsync(long id, CancellationToken cancellationToken = default);
+
+        // Delete range articles
+        public Task<long[]> DeleteRangeAsync(long[] ids, CancellationToken cancellationToken = default);
     }
 }
