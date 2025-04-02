@@ -5,92 +5,15 @@
 
 <div class="articles container">
     <div class="articles__list row justify-content-start row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-3 row-cols-xxl-3 mb-4" id="articlesList">
-        @* @foreach (var articlePreview in Model.Articles)
-        {
-            <div class="articles__preview col mb-4">
-                <div class="articles__card card bg-dark text-white rounded-5" style="background-image: url(@articlePreview.PreviewImgUrl)">
-                    <div class="card-body d-flex align-content-between flex-wrap">
-                        <div class="w-100">
-                            <div class="row justify-content-between mb-auto">
-                                <div class="col-auto">
-                                    @articlePreview.TopicName
-                                </div>
-                                <div class="col-auto">
-                                    @articlePreview.PublishDate
-                                </div>
-                            </div>
-                        </div>
-                        <div class="w-100">
-                            <a asp-area="" asp-controller="home" asp-action="detail" asp-route-id="@articlePreview.Id" 
-                                class="card-title text-decoration-none text-white mb-2">
-                                <h5>
-                                    @articlePreview.Title
-                                </h5>
-                            </a>
-                            <div class="row justify-content-between mb-2">
-                                <div class="articles__positivity col-auto" data-bs-toggle="tooltip" data-bs-placement="right" 
-                                    title="positivity @articlePreview.Positivity">
-                                    @switch (articlePreview.Positivity)
-                                    {
-                                        case 10:
-                                        case 9:
-                                            <i class="bi bi-emoji-smile" style="color: limegreen;"></i>
-                                            break;
-
-                                        case 8:
-                                        case 7:
-                                            <i class="bi bi-emoji-smile" style="color: yellowgreen;"></i>
-                                            break;
-
-                                        case 6:
-                                        case 5:
-                                            <i class="bi bi-emoji-neutral" style="color: orange;"></i>
-                                            break;
-
-                                        case 4:
-                                        case 3:
-                                            <i class="bi bi-emoji-frown" style="color: orangered;"></i>
-                                            break;
-
-                                        case 2:
-                                        case 1:
-                                            <i class="bi bi-emoji-frown" style="color: red;"></i>
-                                            break;
-
-                                        default:
-                                            <i class="bi bi-emoji-tear" style="color: antiquewhite"></i>
-                                            break;
-                                    }
-                                </div>
-                                <div class="col-auto">
-                                    <a href="@articlePreview.SourceUrl" class="text-decoration-none text-white">
-                                        @articlePreview.SourceName
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        }
-    *@ 
+        <partial name="_ArticlePreviewsPartial" model="@Model.Articles"/>
     </div>
-
-@*     @if (Model.PageInfo.TotalPages > 1)
-    {
-        <div class="articles__pagination row align-items-center justify-content-center mb-4">
-            <div class="col-auto">
-                <pagination page-action="index" page-info="@Model.PageInfo"></pagination>
-            </div>
-        </div>
-    } *@
-
 </div>
 
 @section Scripts
 {
     <script>
-        $(document).ready(function(){
+        function ShowArticlePositivityTip()
+        {
             $('[data-bs-toggle="tooltip"]').tooltip({
                 title : "<div>Article preview<div>",
                 html : true,
@@ -99,42 +22,68 @@
                     hide: 500
                 }
             });
-        });
+        }
+
+        // function LoadMoreArticles(isLoading, currentPage, totalPages, pageSize, relativePath)
+        // {
+        //     if (isLoading || currentPage >= totalPages) return;
+
+        //     isLoading = true;
+        //     currentPage++;
+
+        //     $.ajax({
+        //         url: relativePath,
+        //         type: 'GET',
+        //         data: { Page: currentPage, PageSize: pageSize },
+        //         success: function (data) {
+        //             $('#articlesList').append(data);
+        //             isLoading = false;
+        //         },
+        //         error: function () {
+        //             isLoading = false;
+        //         }
+        //     });
+        //   }
+
+          class AjaxArticleLoader 
+          {
+                constructor(currentPage, totalPages, pageSize, relativePath) {
+                    this.currentPage = currentPage;
+                    this.totalPages = totalPages;
+                    this.pageSize = pageSize;
+                    this.relativePath = relativePath;
+                    this.isLoading = false;
+                }
+
+                Load() {
+                    if (this.isLoading || this.currentPage) return;
+
+                    this.isLoading = true;
+                    this.currentPage++;
+
+                    $.ajax({
+                        url: this.relativePath,
+                        type: 'GET',
+                        data: { Page: this.currentPage, PageSize: this.pageSize },
+                        success: function (data) {
+                            $('#articlesList').append(data);
+                            this.isLoading = false;
+                        },
+                        error: function () {
+                            this.isLoading = false;
+                        }
+                    });
+                }
+              }
 
         $(document).ready(function () {
-            var currentPage = 0;
-            var totalPages = @Model.PageInfo.TotalPages;
-            var pageSize = @Model.PageInfo.PageSize;
-            var isLoading = false;
-
-            function loadMoreArticles() {
-                if (isLoading || currentPage >= totalPages) return;
-
-                isLoading = true;
-                currentPage++;
-
-                $.ajax({
-                    url: '@Url.Action("LoadMore", "Home", new { area = "" })',
-                    type: 'GET',
-                    data: { page: currentPage, pageSize: pageSize },
-                    success: function (data) {
-                        $('#articlesList').append(data);
-                        isLoading = false;
-                    },
-                    error: function () {
-                        isLoading = false;
-                    }
-                });
-            }
+            var ajaxArticleLoader = new AjaxArticleLoader(1, @Model.PageInfo.TotalPages, @Model.PageInfo.PageSize, window.location.pathname);
 
             $(window).scroll(function () {
                 if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
-                    loadMoreArticles();
-                    console.log('loading more articles');
+                    ajaxArticleLoader.Load();
                 }
             });
-
-            loadMoreArticles();
         });
     </script>
 }

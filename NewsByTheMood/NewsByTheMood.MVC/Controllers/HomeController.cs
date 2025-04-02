@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using NewsByTheMood.Data.Entities;
 using NewsByTheMood.MVC.Mappers;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
@@ -50,17 +51,24 @@ namespace NewsByTheMood.MVC.Controllers
                     _logger.LogDebug("No articles were found");
                 }
 
-                return View(new ArticlePreviewCollectionModel()
+                if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
                 {
-                    Articles = articlesPreviews!,
-                    PageInfo = new PageInfoModel()
+                    return PartialView("_ArticlePreviewsPartial", articlesPreviews);
+                }
+                else
+                {
+                    return View(new ArticlePreviewCollectionModel()
                     {
-                        Page = pagination.Page,
-                        PageSize = pagination.PageSize,
-                        TotalItems = totalArticles,
-                    },
-                    PageTitle = "Home"
-                });
+                        Articles = articlesPreviews!,
+                        PageInfo = new PageInfoModel()
+                        {
+                            Page = pagination.Page,
+                            PageSize = pagination.PageSize,
+                            TotalItems = totalArticles,
+                        },
+                        PageTitle = "Home"
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -104,17 +112,24 @@ namespace NewsByTheMood.MVC.Controllers
                     _logger.LogDebug($"No articles with topic {topic.Name} were found");
                 }
 
-                return View("Index", new ArticlePreviewCollectionModel()
+                if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
                 {
-                    Articles = articlesPreviews!,
-                    PageInfo = new PageInfoModel()
+                    return PartialView("_ArticlePreviewsPartial", articlesPreviews);
+                }
+                else
+                {
+                    return View("Index", new ArticlePreviewCollectionModel()
                     {
-                        Page = pagination.Page,
-                        PageSize = pagination.PageSize,
-                        TotalItems = totalArticles,
-                    },
-                    PageTitle = topic.Name,
-                });
+                        Articles = articlesPreviews!,
+                        PageInfo = new PageInfoModel()
+                        {
+                            Page = pagination.Page,
+                            PageSize = pagination.PageSize,
+                            TotalItems = totalArticles,
+                        },
+                        PageTitle = topic.Name,
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -143,24 +158,6 @@ namespace NewsByTheMood.MVC.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error while getting article {id}");
-                return StatusCode(500);
-            }
-        }
-
-        // Ajax load more articles
-        [HttpGet]
-        public async Task<IActionResult> LoadMore(int page, int pageSize)
-        {
-            try
-            {
-                var articles = await _articleService.GetRangeLatestAsync(_defaultPositivity, page, pageSize);
-                var articlePreviews = articles.Select(article => _articleMapper.ArticleToArticlePreviewModel(article)).ToArray();
-
-                return PartialView("_ArticlePreviewsPartial", articlePreviews);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while loading more articles");
                 return StatusCode(500);
             }
         }
