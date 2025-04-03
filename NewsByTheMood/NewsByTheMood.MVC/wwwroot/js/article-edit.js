@@ -48,23 +48,23 @@
             tagsContainer.appendChild(input);
         });
 
-        sources.forEach(function (tag, index) {
+        sources.forEach(function (source, index) {
             var input = document.createElement("input");
             input.type = "hidden";
             input.name = `Sources[${index}].Value`;
-            input.value = tag.value;
+            input.value = source.value;
             tagsContainer.appendChild(input);
 
             var input = document.createElement("input");
             input.type = "hidden";
             input.name = `Sources[${index}].Text`;
-            input.value = tag.textContent;
+            input.value = source.textContent;
             tagsContainer.appendChild(input);
 
             var input = document.createElement("input");
             input.type = "hidden";
             input.name = `Sources[${index}].Selected`;
-            input.value = tag.selected;
+            input.value = source.selected;
             tagsContainer.appendChild(input);
         });
     });

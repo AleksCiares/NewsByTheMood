@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace NewsByTheMood.MVC.Models
 {
     // Display source model
-    public class SourceModel
+    public class SourceSettingsModel
     {
         [Required]
         [StringLength(100, MinimumLength = 1)]
@@ -11,6 +12,8 @@ namespace NewsByTheMood.MVC.Models
 
         [Required]
         [StringLength(100, MinimumLength = 1, ErrorMessage = "Name is too small or long (maximum is 100 characters)")]
+        [Remote(action: "NameIsAvailable", controller: "Sources",
+            areaName: "Settings", HttpMethod = "Post", AdditionalFields = nameof(Id), ErrorMessage = "A source with the same name already exists")]
         public required string Name { get; set; }
 
         [Required]

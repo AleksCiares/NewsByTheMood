@@ -51,10 +51,11 @@ namespace NewsByTheMood.MVC
                 builder.Services.AddScoped<IUserService, UserService>();
 
                 //CQS services
-                builder.Services.AddMediatR(sc => sc.RegisterServicesFromAssembly(typeof(NewsByTheMood.CQS.Commands.AddArticleCommand).Assembly));
+                builder.Services.AddMediatR(sc => sc.RegisterServicesFromAssembly(typeof(CQS.Commands.AddArticleCommand).Assembly));
 
                 //Mapper services
-                builder.Services.AddTransient<NewsByTheMood.MVC.Mappers.ArticleMapper>();
+                builder.Services.AddTransient<Mappers.ArticlesMapper>();
+                builder.Services.AddTransient<Mappers.SourcesMapper>();
 
                 // File provider services
                 // Icons service
@@ -106,6 +107,8 @@ namespace NewsByTheMood.MVC
                 app.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+                Log.Information("Host Started");
 
                 app.Run();
             }

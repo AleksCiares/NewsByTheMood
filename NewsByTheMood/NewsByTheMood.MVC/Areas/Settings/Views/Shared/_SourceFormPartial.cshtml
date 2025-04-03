@@ -1,8 +1,8 @@
-﻿@model SourceCreateModel
+﻿@model SourceSettingsCreateModel
 
 <div class="source-settings">
 	<div class="topic form-floating mb-3">
-		<select asp-for="@Model.Source.TopicId" asp-items="@Model.Topics" class="form-select"></select>
+		<select asp-for="@Model.Source.TopicId" asp-items="@Model.Topics" id="topics-single-select" class="form-select"></select>
 		<label asp-for="@Model.Source.TopicId" class="form-label">Topic</label>
 		<span asp-validation-for="@Model.Source.TopicId" class="error-feedback invalid-feedback"></span>
 	</div>
@@ -160,13 +160,4 @@
 		<span asp-validation-for="@Model.Source.ArticleTagPath" class="error-feedback invalid-feedback"></span>
 	</div>
 </div>
-@if (Model.Topics.Count > 0)
-{
-	<div class="topics">
-		@for (int i = 0; i < Model.Topics.Count; i++)
-		{
-			<input type="hidden" name="Topics[@i].Value" value="@Model.Topics[i].Value" />
-			<input type="hidden" name="Topics[@i].Text" value="@Model.Topics[i].Text" />
-		}
-	</div>
-}
+<div class="hidden-data"></div>

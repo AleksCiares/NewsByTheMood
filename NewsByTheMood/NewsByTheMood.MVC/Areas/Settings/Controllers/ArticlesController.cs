@@ -16,13 +16,13 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         private readonly ISourceService _sourceService;
         private readonly ITagService _tagService;
         private readonly ILogger<ArticlesController> _logger;
-        private readonly ArticleMapper _articleMapper;
+        private readonly ArticlesMapper _articleMapper;
         private readonly short _defaultPositivity = 0;
 
         public ArticlesController(IArticleService articleService, 
             ISourceService sourceService, ITagService tagService, 
             ILogger<ArticlesController> logger, 
-            ArticleMapper articleMapper)
+            ArticlesMapper articleMapper)
         {
             _articleService = articleService;
             _sourceService = sourceService;
@@ -69,7 +69,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error while getting articles. " +
+                _logger.LogError(ex, $"Error while fetching articles. " +
                     $"Page: {pagination.Page}, " +
                     $"PageSize: {pagination.PageSize}, ");
                 return StatusCode(500);
@@ -106,22 +106,22 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                     return View(articleCreate);
                 }
 
-                _logger.LogInformation($"Creating article {articleCreate.Article!.Title}");
+                _logger.LogInformation($"Creating article \"{articleCreate.Article!.Title}\"");
 
                 if (await _articleService.AddAsync(_articleMapper.ArticleSettingsModelToArticle(articleCreate.Article)))
                 {
-                    _logger.LogInformation($"Article {articleCreate.Article!.Title} was created successfully");
+                    _logger.LogInformation($"Article \"{articleCreate.Article!.Title}\" was created successfully");
                     return RedirectToAction("Index");
                 }
                 else
                 {
-                    _logger.LogWarning($"Article {articleCreate.Article!.Title} was not created");
-                    return BadRequest("Something gone wrong, while creating. Watch logs to more information");
+                    _logger.LogError($"Article \"{articleCreate.Article!.Title}\" was not created");
+                    return BadRequest("Something gone wrong, while creating article. Watch logs to more information");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error while creating article {articleCreate.Article!.Title}");
+                _logger.LogError(ex, $"Error while creating article {articleCreate.Article!.ToJson()}");
                 return StatusCode(500);
             }
         }
@@ -136,8 +136,8 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                     await  _articleService.GetByIdAsync(long.Parse(id)));
                 if (article == null)
                 {
-                    _logger.LogWarning($"Article {id} was not found");
-                    return BadRequest("Something gone wrong, while getting. Watch logs to more information");
+                    _logger.LogWarning($"Article id={id} was not found");
+                    return BadRequest("Something gone wrong, while getting article. Watch logs to more information");
                 }
 
                 return View(new ArticleSettingsEditModel()
@@ -149,7 +149,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error while preparing to update article {id}");
+                _logger.LogError(ex, $"Error while preparing to update article id={id}");
                 return StatusCode(500);
             }
         }
@@ -165,17 +165,17 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                     return View(articleEdit);
                 }
 
-                _logger.LogInformation($"Updating article {articleEdit.Article.Id}");
+                _logger.LogInformation($"Updating article id={articleEdit.Article.Id}");
 
                 if (await _articleService.UpdateAsync(_articleMapper.ArticleSettingsModelToArticle(articleEdit.Article)))
                 {
-                    _logger.LogInformation($"Article {articleEdit.Article.Id} was updated successfully");
+                    _logger.LogInformation($"Article id={articleEdit.Article.Id} was updated successfully");
                     return RedirectToAction("Index");
                 }
                 else
                 {
-                    _logger.LogWarning($"Article {articleEdit.Article.Id} was not found");
-                    return BadRequest("Something gone wrong, while updating. Watch logs to more information");
+                    _logger.LogError($"Article id={articleEdit.Article.Id} was not updated");
+                    return BadRequest("Something gone wrong, while updating article. Watch logs to more information");
                 }
             }
             catch (Exception ex) 
@@ -191,22 +191,22 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         {
             try
             {
-                _logger.LogInformation($"Deleting article {id}");
+                _logger.LogInformation($"Deleting article id={id}");
 
                 if (await _articleService.DeleteAsync(long.Parse(id)))
                 {
-                    _logger.LogInformation($"Article {id} was deleted successfully");
+                    _logger.LogInformation($"Article id={id} was deleted successfully");
                     return RedirectToAction("Index");
                 }
                 else
                 {
-                    _logger.LogWarning($"Article {id} was not found");
+                    _logger.LogError($"Article id={id} was not deleted");
                     return BadRequest("Something gone wrong, while deleting. Watch logs to more information");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error while deleting article {id}");
+                _logger.LogError(ex, $"Error while deleting article id={id}");
                 return StatusCode(500);
             }
         }
@@ -228,7 +228,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                 }
                 else
                 {
-                    _logger.LogWarning($"Failed while deleting articles. Only {string.Join(", ", deletedIds)} were deleted successfully");
+                    _logger.LogError($"Failed while deleting articles. Only {string.Join(", ", deletedIds)} were deleted successfully");
                     return BadRequest("Something gone wrong, while deleting. Watch logs to more information");
                 }
             }
@@ -242,17 +242,25 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         [HttpPost]
         public async Task<IActionResult> UrlIsAvailable(ArticleSettingsModel article)
        {
-            var isExists = await _articleService.IsExistsByUrlAsync(article.Url);
-            if (isExists && !string.IsNullOrEmpty(article.Id))
+            try
             {
-                var articleTemp = await _articleService.GetByIdAsync(long.Parse(article.Id));
-                if (articleTemp != null && articleTemp.Url.Equals(article.Url))
+                var isExists = await _articleService.IsExistsByUrlAsync(article.Url);
+                if (isExists && !string.IsNullOrEmpty(article.Id))
                 {
-                    isExists = false;
+                    var articleTemp = await _articleService.GetByIdAsync(long.Parse(article.Id));
+                    if (articleTemp != null && articleTemp.Url.Equals(article.Url))
+                    {
+                        isExists = false;
+                    }
                 }
-            }
 
-            return Json(!isExists);
+                return Json(!isExists);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error while checking if article url \"{article.Url}\" is available");
+                return StatusCode(500);
+            }
         }
 
         [NonAction]

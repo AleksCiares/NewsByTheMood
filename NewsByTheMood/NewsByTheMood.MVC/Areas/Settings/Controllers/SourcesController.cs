@@ -1,24 +1,28 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using NewsByTheMood.Data.Entities;
+using NewsByTheMood.MVC.Mappers;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
+using NuGet.Protocol;
 
 namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 {
     // Source controller
     [Area("Settings")]
+    [Route("Settings/[controller]/[action]")]
     public class SourcesController : Controller
     {
         private readonly ISourceService _sourceService;
         private readonly ITopicService _topicService;
         private readonly ILogger<SourcesController> _logger;
+        private readonly SourcesMapper _sourceMapper;
 
-        public SourcesController(ISourceService sourceService, ITopicService topicService, ILogger<SourcesController> logger)
+        public SourcesController(ISourceService sourceService, ITopicService topicService, ILogger<SourcesController> logger, SourcesMapper sourceMapper)
         {
             _sourceService = sourceService;
             _topicService = topicService;
             _logger = logger;
+            _sourceMapper = sourceMapper;
         }
 
         // Get range of sources previews
@@ -28,20 +32,14 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             try
             {
                 var totalSources = await _sourceService.CountAsync();
-                var sources = Array.Empty<SourcePreviewModel>();
+                var sources = Array.Empty<SourceSettingsPreviewModel>();
 
                 if (totalSources > 0)
                 {
                     sources = (await _sourceService.GetRangeAsync(
                         pagination.Page,
                         pagination.PageSize))
-                        .Select(source => new SourcePreviewModel()
-                        {
-                            Id = source.Id.ToString(),
-                            Name = source.Name,
-                            Url = source.Url,
-                            Topic = source.Topic.Name,
-                        })
+                        .Select(source => _sourceMapper.SourceToSourceSettingPreviewModel(source))
                         .ToArray();
 
                     _logger.LogDebug($"Sources were fetch successfully");
@@ -51,7 +49,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                     _logger.LogDebug("No sources were found");
                 }
 
-                return View(new SourceCollectionModel()
+                return View(new SourceSettingsCollectionModel()
                 {
                     SourcePreviews = sources,
                     PageInfo = new PageInfoModel()
@@ -64,7 +62,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error while fetching sources " +
+                _logger.LogError(ex, $"Error while fetching sources. " +
                     $"Page: {pagination.Page}, " +
                     $"PageSize: {pagination.PageSize}, ");
                 return StatusCode(500);
@@ -77,71 +75,52 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         {
             try
             {
-                return View(new SourceCreateModel()
+                return View(new SourceSettingsCreateModel()
                 {
                     Topics = await GetTopicsAsync(),
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while getting create source page");
+                _logger.LogError(ex, "Error while preparing to create source");
                 return StatusCode(500);
             }
         }
 
         // Create source item proccessing
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] SourceCreateModel sourceCreate)
+        public async Task<IActionResult> Create([FromForm] SourceSettingsCreateModel sourceCreate)
         {
             try
             {
-                if (!ModelState.IsValid)
+                if (!ModelState.IsValid || sourceCreate.Source == null)
                 {
                     return View(sourceCreate);
                 }
-                if (await _sourceService.IsExistsByNameAsync(sourceCreate.Source!.Name))
+
+                _logger.LogInformation($"Creating source \"{sourceCreate.Source.Name}\"");
+
+                if (await _sourceService.AddAsync(_sourceMapper.SourceSettingsModelToSource(sourceCreate.Source)))
                 {
-                    ModelState.AddModelError("Source.Name", "A source with the same name already exists");
-                    return View(sourceCreate);
+                    _logger.LogInformation($"Source \"{sourceCreate.Source.Name}\" was created successfully");
+                    return RedirectToAction("Index");
                 }
-
-                await _sourceService.AddAsync(new Source()
+                else
                 {
-                    Name = sourceCreate.Source.Name,
-                    Url = sourceCreate.Source.Url,
-                    SurveyPeriod = sourceCreate.Source.SurveyPeriod,
-                    IsRandomPeriod = sourceCreate.Source.IsRandomPeriod,
-                    HasDynamicPage = sourceCreate.Source.HasDynamicPage,
-                    AcceptInsecureCerts = sourceCreate.Source.AcceptInsecureCerts,
-                    PageElementLoaded = sourceCreate.Source.PageElementLoaded,
-                    PageLoadTimeout = sourceCreate.Source.PageLoadTimeout,
-                    ElementLoadTimeout = sourceCreate.Source.ElementLoadTimeout,
-                    ArticleCollectionsPath = sourceCreate.Source.ArticleCollectionsPath,
-                    ArticleItemPath = sourceCreate.Source.ArticleItemPath,
-                    ArticleUrlPath = sourceCreate.Source.ArticleUrlPath,
-                    ArticleTitlePath = sourceCreate.Source.ArticleTitlePath,
-                    ArticlePreviewImgPath = sourceCreate.Source.ArticlePreviewImgPath,
-                    ArticleBodyCollectionsPath = sourceCreate.Source.ArticleBodyCollectionsPath,
-                    ArticleBodyItemPath = sourceCreate.Source.ArticleBodyItemPath,
-                    ArticlePdatePath = sourceCreate.Source.ArticlePdatePath,
-                    ArticleTagPath = sourceCreate.Source.ArticleTagPath,
-                    TopicId = long.Parse(sourceCreate.Source.TopicId),
-                });
-
-                _logger.LogInformation($"Source {sourceCreate.Source.Name} was created successfully");
-
-                return RedirectToAction("Index");
+                    _logger.LogError($"Source \"{sourceCreate.Source.Name}\" was not created");
+                    return BadRequest("Something gone wrong, while creating source. Watch logs to more information");
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while creating source");
+               _logger.LogError(ex, $"Error while creating source {sourceCreate.Source!.ToJson()}");
                 return StatusCode(500);
             }
         }
 
 
         // Edit source item
-        [HttpGet("{Controller}/{Action}/{id:required}")]
+        [HttpGet("{id:required}")]
         public async Task<IActionResult> Edit([FromRoute] string id)
         {
             try
@@ -149,134 +128,100 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                 var source = await _sourceService.GetByIdAsync(long.Parse(id));
                 if (source == null)
                 {
-                    _logger.LogWarning($"Source with id {id} was not found");
-                    return BadRequest();
+                    _logger.LogWarning($"Source id={id} was not found");
+                    return BadRequest("Something gone wrong, while getting source. Watch logs to more information");
                 }
 
-                return View(new SourceEditModel()
+                return View(new SourceSettingsEditModel()
                 {
-                    Source = new SourceModel()
-                    {
-                        Id = source.Id.ToString(),
-                        Name = source.Name,
-                        Url = source.Url,
-                        SurveyPeriod = source.SurveyPeriod,
-                        IsRandomPeriod = source.IsRandomPeriod,
-                        HasDynamicPage = source.HasDynamicPage,
-                        AcceptInsecureCerts = source.AcceptInsecureCerts,
-                        PageElementLoaded = source.PageElementLoaded,
-                        PageLoadTimeout = source.PageLoadTimeout,
-                        ElementLoadTimeout = source.ElementLoadTimeout,
-                        ArticleCollectionsPath = source.ArticleCollectionsPath,
-                        ArticleItemPath = source.ArticleItemPath,
-                        ArticleUrlPath = source.ArticleUrlPath,
-                        ArticleTitlePath = source.ArticleTitlePath,
-                        ArticlePreviewImgPath = source.ArticlePreviewImgPath,
-                        ArticleBodyCollectionsPath = source.ArticleBodyCollectionsPath,
-                        ArticleBodyItemPath = source.ArticleBodyItemPath,
-                        ArticlePdatePath = source.ArticlePdatePath,
-                        ArticleTagPath = source.ArticleTagPath,
-                        TopicId = source.TopicId.ToString(),
-                    },
+                    Source = _sourceMapper.SourceToSourceSettingsModel(source),
                     Topics = await GetTopicsAsync(),
                     RelatedArticlesCount = source.Articles.Count,
                 });
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex, $"Error while getting source {id}");
+                _logger.LogError(ex, $"Error while preparing to update source id={id}");
                 return StatusCode(500);
             }
         }
 
         // Edit source item proccessing
-        [HttpPost("{Controller}/{Action}/{id:required}")]
-        public async Task<IActionResult> Edit([FromRoute] string id, [FromForm] SourceEditModel sourceEdit)
+        [HttpPost("{id:required}")]
+        public async Task<IActionResult> Edit([FromForm] SourceSettingsEditModel sourceEdit)
         {
             try
             {
-                var source = await _sourceService.GetByIdAsync(long.Parse(id));
-                if (source == null)
-                {
-                    _logger.LogWarning($"Source with id {id} was not found");
-                    return BadRequest();
-                }
                 if (!ModelState.IsValid)
                 {
                     return View(sourceEdit);
                 }
-                if (await _sourceService.IsExistsByNameAsync(sourceEdit.Source.Name) && !sourceEdit.Source.Name.Equals(source.Name))
+                
+                _logger.LogInformation($"Updating source id={sourceEdit.Source.Id}");
+
+                if (await _sourceService.UpdateAsync(_sourceMapper.SourceSettingsModelToSource(sourceEdit.Source)))
                 {
-                    ModelState.AddModelError("Source.Name", "A source with the same name already exists");
-                    sourceEdit.Source.Name = source.Name;
-                    return View(sourceEdit);
+                    _logger.LogInformation($"Source id={sourceEdit.Source.Id} was updated successfully");
+                    return RedirectToAction("Index");
                 }
-
-                await _sourceService.UpdateAsync(new Source()
+                else
                 {
-                    Id = long.Parse(id),
-                    Name = sourceEdit.Source.Name,
-                    Url = sourceEdit.Source.Url,
-                    SurveyPeriod = sourceEdit.Source.SurveyPeriod,
-                    IsRandomPeriod = sourceEdit.Source.IsRandomPeriod,
-                    HasDynamicPage = sourceEdit.Source.HasDynamicPage,
-                    AcceptInsecureCerts = sourceEdit.Source.AcceptInsecureCerts,
-                    PageElementLoaded = sourceEdit.Source.PageElementLoaded,
-                    PageLoadTimeout = sourceEdit.Source.PageLoadTimeout,
-                    ElementLoadTimeout = sourceEdit.Source.ElementLoadTimeout,
-                    ArticleCollectionsPath = sourceEdit.Source.ArticleCollectionsPath,
-                    ArticleItemPath = sourceEdit.Source.ArticleItemPath,
-                    ArticleUrlPath = sourceEdit.Source.ArticleUrlPath,
-                    ArticleTitlePath = sourceEdit.Source.ArticleTitlePath,
-                    ArticlePreviewImgPath = sourceEdit.Source.ArticlePreviewImgPath,
-                    ArticleBodyCollectionsPath = sourceEdit.Source.ArticleBodyCollectionsPath,
-                    ArticleBodyItemPath = sourceEdit.Source.ArticleBodyItemPath,
-                    ArticlePdatePath = sourceEdit.Source.ArticlePdatePath,
-                    ArticleTagPath = sourceEdit.Source.ArticleTagPath,
-                    TopicId = long.Parse(sourceEdit.Source.TopicId),
-                });
-
-                _logger.LogInformation($"Source {sourceEdit.Source.Name} was updated successfully");
-
-                return RedirectToAction("Index");
+                    _logger.LogError($"Source id={sourceEdit.Source.Id} was not updated");
+                    return BadRequest("Something gone wrong, while updating source. Watch logs to more information");
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error while updating source {id}");
+                _logger.LogError(ex, $"Error while updating source {sourceEdit.Source.ToJson()}");
                 return StatusCode(500);
             }
         }
 
         // Delete source utem
-        [HttpPost("{Controller}/{Action}/{id:required}")]
-        public async Task<IActionResult> Delete([FromRoute] string id, [FromForm] SourceEditModel sourceEdit)
+        [HttpPost("{id:required}")]
+        public async Task<IActionResult> Delete([FromRoute] string id)
         {
             try
             {
-                var source = await _sourceService.GetByIdAsync(long.Parse(id));
-                if (source == null)
+                _logger.LogInformation($"Deleting source id={id}");
+
+                if (await _sourceService.DeleteAsync(long.Parse(id)))
                 {
-                    _logger.LogWarning($"Source with id {id} was not found");
-                    return BadRequest();
+                    _logger.LogInformation($"Source id={id} was deleted successfully");
+                    return RedirectToAction("Index");
                 }
-                if (source.Articles.Count > 0)
+                else
                 {
-                    ModelState.AddModelError("Source.Name", "Can not delete source with related articles. First of all delete all related articles");
-                    return View("Edit", sourceEdit);
+                    _logger.LogError($"Source id={id} was not deleted");
+                    return BadRequest("Something gone wrong, while deleting source. Watch logs to more information");
                 }
-
-                await _sourceService.DeleteAsync(new Source()
-                {
-                    Id = source.Id,
-                });
-
-                _logger.LogInformation($"Source {source.Name} was deleted successfully");
-
-                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error while deleting source {id}");
+                _logger.LogError(ex, $"Error while deleting source id={id}");
+                return StatusCode(500);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> NameIsAvailable(SourceSettingsModel source)
+        {
+            try
+            {
+                var isExists = await _sourceService.IsExistsByNameAsync(source.Name);
+                if (isExists && !string.IsNullOrEmpty(source.Id))
+                {
+                    var sourceTemp = await _sourceService.GetByIdAsync(long.Parse(source.Id));
+                    if(sourceTemp != null && sourceTemp.Name.Equals(source.Name))
+                    {
+                        isExists = false;
+                    }
+                }
+                return Json(!isExists);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error while checking if source name \"{source.Name}\" is available");
                 return StatusCode(500);
             }
         }

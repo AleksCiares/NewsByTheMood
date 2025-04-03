@@ -6,7 +6,7 @@ using Riok.Mapperly.Abstractions;
 namespace NewsByTheMood.MVC.Mappers
 {
     [Mapper(AutoUserMappings = false)]
-    public partial class ArticleMapper
+    public partial class ArticlesMapper
     {
         [MapProperty([nameof(Article.Source), nameof(Article.Source.Topic), nameof(Article.Source.Topic.Name)], 
             nameof(ArticlePreviewModel.TopicName))]

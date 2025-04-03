@@ -18,7 +18,7 @@
 			<div class="form__warp">
 				<partial name="_ArticleFormPartial" model="@Model" />
 				<div class="id form-floating mb-3" style="display:none;">
-					<input asp-for="@Model.Article.Id" type="number" value="0" class="form-control" />
+					<input asp-for="@Model.Article!.Id" type="number" value="0" class="form-control" />
 				</div>
 			</div>
 		</div>
@@ -26,5 +26,5 @@
 </div>
 
 @section Scripts {
-	<script src="~/js/article-form.js" asp-append-version="true"></script>
+	<script src="~/js/article-edit.js" asp-append-version="true"></script>
 }

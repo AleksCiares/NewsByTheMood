@@ -21,13 +21,13 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
         public Task<bool> IsExistsByNameAsync(string sourceName, CancellationToken cancellationToken =default);
 
         // Add source item
-        public Task AddAsync(Source source, CancellationToken cancellationToken = default);
+        public Task<bool> AddAsync(Source source, CancellationToken cancellationToken = default);
 
         // Update source item
-        public Task UpdateAsync(Source source, CancellationToken cancellationToken = default);
+        public Task<bool> UpdateAsync(Source source, CancellationToken cancellationToken = default);
 
         // Delete source
-        public Task DeleteAsync(Source source, CancellationToken cancellationToken = default);
+        public Task<bool> DeleteAsync(long id, CancellationToken cancellationToken = default);
 
     }
 }

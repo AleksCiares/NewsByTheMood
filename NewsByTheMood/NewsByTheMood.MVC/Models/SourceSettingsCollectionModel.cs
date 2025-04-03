@@ -1,9 +1,9 @@
 ﻿namespace NewsByTheMood.MVC.Models
 {
     // Source preview and pagination display model
-    public class SourceCollectionModel
+    public class SourceSettingsCollectionModel
     {
-        public required SourcePreviewModel[] SourcePreviews { get; set; }
+        public required SourceSettingsPreviewModel[] SourcePreviews { get; set; }
         public required PageInfoModel PageInfo { get; set; }
     }
 }

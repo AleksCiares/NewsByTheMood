@@ -24,64 +24,49 @@
             });
         }
 
-        // function LoadMoreArticles(isLoading, currentPage, totalPages, pageSize, relativePath)
-        // {
-        //     if (isLoading || currentPage >= totalPages) return;
+        class AjaxArticleLoader {
+            #currentPage;
+            #totalPages;
+            #pageSize;
+            #relativePath;
+            #isLoading;
 
-        //     isLoading = true;
-        //     currentPage++;
+            constructor(currentPage, totalPages, pageSize, relativePath) {
+                this.#currentPage = currentPage;
+                this.#totalPages = totalPages;
+                this.#pageSize = pageSize;
+                this.#relativePath = relativePath;
+                this.#isLoading = false;
+            }
 
-        //     $.ajax({
-        //         url: relativePath,
-        //         type: 'GET',
-        //         data: { Page: currentPage, PageSize: pageSize },
-        //         success: function (data) {
-        //             $('#articlesList').append(data);
-        //             isLoading = false;
-        //         },
-        //         error: function () {
-        //             isLoading = false;
-        //         }
-        //     });
-        //   }
+            load() {
+                if (this.#isLoading || this.#currentPage >= this.#totalPages) return;
 
-          class AjaxArticleLoader 
-          {
-                constructor(currentPage, totalPages, pageSize, relativePath) {
-                    this.currentPage = currentPage;
-                    this.totalPages = totalPages;
-                    this.pageSize = pageSize;
-                    this.relativePath = relativePath;
-                    this.isLoading = false;
-                }
+                this.#isLoading = true;
+                this.#currentPage++;
 
-                Load() {
-                    if (this.isLoading || this.currentPage) return;
+                $.ajax({
+                    url: this.#relativePath,
+                    type: 'GET',
+                    data: { Page: this.#currentPage, PageSize: this.#pageSize },
+                    success: (data) => {
+                        $('#articlesList').append(data);
+                        this.#isLoading = false;
+                    },
+                    error: () => {
+                        this.#isLoading = false;
+                    }
+                });
+            }
+        }
 
-                    this.isLoading = true;
-                    this.currentPage++;
-
-                    $.ajax({
-                        url: this.relativePath,
-                        type: 'GET',
-                        data: { Page: this.currentPage, PageSize: this.pageSize },
-                        success: function (data) {
-                            $('#articlesList').append(data);
-                            this.isLoading = false;
-                        },
-                        error: function () {
-                            this.isLoading = false;
-                        }
-                    });
-                }
-              }
-
-        $(document).ready(function () {
+        $(document).ready(() => {
             var ajaxArticleLoader = new AjaxArticleLoader(1, @Model.PageInfo.TotalPages, @Model.PageInfo.PageSize, window.location.pathname);
 
-            $(window).scroll(function () {
+
+            $(window).scroll(() => {
                 if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
-                    ajaxArticleLoader.Load();
+                    ajaxArticleLoader.load();
                 }
             });
         });

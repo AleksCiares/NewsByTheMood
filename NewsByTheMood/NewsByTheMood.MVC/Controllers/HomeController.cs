@@ -13,12 +13,12 @@ namespace NewsByTheMood.MVC.Controllers
         private readonly IArticleService _articleService;
         private readonly ITopicService _topicService;
         private readonly ILogger<HomeController> _logger;
-        private readonly ArticleMapper _articleMapper;
+        private readonly ArticlesMapper _articleMapper;
         private readonly short _defaultPositivity = 0;
 
         public HomeController(IArticleService articleService, 
             ITopicService topicService, ILogger<HomeController> 
-            logger, ArticleMapper articleMapper)
+            logger, ArticlesMapper articleMapper)
         {
             _articleService = articleService;
             _topicService = topicService;
