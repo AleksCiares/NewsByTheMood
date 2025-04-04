@@ -68,9 +68,7 @@
             tagsContainer.appendChild(input);
         });
     });
-});
 
-document.addEventListener('DOMContentLoaded', function () {
     var textarea = document.querySelector('#articleFormBody');
     if (textarea) {
         textarea.style.height = 'auto';
@@ -100,4 +98,17 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
+
+    let modal = new CommonModal(
+        'Delete Article',
+        'Are you sure you want to delete this article?',
+        'Cancel',
+        'Delete',
+        'deleteArticle',
+        () => {
+            let form = document.querySelector('form');
+            form.submit();
+        }
+    );
 });
+

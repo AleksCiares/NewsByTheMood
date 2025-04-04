@@ -7,7 +7,7 @@
 	<div class="source__header d-flex row mb-5">
 		<h4 class="mb-0">Edit source @Model.Source.Name</h4>
 	</div>
-	<form asp-antiforgery="true" method="post">
+	<form asp-antiforgery="true" method="post" id="editSourceForm">
 		<div class="form__panel row align-items-start justify-content-between mb-4">
 			<div class="col-auto">
 				<button asp-area="settings" asp-controller="sources" asp-action="edit" asp-route-id="@Model.Source.Id" class="btn btn-outline-primary" type="submit">Submit</button>
@@ -35,45 +35,23 @@
 	</form>
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="deleteSourceModal" tabindex="-1" aria-labelledby="deleteSourceModalLabel" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="deleteSourceModalLabel">Confirm Deletion</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-			<div class="modal-body">
-				This source has related articles. Are you sure you want to delete it?
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-				<button id="confirmDeleteButton" type="button" class="btn btn-danger">Delete</button>
-			</div>
-		</div>
-	</div>
-</div>
-
 @section Scripts {
 	<script src="~/js/source-edit.js" asp-append-version="true"></script>
+    <script src="~/js/CommonModal.js" asp-append-version="true"></script>
 
 	<script>
-			document.addEventListener('DOMContentLoaded', function () {
-			var deleteButton = document.getElementById('deleteButton');
-			var confirmDeleteButton = document.getElementById('confirmDeleteButton');
-			var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-
-			deleteButton.addEventListener('click', function (event) {
-				event.preventDefault();
-				deleteModal.show();
-			});
-
-			confirmDeleteButton.addEventListener('click', function () {
-				var form = deleteButton.closest('form');
-				form.action = form.action.replace('edit', 'delete');
-				form.submit();
-			});
+		   document.addEventListener('DOMContentLoaded', () => {
+		   let modal = new CommonModal(
+			   'Confirm Deletion',
+			   'This source has @(Model.RelatedArticlesCount) related articles. Are you sure you want to delete it?',
+			   'Cancel',
+			   'Delete',
+			   'deleteSourceButton',
+			   () => {
+				   let form = document.getElementById('editSourceForm');
+				   form.action = form.action.replace('edit', 'delete');
+				   form.submit();
+			   });
 		});
-	</script>
-		
+	</script>	
 }

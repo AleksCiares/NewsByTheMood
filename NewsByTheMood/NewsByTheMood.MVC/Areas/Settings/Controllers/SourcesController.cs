@@ -118,7 +118,6 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             }
         }
 
-
         // Edit source item
         [HttpGet("{id:required}")]
         public async Task<IActionResult> Edit([FromRoute] string id)

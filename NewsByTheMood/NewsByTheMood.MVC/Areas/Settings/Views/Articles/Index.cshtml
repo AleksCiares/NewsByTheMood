@@ -76,28 +76,6 @@
     }
 </div>
 @section Scripts {
-    <script>
-        document.getElementById('selectAllArticles').addEventListener('change', function () {
-            var checkboxes = document.querySelectorAll('.selectArticle');
-            for (var checkbox of checkboxes) {
-                checkbox.checked = this.checked;
-            }
-            toggleDeleteButton();
-        });
-
-        document.querySelectorAll('.selectArticle').forEach(function (checkbox) {
-            checkbox.addEventListener('change', function () {
-                toggleDeleteButton();
-            });
-        });
-
-        function toggleDeleteButton() {
-            var selectedCheckboxes = document.querySelectorAll('.selectArticle:checked');
-            var deleteButton = document.getElementById('deleteSelectedArticles');
-            deleteButton.disabled = selectedCheckboxes.length === 0;
-        }
-
-        // Initial check
-        toggleDeleteButton();
-    </script>
+    <script src="~/js/CommonModal.js" asp-append-version="true"></script>
+    <script src="~/js/article-index.js" asp-append-version="true"></script>
 }

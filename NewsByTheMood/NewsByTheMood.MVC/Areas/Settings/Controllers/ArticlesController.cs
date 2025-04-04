@@ -217,13 +217,13 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         {
             try
             {
-                _logger.LogInformation($"Deleting articles {string.Join(", ", ids)}");
+                _logger.LogInformation($"Deleting articles ids=\"{string.Join(", ", ids)}\"");
 
                 var deletedIds = await _articleService.DeleteRangeAsync(ids.Select(id => long.Parse(id)).ToArray());
 
                 if (deletedIds.Length == ids.Length)
                 {
-                    _logger.LogInformation($"Articles {string.Join(", ", deletedIds)} were deleted successfully");
+                    _logger.LogInformation($"Articles ids=\"{string.Join(", ", deletedIds)}\" were deleted successfully");
                     return RedirectToAction("Index");
                 }
                 else
