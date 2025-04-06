@@ -7,12 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MediatR" Version="12.4.1" />
+    <PackageReference Include="Riok.Mapperly" Version="4.2.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NewsByTheMood.CQS\NewsByTheMood.CQS.csproj" />
     <ProjectReference Include="..\NewsByTheMood.Data\NewsByTheMood.Data.csproj" />
+    <ProjectReference Include="..\NewsByTheMood.MVC.Models\NewsByTheMood.MVC.Models.csproj" />
     <ProjectReference Include="..\WebScraper\WebScraper.csproj" />
   </ItemGroup>
 

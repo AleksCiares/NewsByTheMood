@@ -5,6 +5,7 @@ using NewsByTheMood.Services.DataProvider.Abstract;
 using NewsByTheMood.Services.DataProvider.Implement;
 using NewsByTheMood.Services.FileProvider.Abstract;
 using NewsByTheMood.Services.FileProvider.Implement;
+using NewsByTheMood.Services.MVC.Mappers;
 using NewsByTheMood.Services.Options;
 using NewsByTheMood.Services.ScrapeProvider.Abstract;
 using NewsByTheMood.Services.ScrapeProvider.Implement;
@@ -54,9 +55,9 @@ namespace NewsByTheMood.MVC
                 builder.Services.AddMediatR(sc => sc.RegisterServicesFromAssembly(typeof(CQS.Commands.AddArticleCommand).Assembly));
 
                 //Mapper services
-                builder.Services.AddTransient<Mappers.ArticlesMapper>();
-                builder.Services.AddTransient<Mappers.SourcesMapper>();
-                builder.Services.AddTransient<Mappers.TopicsMapper>();
+                builder.Services.AddTransient<ArticlesMapper>();
+                builder.Services.AddTransient<SourcesMapper>();
+                builder.Services.AddTransient<TopicsMapper>();
 
                 // File provider services
                 // Icons service

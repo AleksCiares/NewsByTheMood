@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using NewsByTheMood.MVC.Mappers;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
+using NewsByTheMood.Services.MVC.Mappers;
 using NuGet.Protocol;
 
 namespace NewsByTheMood.MVC.Areas.Settings.Controllers

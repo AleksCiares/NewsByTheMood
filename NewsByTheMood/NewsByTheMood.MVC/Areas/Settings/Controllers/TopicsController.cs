@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using NewsByTheMood.Data.Entities;
-using NewsByTheMood.MVC.Mappers;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
+using NewsByTheMood.Services.MVC.Mappers;
 using NuGet.Protocol;
 
 namespace NewsByTheMood.MVC.Areas.Settings.Controllers
@@ -27,7 +26,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         // Get range of topics
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery] PaginationModel pagination)
-         {
+        {
             try
             {
                 var totalTopics = await _topicService.CountAsync();

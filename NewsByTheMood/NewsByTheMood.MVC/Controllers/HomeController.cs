@@ -1,9 +1,8 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using NewsByTheMood.Data.Entities;
-using NewsByTheMood.MVC.Mappers;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
+using NewsByTheMood.Services.MVC.Mappers;
 
 namespace NewsByTheMood.MVC.Controllers
 {
