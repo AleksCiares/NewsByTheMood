@@ -74,19 +74,47 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             return await _mediator.Send(new IsExistsTopicByNameQuery() { TopicName = topicName }, cancellationToken);
         }
 
-        public async Task AddAsync(Topic topic, CancellationToken cancellationToken = default)
+        public async Task<bool> AddAsync(Topic topic, CancellationToken cancellationToken = default)
         {
-           await _mediator.Send(new AddTopicCommand() { Topic = topic }, cancellationToken);
+            if(await IsExistsByNameAsync(topic.Name))
+            {
+                return false;
+            }
+
+            await _mediator.Send(new AddTopicCommand() { Topic = topic }, cancellationToken);
+            return true;
         }
 
-        public async Task UpdateAsync(Topic topic, CancellationToken cancellationToken = default)
+        public async Task<bool> UpdateAsync(Topic topic, CancellationToken cancellationToken = default)
         {
+            var existingTopic = await GetByIdAsync(topic.Id, cancellationToken);
+            if (existingTopic == null)
+            {
+                return false;
+            }
+            if (await IsExistsByNameAsync(topic.Name, cancellationToken) && !existingTopic.Name.Equals(topic.Name))
+            {
+                return false;
+            }
+
             await _mediator.Send(new UpdateTopicCommand() { Topic = topic }, cancellationToken);
+            return true;
         }
 
-        public async Task DeleteAsync(Topic topic, CancellationToken cancellationToken = default)
+        public async Task<bool> DeleteAsync(long id, CancellationToken cancellationToken = default)
         {
-            await _mediator.Send(new DeleteTopicCommand() { Topic = topic }, cancellationToken);
+            var existingTopic = await GetByIdAsync(id, cancellationToken);
+            if (existingTopic == null)
+            {
+                return false;
+            }
+            if(existingTopic.Sources.Count > 0)
+            {
+                return false;
+            }
+
+            await _mediator.Send(new DeleteTopicCommand() { Topic = existingTopic }, cancellationToken);
+            return true;
         }
     }
 }

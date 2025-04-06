@@ -1,42 +1,44 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using NewsByTheMood.Data.Entities;
+using NewsByTheMood.MVC.Mappers;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
+using NuGet.Protocol;
 
 namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 {
     // Topics controller
     [Area("Settings")]
+    [Route("Settings/[controller]/[action]")]
     public class TopicsController : Controller
     {
         private readonly ITopicService _topicService;
         private readonly ILogger<TopicsController> _logger;
+        private readonly TopicsMapper _topicMapper;
 
-        public TopicsController(ITopicService topicService, ILogger<TopicsController> logger)
+        public TopicsController(ITopicService topicService, ILogger<TopicsController> logger, TopicsMapper topicMapper  )
         {
             _topicService = topicService;
             _logger = logger;
+            _topicMapper = topicMapper;
         }
 
         // Get range of topics
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery] PaginationModel pagination)
-        {
+         {
             try
             {
                 var totalTopics = await _topicService.CountAsync();
-                var topics = Array.Empty<TopicModel>();
+                var topics = Array.Empty<TopicSettingsModel>();
 
                 if (totalTopics > 0)
                 {
                     topics = (await _topicService.GetRangeAsync(
                         pagination.Page,
                         pagination.PageSize))
-                        .Select(topic => new TopicModel()
-                        {
-                            Name = topic.Name,
-                            IconCssClass = topic.IconCssClass,
-                        })
+                        .Select(topic => _topicMapper.TopicToTopicSettingsModel(topic))
                         .ToArray();
 
                     _logger.LogDebug($"Topics were fetch successfully");
@@ -46,7 +48,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                     _logger.LogDebug("No topics were found");
                 }
 
-                return View(new TopicCollectionModel()
+                return View(new TopicSettingsCollectionModel()
                 {
                     Topics = topics,
                     PageInfo = new PageInfoModel()
@@ -70,12 +72,20 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            try
+            {
+                return View();
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "Error while preparing to create topic");
+                return StatusCode(500);
+            }
         }
 
         // Create topic item processing
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] TopicModel topic)
+        public async Task<IActionResult> Create([FromForm] TopicSettingsModel topic)
         {
             try
             {
@@ -83,129 +93,129 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                 {
                     return View(topic);
                 }
-                if (await _topicService.IsExistsByNameAsync(topic.Name))
+                
+                _logger.LogInformation($"Creating topic \"{topic.Name}\"");
+
+                if (await _topicService.AddAsync(_topicMapper.TopicSettingsModelToTopic(topic)))
                 {
-                    ModelState.AddModelError("Name", "A topic with the same name already exists");
-                    return View(topic);
+                    _logger.LogInformation($"Topic \"{topic.Name}\" was created successfully");
+                    return RedirectToAction("Index");
                 }
-
-                await _topicService.AddAsync(new Topic()
+                else
                 {
-                    Name = topic.Name,
-                    IconCssClass = topic.IconCssClass,
-                });
-
-                _logger.LogInformation($"Topic {topic.Name} was created successfully");
-
-                return RedirectToAction("Index");
+                    _logger.LogError($"Topic \"{topic.Name}\" was not created");
+                    return BadRequest("Something gone wrong, while creating source. Watch logs to more information");
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while creating topic");
+                _logger.LogError(ex, $"Error while creating topic {topic.ToJson()}");
                 return StatusCode(500);
             }
         }
 
         // Edit topic item
-        [HttpGet("{Controller}/{Action}/{id:required}")]
+        [HttpGet("{id:required}")]
         public async Task<IActionResult> Edit([FromRoute] string id)
         {
             try
             {
-                var topic = await _topicService.GetByNameAsync(id);
+                var topic = await _topicService.GetByIdAsync(long.Parse(id));
                 if (topic == null)
                 {
-                    return BadRequest();
+                    _logger.LogWarning($"Topic id={id} was not found");
+                    return BadRequest("Something gone wrong, while getting source. Watch logs to more information");
                 }
 
-                return View(new TopicEditModel()
+                return View(new TopicSettingsEditModel()
                 {
-                    Topic = new TopicModel()
-                    {
-                        Name = topic.Name,
-                        IconCssClass = topic.IconCssClass,
-                    },
+                    Topic = _topicMapper.TopicToTopicSettingsModel(topic),
                     RelatedSourceCount = topic.Sources.Count
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error while getting topic {id}");
+                _logger.LogError(ex, $"Error while preparing to update topic id={id}");
                 return StatusCode(500);
             }
         }
 
         // Edit topic item proccessing
-        [HttpPost("{Controller}/{Action}/{id:required}")]
-        public async Task<IActionResult> Edit([FromRoute] string id, [FromForm] TopicEditModel topicEdit)
+        [HttpPost("{id:required}")]
+        public async Task<IActionResult> Edit([FromForm] TopicSettingsEditModel topicEdit)
         {
             try
             {
-                var topic = await _topicService.GetByNameAsync(id);
-                if (topic == null)
-                {
-                    _logger.LogWarning($"Topic with name {id} was not found");
-                    return BadRequest();
-                }
                 if (!ModelState.IsValid)
                 {
                     return View(topicEdit);
                 }
-                if (await _topicService.IsExistsByNameAsync(topicEdit.Topic.Name) && !topicEdit.Topic.Name.Equals(topic.Name))
+                
+                _logger.LogInformation($"Updating topic id={topicEdit.Topic.Id}");
+
+                if (await _topicService.UpdateAsync(_topicMapper.TopicSettingsModelToTopic(topicEdit.Topic)))
                 {
-                    ModelState.AddModelError("Topic.Name", "A topic with the same name already exists");
-                    topicEdit.Topic.Name = topic.Name;
-                    return View(topicEdit);
+                    _logger.LogInformation($"Topic id={topicEdit.Topic.Id} was updated successfully");
+                    return RedirectToAction("Index");
                 }
-
-                await _topicService.UpdateAsync(new Topic()
+                else
                 {
-                    Id = topic.Id,
-                    Name = topicEdit.Topic.Name,
-                    IconCssClass = topicEdit.Topic.IconCssClass,
-                });
-
-                _logger.LogInformation($"Topic {topicEdit.Topic.Name} was updated successfully");
-
-                return RedirectToAction("Index");
+                    _logger.LogError($"Topic id={topicEdit.Topic.Id} was not updated");
+                    return BadRequest("Something gone wrong, while updating topic. Watch logs to more information");
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error while updating topic {id}");
+                _logger.LogError(ex, $"Error while updating topic {topicEdit.Topic.ToJson()}");
                 return StatusCode(500);
             }
         }
 
         // Delete topic item
-        [HttpPost("{Controller}/{Action}/{id:required}")]
-        public async Task<IActionResult> Delete([FromRoute] string id, TopicEditModel topicEdit)
+        [HttpPost("{id:required}")]
+        public async Task<IActionResult> Delete([FromRoute] string id)
         {
             try
             {
-                var topic = await _topicService.GetByNameAsync(id);
-                if (topic == null)
+               _logger.LogInformation($"Deleting topic id={id}");
+
+                if (await _topicService.DeleteAsync(long.Parse(id)))
                 {
-                    _logger.LogWarning($"Topic with name {id} was not found");
-                    return BadRequest();
+                    _logger.LogInformation($"Topic id={id} was deleted successfully");
+                    return RedirectToAction("Index");
                 }
-                if (topic.Sources.Count > 0)
+                else
                 {
-                    ModelState.AddModelError("Topic.Name", "Can not delete topic with related source. First of all delete all related sources");
-                    return View("Edit", topicEdit);
+                    _logger.LogError($"Topic id={id} was not deleted");
+                    return BadRequest("Something gone wrong, while deleting topic. Watch logs to more information");
                 }
-
-                await _topicService.DeleteAsync(new Topic()
-                {
-                    Id = topic.Id,
-                });
-
-                _logger.LogInformation($"Topic {topic.Name} was deleted successfully");
-
-                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error while deleting topic {id}");
+                _logger.LogError(ex, $"Error while deleting topic id={id}");
+                return StatusCode(500);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> NameIsAvailable(TopicSettingsModel topic)
+        {
+            try
+            {
+                var isEXists = await _topicService.IsExistsByNameAsync(topic.Name);
+                if (isEXists && !topic.Name.IsNullOrEmpty())
+                {
+                    var topicTemp = await _topicService.GetByIdAsync(long.Parse(topic.Id));
+                    if(topicTemp != null && topicTemp.Name.Equals(topic.Name))
+                    {
+                        isEXists = false;
+                    }
+                }
+                return Json(!isEXists);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error while checking topic name \"{topic.Name}\" availability");
                 return StatusCode(500);
             }
         }

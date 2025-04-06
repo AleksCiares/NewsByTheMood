@@ -5,6 +5,7 @@ using NewsByTheMood.Services.ScrapeProvider.Abstract;
 namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 {
     [Area("Settings")]
+    [Route("Settings/[controller]/[action]")]
     public class ArticlesLoadController : Controller
     {
         private readonly IArticleScrapeService _articleLoadService;
@@ -18,7 +19,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             _logger = logger;
         }
 
-        [HttpGet("{Controller}/{Action}/{id:required}")]
+        [HttpGet("{id:required}")]
         public async Task<IActionResult> LoadArticles(string id)
         {
             try

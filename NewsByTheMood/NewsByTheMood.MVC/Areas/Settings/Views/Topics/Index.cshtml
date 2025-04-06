@@ -1,4 +1,4 @@
-﻿@model TopicCollectionModel
+﻿@model TopicSettingsCollectionModel
 @{
 	ViewData["PageTitle"] = "Topics";
 }
@@ -16,6 +16,7 @@
 		<table class="table">
 			<thead>
 				<tr>
+					<th scope="col">Id</th>
 					<th scope="col">Name</th>
 					<th scope="col">Icon</th>
 				</tr>
@@ -25,8 +26,9 @@
 				{
 					<tr>
 						<th scope="row">
-							<a asp-area="settings" asp-controller="topics" asp-action="edit" asp-route-id="@topic.Name">@topic.Name</a>
+							<a asp-area="settings" asp-controller="topics" asp-action="edit" asp-route-id="@topic.Id">@topic.Id</a>
 						</th>
+						<td>@topic.Name</td>
 						<td><i class="fs-4 @topic.IconCssClass"></i> <span class="ms-1 d-none d-sm-inline"></span></td>
 					</tr>
 				}

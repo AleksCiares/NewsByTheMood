@@ -2,10 +2,10 @@
 
 namespace NewsByTheMood.MVC.Models
 {
-    public class TopicEditModel
+    public class TopicSettingsEditModel
     {
         [Required]
-        public required TopicModel Topic { get; set; }
+        public required TopicSettingsModel Topic { get; set; }
 
         [Required]
         public required int RelatedSourceCount { get; set; }

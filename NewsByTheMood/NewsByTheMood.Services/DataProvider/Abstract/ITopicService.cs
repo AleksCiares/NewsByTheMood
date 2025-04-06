@@ -24,12 +24,12 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
         public Task<int> CountAsync(CancellationToken cancellationToken = default);
 
         // Add topic
-        public Task AddAsync(Topic topic, CancellationToken cancellationToken = default);
+        public Task<bool> AddAsync(Topic topic, CancellationToken cancellationToken = default);
 
         // Update topic
-        public Task UpdateAsync(Topic topic, CancellationToken cancellationToken = default);
+        public Task<bool> UpdateAsync(Topic topic, CancellationToken cancellationToken = default);
 
         // Delete topic
-        public Task DeleteAsync(Topic topic, CancellationToken cancellationToken = default);
+        public Task<bool> DeleteAsync(long id, CancellationToken cancellationToken = default);
     }
 }

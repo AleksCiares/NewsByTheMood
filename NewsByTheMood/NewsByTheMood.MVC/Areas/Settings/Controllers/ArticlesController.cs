@@ -241,7 +241,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 
         [HttpPost]
         public async Task<IActionResult> UrlIsAvailable(ArticleSettingsModel article)
-       {
+        {
             try
             {
                 var isExists = await _articleService.IsExistsByUrlAsync(article.Url);

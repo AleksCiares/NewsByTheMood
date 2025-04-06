@@ -1,4 +1,4 @@
-﻿@model TopicModel
+﻿@model TopicSettingsModel
 @{
 	ViewData["PageTitle"] = "Create a topic";
 }
@@ -22,11 +22,14 @@
 					<span asp-validation-for="@Model.Name" class="error-feedback invalid-feedback"></span>
 				</div>
 				<div class="icon form-floating mb-3">
-					<input asp-for="@Model.IconCssClass" type="text" class="form-control" placeholder="@nameof(Model.IconCssClass)" />
+					<input asp-for="@Model.IconCssClass" type="text" class="form-control" id="TopicIconCssClass" placeholder="@nameof(Model.IconCssClass)" />
 					<label asp-for="@Model.IconCssClass" class="form-label">Icon css class</label>
 					<span asp-validation-for="@Model.IconCssClass" class="error-feedback invalid-feedback"></span>
 				</div>
 				@await Component.InvokeAsync("TopicsIcons")
+				<div class="id form-floating mb-3" style="display:none;">
+					<input asp-for="@Model.Id" type="number" value="0" class="form-control" />
+				</div>
 			</div>
 		</div>
 	</form>
@@ -34,11 +37,5 @@
 
 @section Scripts
 {
-	<script type="text/javascript" on-content-loaded="true">
-		console.log("sada");
-		$(document).on("click", ".icon-item", function(){
-			var clickedIconCssClass = $(this).attr("value");
-			$("#IconCssClass").attr("value", clickedIconCssClass)
-		})
-	</script>
+    <script src="~/js/topic-edit.js" asp-append-version="true"></script>
 }

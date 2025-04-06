@@ -99,11 +99,11 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 return false;
             }
 
-            if (source.Articles != null && source.Articles.Count > 0)
+            /*if (source.Articles != null && source.Articles.Count > 0)
             {
                 //"Can not delete source with related articles. First of all delete all related articles"
                 return false;
-            }
+            }*/
 
             await _mediator.Send(new DeleteSourceCommand() { Source = source }, cancellationToken);
             return true;

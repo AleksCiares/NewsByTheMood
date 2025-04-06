@@ -1,4 +1,4 @@
-﻿@model TopicEditModel
+﻿@model TopicSettingsEditModel
 @{
 	ViewData["PageTitle"] = $"{Model.Topic.Name} - Editing";
 }
@@ -7,14 +7,14 @@
 	<div class="topic__header d-flex row mb-5">
 		<h4 class="mb-0">Edit topic @Model.Topic.Name</h4>
 	</div>
-	<form asp-antiforgery="true" method="post">
+	<form asp-antiforgery="true" method="post" id="editTopicForm">
 		<div class="form__panel row align-items-start justify-content-between mb-4">
 			<div class="col-auto">
 				<button asp-area="settings" asp-controller="topics" asp-action="edit" asp-route-id="@Model.Topic.Name" type="submit" class="btn btn-outline-primary">Submit</button>
 				<a asp-area="settings" asp-controller="topics" asp-action="index" class="btn btn-outline-secondary">Cancel</a>
 			</div>
 			<div class="col-auto">
-				<button asp-area="settings" asp-controller="topics" asp-action="delete" asp-route-id="@Model.Topic.Name" type="submit" class="btn btn-danger">Delete</button>
+				<button formnovalidate asp-area="settings" asp-controller="topics" asp-action="delete" asp-route-id="@Model.Topic.Id" id="deleteTopicButton" class="btn btn-danger">Delete</button>
 			</div>
 		</div>
 		<div class="form__body row align-items-start justify-content-start mb-4">
@@ -31,11 +31,14 @@
 					<span asp-validation-for="@Model.Topic.Name" class="error-feedback invalid-feedback"></span>
 				</div>
 				<div class="icon form-floating mb-3">
-					<input asp-for="@Model.Topic.IconCssClass" type="text" class="form-control" placeholder="@nameof(Model.Topic.IconCssClass)" />
+					<input asp-for="@Model.Topic.IconCssClass" type="text" class="form-control" id="TopicIconCssClass" placeholder="@nameof(Model.Topic.IconCssClass)" />
 					<label asp-for="@Model.Topic.IconCssClass" class="form-label">Icon css class</label>
 					<span asp-validation-for="@Model.Topic.IconCssClass" class="error-feedback invalid-feedback"></span>
 				</div>
 				@await Component.InvokeAsync("TopicsIcons")
+				<div class="id form-floating mb-3" style="display:none;">
+					<input asp-for="@Model.Topic.Id" type="number" value="@Model.Topic.Id" class="form-control" />
+				</div>
 			</div>
 		</div>
 	</form>
@@ -43,11 +46,30 @@
 
 @section Scripts
  {
-	<script type="text/javascript" on-content-loaded="true">
-		console.log("sada");
-		$(document).on("click", ".icon-item", function(){
-			var clickedIconCssClass = $(this).attr("value");
-			$("#Topic_IconCssClass").attr("value", clickedIconCssClass)
-		})
+	<script src="~/js/topic-edit.js" asp-append-version="true"></script>
+    <script src="~/js/CommonModal.js" asp-append-version="true"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+			let deleteButton = document.getElementById('deleteTopicButton');
+			let relatedSourceCount = @Model.RelatedSourceCount;
+
+			if (relatedSourceCount > 0) {
+				deleteButton.disabled = true;
+				deleteButton.title = 'This topic has related sources. First of all delete related sources.';
+			} else {
+				let modal = new CommonModal(
+					'Confirm Deletion',
+					'Are you sure you want to delete this topic?',
+					'Cancel',
+					'Delete',
+					'deleteTopicButton',
+					() => {
+						let form = document.getElementById('editTopicForm');
+						form.action = form.action.replace('edit', 'delete');
+						form.submit();
+					});
+			}
+		});
 	</script>
+}
 }

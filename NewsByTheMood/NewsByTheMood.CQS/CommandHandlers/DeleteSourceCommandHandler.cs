@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using NewsByTheMood.CQS.Commands;
 using NewsByTheMood.Data;
 using NewsByTheMood.Data.Entities;
@@ -16,8 +17,29 @@ namespace NewsByTheMood.CQS.CommandHandlers
 
         public async Task Handle(DeleteSourceCommand request, CancellationToken cancellationToken)
         {
-            _dbContext.Sources.Remove(request.Source);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+
+            try
+            {
+                // Удаление всех связанных статей
+                var articles = await _dbContext.Articles
+                    .Include(article => article.Tags)
+                    .Where(a => a.SourceId == request.Source.Id)
+                    .ToListAsync(cancellationToken);
+
+                _dbContext.Articles.RemoveRange(articles);
+
+                // Удаление источника
+                _dbContext.Sources.Remove(request.Source);
+
+                await _dbContext.SaveChangesAsync(cancellationToken);
+                await transaction.CommitAsync(cancellationToken);
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                throw;
+            }
         }
     }
 }

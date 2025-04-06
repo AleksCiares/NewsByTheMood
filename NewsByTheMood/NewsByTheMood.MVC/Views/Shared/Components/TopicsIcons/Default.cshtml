@@ -7,10 +7,13 @@
 			<div class="d-flex mb-3">
 				<h4 class="mb-0">Icons library</h4>
 			</div>
+			<div class="icons-search mb-3">
+				<input type="text" id="iconSearch" class="form-control" placeholder="Search icons..." />
+			</div>
 			<div class="row row-cols-10 row-cols-sm-12">
 				@foreach (var iconClass in Model)
 				{
-					<div class="col mb-4 rounded">
+					<div class="col mb-4 rounded icon-item-wrap">
 						<div class="icon-item card text-center" value="@iconClass">
 							<div class="card-body">
 								<i class="fs-4 @iconClass"></i>

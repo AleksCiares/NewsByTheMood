@@ -176,7 +176,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             }
         }
 
-        // Delete source utem
+        // Delete source utem 
         [HttpPost("{id:required}")]
         public async Task<IActionResult> Delete([FromRoute] string id)
         {
