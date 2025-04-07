@@ -10,12 +10,12 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
         /// <summary>
         /// Get tag by name
         /// </summary>
-        public Task<Tag?> GetByNameAsync(string tagName, CancellationToken cancellationToken = default);
+        /*public Task<Tag?> GetByNameAsync(string tagName, CancellationToken cancellationToken = default);*/
 
         /// <summary>
         /// Is exist tag by name
         /// </summary>
-        public Task<bool> IsExistsByNameAsync(string tagName, CancellationToken cancellationToken = default);
+        //public Task<bool> IsExistsByNameAsync(string tagName, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get all tags
@@ -26,7 +26,7 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
         /// <summary>
         /// Add tag
         /// </summary>
-        public Task AddAsync(Tag tag, CancellationToken cancellationToken = default);
+        /*public Task AddAsync(Tag tag, CancellationToken cancellationToken = default);*/
 
     }
 }

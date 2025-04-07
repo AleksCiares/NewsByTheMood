@@ -1,12 +1,6 @@
 ﻿using MediatR;
 using NewsByTheMood.CQS.Commands;
 using NewsByTheMood.Data;
-using NewsByTheMood.Data.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NewsByTheMood.CQS.CommandHandlers
 {

@@ -1,9 +1,8 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using NewsByTheMood.CQS.Commands;
 using NewsByTheMood.CQS.Queries;
-using NewsByTheMood.Data;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.DataProvider.Abstract;
 
@@ -11,19 +10,20 @@ namespace NewsByTheMood.Services.DataProvider.Implement
 {
     public class TopicService : ITopicService
     {
-        private readonly NewsByTheMoodDbContext _dbContext;
         private readonly IMediator _mediator;
+        private readonly ILogger<TopicService> _logger; 
 
-        public TopicService(NewsByTheMoodDbContext dbContext, IMediator mediator)
+        public TopicService(IMediator mediator, ILogger<TopicService> logger)
         {
-            _dbContext = dbContext;
             _mediator = mediator;
+            _logger = logger;
         }
 
         public async Task<Topic?> GetByIdAsync(Int64 id, CancellationToken cancellationToken =default)
         {
             if (id <= 0)
             {
+                _logger.LogWarning($"Topic id is less than or equal to 0. Id: {id}");
                 return null;
             }
 
@@ -34,6 +34,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         {
             if (topicName.IsNullOrEmpty())
             {
+                _logger.LogWarning($"Topic name is null or empty. TopicName: {topicName}");
                 return null;
             }
 
@@ -44,6 +45,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         {
             if (pageSize <= 0 || pageNumber <= 0)
             {
+                _logger.LogWarning($"Page size or page number is less than or equal to 0. PageSize: {pageSize}, PageNumber: {pageNumber}");
                 return Array.Empty<Topic>();
             }
 
@@ -68,6 +70,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         {
             if (topicName.IsNullOrEmpty())
             {
+                _logger.LogWarning($"Topic name is null or empty. TopicName: {topicName}");
                 return false;
             }
 
@@ -78,6 +81,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         {
             if(await IsExistsByNameAsync(topic.Name))
             {
+                _logger.LogWarning($"Topic with name {topic.Name} already exists.");
                 return false;
             }
 
@@ -90,10 +94,12 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             var existingTopic = await GetByIdAsync(topic.Id, cancellationToken);
             if (existingTopic == null)
             {
+                _logger.LogWarning($"Topic with id {topic.Id} does not exist.");
                 return false;
             }
             if (await IsExistsByNameAsync(topic.Name, cancellationToken) && !existingTopic.Name.Equals(topic.Name))
             {
+                _logger.LogWarning($"Topic with name {topic.Name} already exists.");
                 return false;
             }
 
@@ -106,10 +112,12 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             var existingTopic = await GetByIdAsync(id, cancellationToken);
             if (existingTopic == null)
             {
+                _logger.LogWarning($"Topic with id {id} does not exist.");
                 return false;
             }
             if(existingTopic.Sources.Count > 0)
             {
+                _logger.LogWarning($"Topic with id {id} has sources. Cannot delete.");
                 return false;
             }
 

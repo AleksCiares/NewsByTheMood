@@ -47,11 +47,3 @@ namespace NewsByTheMood.CQS.QueryHandlers
         }
     }
 }
-
-/*return await _dbContext.Articles
-                .AsNoTracking()
-                .Where(article => article.Id == id)
-                .Include(article => article.Source)
-                    .ThenInclude(source => source.Topic)
-                .Include(article => article.Tags)
-                .SingleOrDefaultAsync();*/

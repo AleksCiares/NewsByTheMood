@@ -17,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewsByTheMood.CQS", "NewsBy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewsByTheMood.MVC.Models", "NewsByTheMood.MVC.Models\NewsByTheMood.MVC.Models.csproj", "{68E31B0D-88ED-4010-9201-AE1A4C0253AE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewsByTheMood.Services.Tests", "NewsByTheMood.Services.Tests\NewsByTheMood.Services.Tests.csproj", "{3DB3C1A5-0EC7-49BF-8A80-2AE185E31543}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,9 +55,16 @@ Global
 		{68E31B0D-88ED-4010-9201-AE1A4C0253AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68E31B0D-88ED-4010-9201-AE1A4C0253AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68E31B0D-88ED-4010-9201-AE1A4C0253AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DB3C1A5-0EC7-49BF-8A80-2AE185E31543}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DB3C1A5-0EC7-49BF-8A80-2AE185E31543}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DB3C1A5-0EC7-49BF-8A80-2AE185E31543}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DB3C1A5-0EC7-49BF-8A80-2AE185E31543}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3DB3C1A5-0EC7-49BF-8A80-2AE185E31543} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7693468A-E424-4262-B2D7-87485A9DF4AF}

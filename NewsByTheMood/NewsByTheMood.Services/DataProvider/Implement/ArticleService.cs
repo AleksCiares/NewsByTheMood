@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using NewsByTheMood.CQS.Commands;
 using NewsByTheMood.CQS.Queries;
@@ -9,19 +10,20 @@ namespace NewsByTheMood.Services.DataProvider.Implement
 {
     public class ArticleService : IArticleService
     {
-        /*private readonly NewsByTheMoodDbContext _dbContext;*/
         private readonly IMediator _mediator;
+        private readonly ILogger<ArticleService> _logger;
 
-        public ArticleService(/*NewsByTheMoodDbContext dbContext, */IMediator mediator)
+        public ArticleService(IMediator mediator, ILogger<ArticleService> logger)
         {
-            /*_dbContext = dbContext;*/
             _mediator = mediator;
+            _logger = logger;
         }
 
         public async Task<int> CountAsync(short positivity, CancellationToken cancellationToken = default)
         {
             if (positivity < 0)
             {
+                _logger.LogWarning($"Positivity is less than 0. Positivity: {positivity}");
                 return 0;
             }
 
@@ -32,6 +34,8 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         {
             if (positivity < 0 || pageNumber <= 0 || pageSize <= 0)
             {
+                _logger.LogWarning($"Positivity is less than 0 or pageNumber/pageSize is less than or equal to 0. Positivity: " +
+                    $"{positivity}, PageNumber: {pageNumber}, PageSize: {pageSize}");
                 return Array.Empty<Article>();
             }
 
@@ -47,6 +51,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         {
             if (positivity < 0 || topicId <= 0)
             {
+                _logger.LogWarning($"Positivity is less than 0 or topicId is less than or equal to 0. Positivity: {positivity}, TopicId: {topicId}");
                 return 0;
             }
 
@@ -57,6 +62,8 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         {
             if (positivity < 0 || topicId <= 0 || pageNumber <= 0 || pageSize <= 0)
             {
+                _logger.LogWarning($"Positivity is less than 0 or topicId is less than or equal to 0 or pageNumber/pageSize is less than or equal to 0. Positivity: " +
+                    $"{positivity}, TopicId: {topicId}, PageNumber: {pageNumber}, PageSize: {pageSize}");
                 return Array.Empty<Article>();
             }
 
@@ -73,6 +80,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         {
             if (id <= 0)
             {
+                _logger.LogWarning($"Article id is less than or equal to 0. Id: {id}");
                 return null;
             }
 
@@ -83,6 +91,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         {
             if (articleUrl.IsNullOrEmpty())
             {
+                _logger.LogWarning($"Article url is null or empty. ArticleUrl: {articleUrl}");
                 return false;
             }
 
@@ -93,6 +102,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         {
             if(await IsExistsByUrlAsync(article.Url))
             {
+                _logger.LogWarning($"Article with url {article.Url} already exists.");
                 return false;
             }
 
@@ -102,12 +112,32 @@ namespace NewsByTheMood.Services.DataProvider.Implement
 
         public async Task<bool> AddRangeAsync(IEnumerable<Article> articles, CancellationToken cancellationToken = default)
         {
+            if (articles == null || !articles.Any())
+            {
+                _logger.LogWarning($"Articles collection is null or empty.");
+                return false;
+            }
+
+            var existinsUrls = new List<string>();
             foreach (var article in articles)
             {
                 if (await IsExistsByUrlAsync(article.Url, cancellationToken))
                 {
-                    return false;
+                   existinsUrls.Add(article.Url);
                 }
+            }
+
+            if(existinsUrls.Count > 0)
+            {
+                _logger.LogWarning($"Articles with urls {string.Join(", ", existinsUrls)} already exists.");
+            }
+
+            var articlesToAdd = articles.Where(article => !existinsUrls.Contains(article.Url)).ToList();
+
+            if (!articlesToAdd.Any())
+            {
+                _logger.LogWarning("No new articles to add.");
+                return false;
             }
 
             await _mediator.Send(new AddArticlesRangeCommand() { Articles = articles }, cancellationToken);
@@ -119,10 +149,12 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             var articleEntity = await GetByIdAsync(article.Id, cancellationToken);
             if (articleEntity == null)
             {
+                _logger.LogWarning($"Article with id {article.Id} not found.");
                 return false;
             }
             if (await IsExistsByUrlAsync(article.Url, cancellationToken) && !article.Url.Equals(articleEntity.Url))
             {
+                _logger.LogWarning($"Article with url {article.Url} already exists.");
                 return false;
             }
 
@@ -135,6 +167,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             var article = await GetByIdAsync(id, cancellationToken);
             if (article == null)
             {
+                _logger.LogWarning($"Article with id {id} not found.");
                 return false;
             }
 

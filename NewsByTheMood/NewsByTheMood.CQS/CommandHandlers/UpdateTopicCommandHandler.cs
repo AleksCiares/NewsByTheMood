@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using NewsByTheMood.CQS.Commands;
 using NewsByTheMood.Data;
-using NewsByTheMood.Data.Entities;
 
 namespace NewsByTheMood.CQS.CommandHandlers
 {

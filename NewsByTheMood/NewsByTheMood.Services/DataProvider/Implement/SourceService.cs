@@ -1,9 +1,8 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using NewsByTheMood.CQS.Commands;
 using NewsByTheMood.CQS.Queries;
-using NewsByTheMood.Data;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.DataProvider.Abstract;
 
@@ -11,19 +10,20 @@ namespace NewsByTheMood.Services.DataProvider.Implement
 {
     public class SourceService : ISourceService
     {
-        //private readonly NewsByTheMoodDbContext _dbContext;
         private readonly IMediator _mediator;
+        private readonly ILogger<SourceService> _logger;
 
-        public SourceService(/*NewsByTheMoodDbContext dbContext,*/ IMediator mediator)
+        public SourceService(IMediator mediator, ILogger<SourceService> logger)
         {
-            //_dbContext = dbContext;
             _mediator = mediator;
+            _logger = logger;
         }
 
         public async Task<Source?> GetByIdAsync(Int64 id, CancellationToken cancellationToken = default)
         {
             if (id <= 0)
             {
+                _logger.LogWarning($"Source id is less than or equal to 0. Id: {id}");
                 return null;
             }
 
@@ -34,6 +34,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         {
             if (pageSize <= 0 || pageNumber <= 0)
             {
+                _logger.LogWarning($"Page size or page number is less than or equal to 0. PageSize: {pageSize}, PageNumber: {pageNumber}");
                 return Array.Empty<Source>();
             }
 
@@ -58,6 +59,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         {
             if (sourceName.IsNullOrEmpty())
             {
+                _logger.LogWarning($"Source name is null or empty. SourceName: {sourceName}");
                 return false;
             }
 
@@ -68,6 +70,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         {
             if(await IsExistsByNameAsync(source.Name))
             {
+                _logger.LogWarning($"Source with name {source.Name} already exists.");
                 return false;
             }
 
@@ -80,10 +83,12 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             var sourceEntity = await GetByIdAsync(source.Id, cancellationToken);
             if (sourceEntity == null)
             {
+                _logger.LogWarning($"Source with id {source.Id} not found.");
                 return false;
             }
             if (await IsExistsByNameAsync(source.Name) && !source.Name.Equals(sourceEntity.Name))
             {
+                _logger.LogWarning($"Source with name {source.Name} already exists.");
                 return false;
             }
 
@@ -96,6 +101,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             var source = await GetByIdAsync(id, cancellationToken);
             if (source == null) 
             {
+                _logger.LogWarning($"Source with id {id} not found.");
                 return false;
             }
 
