@@ -1,7 +1,0 @@
-﻿header {
-    background-color: var(--main-background-color);
-}
-
-header .navbar-toggler span.navbar-toggler-icon {
-    color: var(--main-highlight-color);
-}

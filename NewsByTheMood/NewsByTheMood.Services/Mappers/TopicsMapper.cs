@@ -14,5 +14,10 @@ namespace NewsByTheMood.Services.MVC.Mappers
         [MapperIgnoreSource(nameof(Topic.Sources))]
         [MapperIgnoreSource(nameof(Topic.Users))]
         public partial TopicSettingsModel TopicToTopicSettingsModel(Topic topic);
+
+        [MapperIgnoreSource(nameof(Topic.Id))]
+        [MapperIgnoreSource(nameof(Topic.Users))]
+        [MapperIgnoreSource(nameof(Topic.Sources))]
+        public partial TopicModel TopicToTopicModel(Topic topic);
     }
 }

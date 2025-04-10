@@ -28,7 +28,6 @@ namespace NewsByTheMood.MVC
                     .ReadFrom.Configuration(builder.Configuration)
                     .CreateLogger();
                 builder.Services.AddSerilog();
-
                 Log.Information("Starting host...");
 
                 // Add services to the container.
@@ -36,11 +35,18 @@ namespace NewsByTheMood.MVC
 
                 // Db provider service
                 builder.Services.AddDbContext<NewsByTheMoodDbContext>(
-                    opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default1")));
+                    opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
                 // Identity provider service
                 builder.Services.AddIdentity<NewsByTheMood.Data.Entities.User, Microsoft.AspNetCore.Identity.IdentityRole<Int64>>()
                     .AddEntityFrameworkStores<NewsByTheMoodDbContext>();
+
+                // Auth service
+                builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                    .AddCookie("NewsByTheMood", options =>
+                    {
+                        options.LoginPath = "/account/login";
+                    });
 
                 // Data provider services
                 // Article service
@@ -78,9 +84,9 @@ namespace NewsByTheMood.MVC
                 }
 
                 // Scrape provider services
+                // Article scrape service
                 builder.Services.Configure<WebScrapeOptions>(
                     builder.Configuration.GetSection(WebScrapeOptions.Position));
-                // Article scrape service
                 builder.Services.AddScoped<IArticleScrapeService, ArticleScrapeService>();
 
                 // Spoof provider services
@@ -90,13 +96,6 @@ namespace NewsByTheMood.MVC
                 // Routing service
                 builder.Services.AddRouting(options => options.LowercaseUrls = true);
                 
-                // Auth service
-                builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                    .AddCookie("NewsByTheMood", options =>
-                    {
-                        options.LoginPath = "/account/login";
-                    });
-
                 var app = builder.Build();
 
                 // Configure the HTTP request pipeline.
@@ -125,7 +124,6 @@ namespace NewsByTheMood.MVC
                     pattern: "{controller=Home}/{action=Index}/{id?}");
 
                 Log.Information("Host Started");
-
                 app.Run();
             }
             catch (Exception ex)

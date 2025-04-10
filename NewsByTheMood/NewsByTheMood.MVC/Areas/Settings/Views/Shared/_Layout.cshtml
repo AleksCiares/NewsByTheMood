@@ -4,7 +4,7 @@
     <partial name="_HeadPartial" />
 </head>
 <body>
-    <partial name="_HeaderPartial" />
+    @await Component.InvokeAsync("Header")
     <main role="main">
         <div class="container-fluid">
             <div class="row flex-nowrap">
