@@ -13,7 +13,7 @@
         public string? GetAttribute(string name);
         public List<string> GetAttributes(string name);
         public List<string> TextContent();
-        public List<string> InnerText();
+        public List<string> InnerHtml();
         public string ToHtml();
     }
 }

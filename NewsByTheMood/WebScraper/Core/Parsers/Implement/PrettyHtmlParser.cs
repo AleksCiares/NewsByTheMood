@@ -15,7 +15,7 @@ namespace WebScraper.Core.Parsers.Implement
 
         internal PrettyHtmlParser() 
         {
-            var config = Configuration.Default.WithDefaultLoader().WithCss();
+            var config = Configuration.Default.WithDefaultLoader();
             _context = BrowsingContext.New(config);
         }
 
@@ -149,7 +149,7 @@ namespace WebScraper.Core.Parsers.Implement
             return textList;
         }
 
-        public List<string> InnerText()
+        public List<string> InnerHtml()
         {
             if (_elements == null)
             {
@@ -159,7 +159,7 @@ namespace WebScraper.Core.Parsers.Implement
             var textList = new List<string>();
             foreach (var element in _elements)
             {
-                textList.Add(element.GetInnerText());
+                textList.Add(element.InnerHtml);
             }
 
             return textList;
