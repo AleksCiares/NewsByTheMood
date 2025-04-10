@@ -32,6 +32,7 @@ namespace NewsByTheMood.MVC
 
                 // Add services to the container.
                 builder.Services.AddControllersWithViews();
+                builder.Services.AddRazorPages();
 
                 // Db provider service
                 builder.Services.AddDbContext<NewsByTheMoodDbContext>(
@@ -122,6 +123,8 @@ namespace NewsByTheMood.MVC
                 app.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+                app.MapRazorPages();
 
                 Log.Information("Host Started");
                 app.Run();

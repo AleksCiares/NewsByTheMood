@@ -34,7 +34,7 @@ namespace NewsByTheMood.MVC.Components
         {
             try
             {
-                var topics = (await this._topicService.GetAllAsync()) // replaced with mapper
+                var topics = (await this._topicService.GetAllAsync())
                     .Select(topic => _topicMapper.TopicToTopicModel(topic))
                     .ToArray();
                 UserPreviewModel? user = null;
