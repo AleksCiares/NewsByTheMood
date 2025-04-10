@@ -1,17 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using NewsByTheMood.Data.Entities;
 
 namespace NewsByTheMood.Data
 {
-    public class NewsByTheMoodDbContext : DbContext
+    public class NewsByTheMoodDbContext : IdentityDbContext<User, IdentityRole<Int64>, Int64>
     {
         public DbSet<Article> Articles { get; set; }
         public DbSet<Comment> Comments { get; set; }
-        public DbSet<Right> Rights { get; set; }
         public DbSet<Source> Sources { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Topic> Topics { get; set; }
-        public DbSet<User> Users { get; set; }
 
         public NewsByTheMoodDbContext(DbContextOptions<NewsByTheMoodDbContext> options)
             :base(options)
@@ -23,7 +23,7 @@ namespace NewsByTheMood.Data
             base.OnConfiguring(optionsBuilder);
         }
         
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        /*protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Right>().HasData(
                 new Right { Id = 1, AccessLevel = "Administrator"},
@@ -43,8 +43,7 @@ namespace NewsByTheMood.Data
                 IsVerified = true,
                 AvatarUrl = "~/images/newsbythemood-logo.webp",
                 RightId = 1
-            });
-               
-        }
+            }); 
+        }*/
     }
 }

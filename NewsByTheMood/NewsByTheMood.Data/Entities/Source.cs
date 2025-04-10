@@ -13,6 +13,8 @@
         public string PageElementLoaded { get; set; }
         public int PageLoadTimeout { get; set; }
         public int ElementLoadTimeout { get; set; }
+        public bool IsActive { get; set; }
+
 
         public string ArticleCollectionsPath { get; set; }
         public string ArticleItemPath { get; set; }

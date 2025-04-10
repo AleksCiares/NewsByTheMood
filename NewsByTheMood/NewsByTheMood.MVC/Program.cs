@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using NewsByTheMood.Data;
 using NewsByTheMood.MVC.Options;
@@ -36,6 +37,10 @@ namespace NewsByTheMood.MVC
                 // Db provider service
                 builder.Services.AddDbContext<NewsByTheMoodDbContext>(
                     opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default1")));
+
+                // Identity provider service
+                builder.Services.AddIdentity<NewsByTheMood.Data.Entities.User, Microsoft.AspNetCore.Identity.IdentityRole<Int64>>()
+                    .AddEntityFrameworkStores<NewsByTheMoodDbContext>();
 
                 // Data provider services
                 // Article service
@@ -82,8 +87,16 @@ namespace NewsByTheMood.MVC
                 /*builder.Services.Configure<SpoofOptions>(
                     builder.Configuration.GetSection(SpoofOptions.Position));*/
 
+                // Routing service
                 builder.Services.AddRouting(options => options.LowercaseUrls = true);
                 
+                // Auth service
+                builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                    .AddCookie("NewsByTheMood", options =>
+                    {
+                        options.LoginPath = "/account/login";
+                    });
+
                 var app = builder.Build();
 
                 // Configure the HTTP request pipeline.
@@ -99,6 +112,7 @@ namespace NewsByTheMood.MVC
 
                 app.UseRouting();
 
+                app.UseAuthentication();
                 app.UseAuthorization();
 
                 app.MapAreaControllerRoute(

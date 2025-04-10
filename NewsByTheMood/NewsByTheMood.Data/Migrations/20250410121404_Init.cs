@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace NewsByTheMood.Data.Migrations
 {
     /// <inheritdoc />
@@ -14,16 +12,48 @@ namespace NewsByTheMood.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Rights",
+                name: "AspNetRoles",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AccessLevel = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Rights", x => x.Id);
+                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DisplayedName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PreferedPositivity = table.Column<short>(type: "smallint", nullable: false),
+                    RegDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AvatarUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -54,31 +84,109 @@ namespace NewsByTheMood.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "AspNetRoleClaims",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserName = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    DisplayedName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PreferedPositivity = table.Column<short>(type: "smallint", nullable: false),
-                    RegDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsVerified = table.Column<bool>(type: "bit", nullable: false),
-                    AvatarUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RightId = table.Column<long>(type: "bigint", nullable: false)
+                    RoleId = table.Column<long>(type: "bigint", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Users_Rights_RightId",
-                        column: x => x.RightId,
-                        principalTable: "Rights",
+                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict,
-                        onUpdate: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserClaims_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserLogins",
+                columns: table => new
+                {
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserLogins_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserRoles",
+                columns: table => new
+                {
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    RoleId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserTokens",
+                columns: table => new
+                {
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserTokens_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -96,6 +204,7 @@ namespace NewsByTheMood.Data.Migrations
                     PageElementLoaded = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PageLoadTimeout = table.Column<int>(type: "int", nullable: false),
                     ElementLoadTimeout = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     ArticleCollectionsPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ArticleItemPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ArticleUrlPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -115,7 +224,7 @@ namespace NewsByTheMood.Data.Migrations
                         column: x => x.TopicId,
                         principalTable: "Topics",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict, 
+                        onDelete: ReferentialAction.Restrict,
                         onUpdate: ReferentialAction.Cascade);
                 });
 
@@ -130,19 +239,17 @@ namespace NewsByTheMood.Data.Migrations
                 {
                     table.PrimaryKey("PK_TopicUser", x => new { x.TopicsId, x.UsersId });
                     table.ForeignKey(
+                        name: "FK_TopicUser_AspNetUsers_UsersId",
+                        column: x => x.UsersId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_TopicUser_Topics_TopicsId",
                         column: x => x.TopicsId,
                         principalTable: "Topics",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict, 
-                        onUpdate: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_TopicUser_Users_UsersId",
-                        column: x => x.UsersId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict, 
-                        onUpdate: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -158,6 +265,8 @@ namespace NewsByTheMood.Data.Migrations
                     PublishDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Positivity = table.Column<short>(type: "smallint", nullable: false),
                     Rating = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    FailedLoaded = table.Column<bool>(type: "bit", nullable: false),
                     SourceId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -187,7 +296,7 @@ namespace NewsByTheMood.Data.Migrations
                         column: x => x.ArticlesId,
                         principalTable: "Articles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict,
+                        onDelete: ReferentialAction.Restrict, 
                         onUpdate: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ArticleTag_Tags_TagsId",
@@ -217,32 +326,16 @@ namespace NewsByTheMood.Data.Migrations
                         column: x => x.ArticleId,
                         principalTable: "Articles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict,
+                        onDelete: ReferentialAction.Restrict, 
                         onUpdate: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Comments_Users_UserId",
+                        name: "FK_Comments_AspNetUsers_UserId",
                         column: x => x.UserId,
-                        principalTable: "Users",
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict,
+                        onDelete: ReferentialAction.Restrict, 
                         onUpdate: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.InsertData(
-                table: "Rights",
-                columns: new[] { "Id", "AccessLevel" },
-                values: new object[,]
-                {
-                    { 1L, "Administrator" },
-                    { 2L, "Moderator" },
-                    { 3L, "Content editor" },
-                    { 4L, "User" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Users",
-                columns: new[] { "Id", "AvatarUrl", "DisplayedName", "Email", "IsVerified", "PasswordHash", "PreferedPositivity", "RegDate", "RightId", "UserName" },
-                values: new object[] { 1L, "~/images/newsbythemood-logo.webp", "NewsByTheMood Admin", "test@test.com", true, "Qwerty", (short)0, new DateTime(2025, 3, 12, 12, 35, 21, 312, DateTimeKind.Local), 1L, "Administrator" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Articles_SourceId",
@@ -255,6 +348,45 @@ namespace NewsByTheMood.Data.Migrations
                 column: "TagsId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetRoleClaims_RoleId",
+                table: "AspNetRoleClaims",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "RoleNameIndex",
+                table: "AspNetRoles",
+                column: "NormalizedName",
+                unique: true,
+                filter: "[NormalizedName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserClaims_UserId",
+                table: "AspNetUserClaims",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserLogins_UserId",
+                table: "AspNetUserLogins",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserRoles_RoleId",
+                table: "AspNetUserRoles",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "EmailIndex",
+                table: "AspNetUsers",
+                column: "NormalizedEmail");
+
+            migrationBuilder.CreateIndex(
+                name: "UserNameIndex",
+                table: "AspNetUsers",
+                column: "NormalizedUserName",
+                unique: true,
+                filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Comments_ArticleId",
                 table: "Comments",
                 column: "ArticleId");
@@ -263,12 +395,6 @@ namespace NewsByTheMood.Data.Migrations
                 name: "IX_Comments_UserId",
                 table: "Comments",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Rights_AccessLevel",
-                table: "Rights",
-                column: "AccessLevel",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Sources_TopicId",
@@ -291,23 +417,6 @@ namespace NewsByTheMood.Data.Migrations
                 name: "IX_TopicUser_UsersId",
                 table: "TopicUser",
                 column: "UsersId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_Email",
-                table: "Users",
-                column: "Email",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_RightId",
-                table: "Users",
-                column: "RightId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_UserName",
-                table: "Users",
-                column: "UserName",
-                unique: true);
         }
 
         /// <inheritdoc />
@@ -315,6 +424,21 @@ namespace NewsByTheMood.Data.Migrations
         {
             migrationBuilder.DropTable(
                 name: "ArticleTag");
+
+            migrationBuilder.DropTable(
+                name: "AspNetRoleClaims");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserClaims");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserLogins");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserRoles");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
                 name: "Comments");
@@ -326,16 +450,16 @@ namespace NewsByTheMood.Data.Migrations
                 name: "Tags");
 
             migrationBuilder.DropTable(
+                name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
                 name: "Articles");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "Sources");
-
-            migrationBuilder.DropTable(
-                name: "Rights");
 
             migrationBuilder.DropTable(
                 name: "Topics");
