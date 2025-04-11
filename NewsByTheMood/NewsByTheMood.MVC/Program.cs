@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using NewsByTheMood.Data;
 using NewsByTheMood.MVC.Options;
@@ -10,7 +11,10 @@ using NewsByTheMood.Services.MVC.Mappers;
 using NewsByTheMood.Services.Options;
 using NewsByTheMood.Services.ScrapeProvider.Abstract;
 using NewsByTheMood.Services.ScrapeProvider.Implement;
+using NewsByTheMood.Services.EmailProvider;
 using Serilog;
+using Microsoft.AspNetCore.Identity;
+using NewsByTheMood.Data.Entities;
 
 namespace NewsByTheMood.MVC
 {
@@ -34,20 +38,30 @@ namespace NewsByTheMood.MVC
                 builder.Services.AddControllersWithViews();
                 builder.Services.AddRazorPages();
 
-                // Db provider service
-                builder.Services.AddDbContext<NewsByTheMoodDbContext>(
-                    opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
-
-                // Identity provider service
-                builder.Services.AddIdentity<NewsByTheMood.Data.Entities.User, Microsoft.AspNetCore.Identity.IdentityRole<Int64>>()
-                    .AddEntityFrameworkStores<NewsByTheMoodDbContext>();
-
                 // Auth service
                 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                     .AddCookie("NewsByTheMood", options =>
                     {
                         options.LoginPath = "/account/login";
                     });
+
+                // Db provider service
+                builder.Services.AddDbContext<NewsByTheMoodDbContext>(
+                    opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default1")));
+
+                // Identity provider service
+                builder.Services.AddIdentity<User, IdentityRole<Int64>>(options => 
+                    {
+                        options.SignIn.RequireConfirmedAccount = true;
+                        options.User.RequireUniqueEmail = true;
+                        options.Password.RequiredLength = 12;
+                        options.Password.RequireDigit = true;
+                        options.Password.RequireLowercase = true;
+                        options.Password.RequireUppercase = true;
+                        options.Password.RequireNonAlphanumeric = true;
+                    })
+                    .AddEntityFrameworkStores<NewsByTheMoodDbContext>()
+                    .AddDefaultTokenProviders();
 
                 // Data provider services
                 // Article service
@@ -84,8 +98,19 @@ namespace NewsByTheMood.MVC
                     builder.Services.AddSingleton<IiconService, EmptyIconService>();
                 }
 
+                // Email provider services
+                if (builder.Configuration.GetValue<bool>("UseEmailSender"))
+                {
+                    builder.Services.Configure<EmailOptions>(
+                        builder.Configuration.GetSection(EmailOptions.Position));
+                    builder.Services.AddTransient<IEmailSender, PrettyEmailSender>();
+                }
+                else
+                {
+                    builder.Services.AddTransient<IEmailSender, EmptyEmailSender>();
+                }
+
                 // Scrape provider services
-                // Article scrape service
                 builder.Services.Configure<WebScrapeOptions>(
                     builder.Configuration.GetSection(WebScrapeOptions.Position));
                 builder.Services.AddScoped<IArticleScrapeService, ArticleScrapeService>();
