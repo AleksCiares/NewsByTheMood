@@ -31,7 +31,7 @@ namespace NewsByTheMood.MVC.Components
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
-        {
+     {
             try
             {
                 var topics = (await this._topicService.GetAllAsync())
@@ -46,6 +46,7 @@ namespace NewsByTheMood.MVC.Components
                     {
                         user = new UserPreviewModel
                         {
+                            UserName = userPrincipal.UserName!,
                             DisplayedName = userPrincipal.DisplayedName,
                             AvatarUrl = userPrincipal.AvatarUrl
                         };
