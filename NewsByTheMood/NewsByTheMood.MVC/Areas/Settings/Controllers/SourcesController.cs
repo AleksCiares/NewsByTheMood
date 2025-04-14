@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
@@ -10,6 +11,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
     // Source controller
     [Area("Settings")]
     [Route("Settings/[controller]/[action]")]
+    [Authorize(Roles = "Admin")]
     public class SourcesController : Controller
     {
         private readonly ISourceService _sourceService;

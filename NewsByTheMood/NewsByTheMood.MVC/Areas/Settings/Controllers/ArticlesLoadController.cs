@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NewsByTheMood.Services.DataProvider.Abstract;
 using NewsByTheMood.Services.ScrapeProvider.Abstract;
 
@@ -6,6 +7,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 {
     [Area("Settings")]
     [Route("Settings/[controller]/[action]")]
+    [Authorize(Roles = "Admin,Editor")]
     public class ArticlesLoadController : Controller
     {
         private readonly IArticleScrapeService _articleLoadService;

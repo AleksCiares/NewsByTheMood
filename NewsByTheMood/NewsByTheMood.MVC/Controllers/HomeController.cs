@@ -1,7 +1,11 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using NewsByTheMood.Data.Entities;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
+using NewsByTheMood.Services.Mappers;
 using NewsByTheMood.Services.MVC.Mappers;
 
 namespace NewsByTheMood.MVC.Controllers
@@ -13,16 +17,22 @@ namespace NewsByTheMood.MVC.Controllers
         private readonly ITopicService _topicService;
         private readonly ILogger<HomeController> _logger;
         private readonly ArticlesMapper _articleMapper;
-        private readonly short _defaultPositivity = 0;
+        private readonly UsersMapper _userMapper;
+        private readonly UserManager<User> _userManager;
 
         public HomeController(IArticleService articleService, 
-            ITopicService topicService, ILogger<HomeController> 
-            logger, ArticlesMapper articleMapper)
+            ITopicService topicService, 
+            ILogger<HomeController> logger, 
+            ArticlesMapper articleMapper,
+            UsersMapper userMapper,
+            UserManager<User> userManager)
         {
             _articleService = articleService;
             _topicService = topicService;
             _logger = logger;
             _articleMapper = articleMapper;
+            _userMapper = userMapper;
+            _userManager = userManager;
         }
 
         // Get range of articles previews
@@ -31,13 +41,14 @@ namespace NewsByTheMood.MVC.Controllers
         {
             try
             {
-                var totalArticles = await _articleService.CountAsync(_defaultPositivity);
+                var user = await GetCurrentUserModelAsync();
+                var totalArticles = await _articleService.CountAsync(user.PreferedPositivity);
                 var articlesPreviews = Array.Empty<ArticlePreviewModel>();
 
                 if (totalArticles > 0)
                 {
                     articlesPreviews = (await _articleService.GetRangeLatestAsync(
-                        _defaultPositivity,
+                        user.PreferedPositivity,
                         pagination.Page,
                         pagination.PageSize))
                         .Select(article => _articleMapper.ArticleToArticlePreviewModel(article))
@@ -91,13 +102,14 @@ namespace NewsByTheMood.MVC.Controllers
                     return BadRequest();
                 }
 
-                var totalArticles = await _articleService.CountByTopicAsync(_defaultPositivity, topic.Id);
+                var user = await GetCurrentUserModelAsync();
+                var totalArticles = await _articleService.CountByTopicAsync(user.PreferedPositivity, topic.Id);
                 var articlesPreviews = Array.Empty<ArticlePreviewModel>();
 
                 if (totalArticles > 0)
                 {
                     articlesPreviews = (await _articleService.GetRangeByTopicAsync(
-                        _defaultPositivity,
+                        user.PreferedPositivity,
                         topic.Id,
                         pagination.Page,
                         pagination.PageSize))
@@ -139,7 +151,64 @@ namespace NewsByTheMood.MVC.Controllers
             }
         }
 
+        // Get favorite articles
+        [HttpGet("favorite")]
+        [Authorize]
+        public async Task<IActionResult> Favorites([FromQuery] PaginationModel pagination)
+        {
+            try
+            {
+                var user = await GetCurrentUserModelAsync();
+                var totalArticles = await _articleService.CountFavoriteAsync(user.PreferedPositivity, user.TopicsIds);
+                var articlesPreviews = Array.Empty<ArticlePreviewModel>();
+
+                if (totalArticles > 0)
+                {
+                    articlesPreviews = (await _articleService.GetRangeFavoriteAsync(
+                        user.PreferedPositivity,
+                        user.TopicsIds,
+                        pagination.Page,
+                        pagination.PageSize))
+                        .Select(article => _articleMapper.ArticleToArticlePreviewModel(article))
+                        .ToArray();
+
+                    _logger.LogDebug($"Articles were fetch successfully");
+                }
+                else
+                {
+                    _logger.LogDebug("No articles were found");
+                }
+
+                if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return PartialView("_ArticlePreviewsPartial", articlesPreviews);
+                }
+                else
+                {
+                    return View("Index", new ArticlePreviewCollectionModel()
+                    {
+                        Articles = articlesPreviews!,
+                        PageInfo = new PageInfoModel()
+                        {
+                            Page = pagination.Page,
+                            PageSize = pagination.PageSize,
+                            TotalItems = totalArticles,
+                        },
+                        PageTitle = "Favorites"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while getting favorite articles. " +
+                    $"Page: {pagination.Page}, " +
+                    $"PageSize: {pagination.PageSize}, ");
+                return StatusCode(500);
+            }
+        }
+
         // Get certain article
+
         [HttpGet("detail/{id:required}")]
         public async Task<IActionResult> Detail([FromRoute] string id)
         {
@@ -165,6 +234,17 @@ namespace NewsByTheMood.MVC.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        [NonAction]
+        private async Task<UserModel> GetCurrentUserModelAsync() // не подт€гивает топики
+        {
+            if (HttpContext.User.Identity?.IsAuthenticated == true)
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                return _userMapper.UserToUserModel(user) ?? new UserModel();
+            }
+            return new UserModel();
         }
     }
 }

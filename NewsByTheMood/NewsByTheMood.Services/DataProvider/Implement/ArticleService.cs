@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using NewsByTheMood.CQS.Commands;
 using NewsByTheMood.CQS.Queries;
 using NewsByTheMood.Data.Entities;
+using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
 
 namespace NewsByTheMood.Services.DataProvider.Implement
@@ -70,10 +71,40 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             return await _mediator.Send(new GetArticlesRangeByTopicQuery() 
             { 
                 Positivity = positivity, 
-                TopicId = topicId, Page = pageNumber, 
+                TopicId = topicId, 
+                Page = pageNumber, 
                 PageSize = pageSize 
             }, 
             cancellationToken);
+        }
+
+        public async Task<int> CountFavoriteAsync(short positivity, IEnumerable<long> topicsIds, CancellationToken cancellationToken = default)
+        {
+            if (positivity < 0)
+            {
+                _logger.LogWarning($"Positivity is less than 0 or topicId is less than or equal to 0. Positivity: {positivity}");
+                return 0;
+            }
+
+            return await _mediator.Send(new GetArticlesCountByFavoriteQuery() { Positivity = positivity, TopicIds = topicsIds });
+        }
+
+        public async Task<IEnumerable<Article>> GetRangeFavoriteAsync(short positivity, IEnumerable<long> topicsIds, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        {
+            if (positivity < 0 || pageNumber <= 0 || pageSize <= 0)
+            {
+                _logger.LogWarning($"Positivity is less than 0 or topicId is less than or equal to 0 or pageNumber/pageSize is less than or equal to 0. Positivity: " +
+                    $"{positivity}, PageNumber: {pageNumber}, PageSize: {pageSize}");
+                return Array.Empty<Article>();
+            }
+
+            return await _mediator.Send(new GetArticlesRangeByFavoriteQuery() 
+            { 
+                Page = pageNumber,
+                PageSize = pageSize,
+                TopicIds = topicsIds,
+                Positivity = positivity
+            });
         }
 
         public async Task<Article?> GetByIdAsync(Int64 id, CancellationToken cancellationToken = default)

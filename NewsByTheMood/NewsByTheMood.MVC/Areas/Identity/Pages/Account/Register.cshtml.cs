@@ -108,9 +108,19 @@ namespace NewsByTheMood.MVC.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
 
+                // Additional properties
+                user.DisplayedName = "User" + new Random(1000000).Next().ToString();
+                user.RegDate = DateTime.Now;
+                user.PreferedPositivity = 0;
+                user.AvatarUrl = "/storage/usericons/default.webp";
+                //
+
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
+                
+                // Add user to role
+                await _userManager.AddToRoleAsync(user, "User");
 
                 if (result.Succeeded)
                 {

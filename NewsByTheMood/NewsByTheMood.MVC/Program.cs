@@ -15,12 +15,13 @@ using NewsByTheMood.Services.EmailProvider;
 using Serilog;
 using Microsoft.AspNetCore.Identity;
 using NewsByTheMood.Data.Entities;
+using NewsByTheMood.Services.Mappers;
 
 namespace NewsByTheMood.MVC
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             try
             {
@@ -42,7 +43,7 @@ namespace NewsByTheMood.MVC
                 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                     .AddCookie("NewsByTheMood", options =>
                     {
-                        options.LoginPath = "/account/login";
+                        options.LoginPath = "/identity/account/login";
                     });
 
                 // Db provider service
@@ -84,6 +85,7 @@ namespace NewsByTheMood.MVC
                 builder.Services.AddTransient<ArticlesMapper>();
                 builder.Services.AddTransient<SourcesMapper>();
                 builder.Services.AddTransient<TopicsMapper>();
+                builder.Services.AddTransient<UsersMapper>();
 
                 // File provider services
                 // Icons service
@@ -140,6 +142,11 @@ namespace NewsByTheMood.MVC
                 app.UseAuthentication();
                 app.UseAuthorization();
 
+                /*app.MapControllerRoute(
+                    name: "settings",
+                    pattern: "settings/{controller=Home}/{action=Index}/{id?}",
+                    defaults: new { area = "Settings" });*/
+
                 app.MapAreaControllerRoute(
                     name: "AreaSettings",
                     areaName: "Settings",
@@ -151,8 +158,14 @@ namespace NewsByTheMood.MVC
 
                 app.MapRazorPages();
 
+                using (var scope = app.Services.CreateScope())
+                {
+                   await scope.ServiceProvider.GetRequiredService<NewsByTheMoodDbContext>()
+                        .SeedRolesAndSuperAdmin(scope.ServiceProvider);
+                }
+
                 Log.Information("Host Started");
-                app.Run();
+                await app.RunAsync();
             }
             catch (Exception ex)
             {

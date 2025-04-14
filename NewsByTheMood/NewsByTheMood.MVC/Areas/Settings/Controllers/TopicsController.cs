@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
@@ -10,6 +11,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
     // Topics controller
     [Area("Settings")]
     [Route("Settings/[controller]/[action]")]
+    [Authorize(Roles = "Admin")]
     public class TopicsController : Controller
     {
         private readonly ITopicService _topicService;

@@ -4,10 +4,10 @@ namespace NewsByTheMood.Data.Entities
 {
     public class User : IdentityUser<Int64>
     {
-        public string DisplayedName { get; set; } = "Temp";
-        public short PreferedPositivity { get; set; } = 1;
+        public string DisplayedName { get; set; }
+        public short PreferedPositivity { get; set; } 
         public DateTime RegDate { get; set; }
-        public string AvatarUrl { get; set; } = "Temp";
+        public string AvatarUrl { get; set; }
 
         // nav property
         public List<Comment> Comments { get; set; }

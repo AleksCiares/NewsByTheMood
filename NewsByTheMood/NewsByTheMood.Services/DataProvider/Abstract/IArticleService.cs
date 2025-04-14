@@ -1,4 +1,5 @@
 ﻿using NewsByTheMood.Data.Entities;
+using NewsByTheMood.MVC.Models;
 
 namespace NewsByTheMood.Services.DataProvider.Abstract
 {
@@ -16,6 +17,12 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
 
         // Get latest articles range with certain positivity and topic
         public Task<IEnumerable<Article>> GetRangeByTopicAsync(short positivity, Int64 topicId, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+
+        // Get article count with certain positivity and topics
+        public Task<int> CountFavoriteAsync(short positivity, IEnumerable<long> topicsIds, CancellationToken cancellationToken = default);
+
+        // Get latest articles range with certain positivity and topics
+        public Task<IEnumerable<Article>> GetRangeFavoriteAsync(short positivity, IEnumerable<long> topicsIds, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 
         // Get article by certain id
         public Task<Article?> GetByIdAsync(Int64 id, CancellationToken cancellationToken = default);
