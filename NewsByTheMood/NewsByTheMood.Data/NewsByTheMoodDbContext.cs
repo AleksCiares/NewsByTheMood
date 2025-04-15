@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using NewsByTheMood.Core.Settings;
 using NewsByTheMood.Data.Entities;
 
 namespace NewsByTheMood.Data
@@ -29,14 +30,16 @@ namespace NewsByTheMood.Data
             base.OnModelCreating(builder);
         }
 
-        public async Task SeedRolesAndSuperAdmin(IServiceProvider serviceProvider)
+        public async Task SeedData(IServiceProvider serviceProvider, InitialData initialData)
+        {
+            await SeedRoles(serviceProvider);
+            await SeedUsers(serviceProvider, initialData.User);
+        }
+
+        private async Task SeedRoles(IServiceProvider serviceProvider)
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole<long>>>();
-            var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
-
-            string[] roleNames = { "Admin", "Editor", "User" };
-
-            foreach (var roleName in roleNames)
+            foreach (var roleName in AccessLevels.AllRoles)
             {
                 if (!await roleManager.RoleExistsAsync(roleName))
                 {
@@ -46,28 +49,30 @@ namespace NewsByTheMood.Data
                     });
                 }
             }
+        }
 
-            var adminEmail = "admin@admin.com";
-            var adminPassword = "Admin@12345678";
+        private async Task SeedUsers(IServiceProvider serviceProvider, InitialUser user)
+        {
+            var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
 
-            var admin = await userManager.FindByEmailAsync(adminEmail);
+            var admin = await userManager.FindByNameAsync(user.UserName);
             if (admin == null)
             {
                 admin = new User
                 {
-                    UserName = adminEmail,
-                    Email = adminEmail,
+                    UserName = user.UserName,
+                    Email = user.Email,
                     EmailConfirmed = true,
-                    DisplayedName = "Admin",
+                    DisplayedName = user.DisplayedName,
                     RegDate = DateTime.Now,
-                    PreferedPositivity = 1,
-                    AvatarUrl = "/storage/usericons/default.webp"
+                    PreferedPositivity = 0,
+                    AvatarUrl = "/storage/usericons/default/default.webp",
                 };
 
-                var result = await userManager.CreateAsync(admin, adminPassword);
+                var result = await userManager.CreateAsync(admin, user.Password);
                 if (result.Succeeded)
                 {
-                    await userManager.AddToRoleAsync(admin, "Admin");
+                    await userManager.AddToRoleAsync(admin, AccessLevels.Admininistrator);
                 }
             }
         }

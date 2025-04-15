@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using NewsByTheMood.Core.Settings;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
 using NewsByTheMood.Services.MVC.Mappers;
@@ -10,8 +11,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 {
     // Source controller
     [Area("Settings")]
-    [Route("Settings/[controller]/[action]")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = AccessLevels.Admininistrator)]
     public class SourcesController : Controller
     {
         private readonly ISourceService _sourceService;
@@ -121,7 +121,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         }
 
         // Edit source item
-        [HttpGet("{id:required}")]
+        [HttpGet]
         public async Task<IActionResult> Edit([FromRoute] string id)
         {
             try
@@ -148,7 +148,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         }
 
         // Edit source item proccessing
-        [HttpPost("{id:required}")]
+        [HttpPost]
         public async Task<IActionResult> Edit([FromForm] SourceSettingsEditModel sourceEdit)
         {
             try
@@ -179,7 +179,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         }
 
         // Delete source utem 
-        [HttpPost("{id:required}")]
+        [HttpPost]
         public async Task<IActionResult> Delete([FromRoute] string id)
         {
             try
@@ -210,7 +210,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             try
             {
                 var isExists = await _sourceService.IsExistsByNameAsync(source.Name);
-                if (isExists && !string.IsNullOrEmpty(source.Id))
+                if (isExists && !string.IsNullOrEmpty(source.Id) && !source.Id.Equals("0"))
                 {
                     var sourceTemp = await _sourceService.GetByIdAsync(long.Parse(source.Id));
                     if(sourceTemp != null && sourceTemp.Name.Equals(source.Name))

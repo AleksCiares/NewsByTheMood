@@ -37,5 +37,12 @@
 
 @section Scripts
 {
-    <script src="~/js/topic-edit.js" asp-append-version="true"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			$(document).on("click", ".icon-item", function () {
+				var clickedIconCssClass = $(this).attr("value");
+				$("#TopicIconCssClass").attr("value", clickedIconCssClass);
+			});
+		});
+	</script>
 }

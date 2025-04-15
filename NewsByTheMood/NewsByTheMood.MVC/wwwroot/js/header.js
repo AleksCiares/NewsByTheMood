@@ -12,6 +12,4 @@
     closeMenuButton?.addEventListener('click', function () {
         settingsMenu.style.transform = 'translateX(100%)';
     });
-
-    console.log('Header script loaded');
 });

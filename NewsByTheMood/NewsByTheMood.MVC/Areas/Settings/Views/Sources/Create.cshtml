@@ -7,7 +7,7 @@
 	<div class="source__header d-flex row mb-5">
 		<h4 class="mb-0">Create a source</h4>
 	</div>
-	<form asp-antiforgery="true" method="post">
+	<form asp-antiforgery="true" method="post" id="createSourceForm">
 		<div class="form__panel row align-items-start justify-content-between mb-4">
 			<div class="col-auto">
 				<button asp-area="settings" asp-controller="sources" asp-action="create" class="btn btn-outline-primary" type="submit">Submit</button>
@@ -25,5 +25,14 @@
 	</form>
 </div>
 @section Scripts {
-	<script src="~/js/source-edit.js" asp-append-version="true"></script>
+	<script src="~/js/SelectItemModelCollector.js" asp-append-version="true"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			let selectItemModelCollector = new SelectItemModelCollector('createSourceForm');
+			selectItemModelCollector.setModelItems('#topics-single-select option', '@(nameof(Model.Topics))');
+			document.getElementById('createSourceForm').addEventListener('submit', function (event) {
+				selectItemModelCollector.collectModels();
+			});
+		});
+	</script>
 }

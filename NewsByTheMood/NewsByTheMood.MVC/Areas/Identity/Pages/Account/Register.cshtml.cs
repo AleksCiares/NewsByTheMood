@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using NewsByTheMood.Core.Settings;
 using NewsByTheMood.Data.Entities;
 
 namespace NewsByTheMood.MVC.Areas.Identity.Pages.Account
@@ -64,6 +65,10 @@ namespace NewsByTheMood.MVC.Areas.Identity.Pages.Account
         /// </summary>
         public class InputModel
         {
+            [Required]
+            [StringLength(100, MinimumLength = 3, ErrorMessage = "The username must be between 3 and 100 characters.")]
+            [Display(Name = "Username")]
+            public string UserName { get; set; }
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -108,23 +113,16 @@ namespace NewsByTheMood.MVC.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
 
-                // Additional properties
-                user.DisplayedName = "User" + new Random(1000000).Next().ToString();
-                user.RegDate = DateTime.Now;
-                user.PreferedPositivity = 0;
-                user.AvatarUrl = "/storage/usericons/default.webp";
-                //
-
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+                await _userStore.SetUserNameAsync(user, Input.UserName, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
-                
-                // Add user to role
-                await _userManager.AddToRoleAsync(user, "User");
 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User created a new account with password.");
+                    // Add user to role
+                    await _userManager.AddToRoleAsync(user, AccessLevels.User);
+
+                    _logger.LogInformation($"User {Input.UserName} created a new account with password.");
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -162,7 +160,12 @@ namespace NewsByTheMood.MVC.Areas.Identity.Pages.Account
         {
             try
             {
-                return Activator.CreateInstance<User>();
+                var user = Activator.CreateInstance<User>();
+                user.DisplayedName = Input.UserName;
+                user.RegDate = DateTime.Now;
+                user.PreferedPositivity = 0;
+                user.AvatarUrl = "/storage/usericons/default/default.webp";
+                return user;
             }
             catch
             {

@@ -69,14 +69,14 @@
                                     <a asp-area="identity" asp-page="/account/manage/index" class="text-dark text-decoration-none">Manage account</a>
                                 </li>
                                 <hr />
-                                @if (User.IsInRole("Editor"))
+                                @if (User.IsInRole(AccessLevels.Editor))
                                 {
                                     <li>
                                         <a asp-area="settings" asp-controller="articles" asp-action="index" class="text-dark text-decoration-none">Articles editor</a>
                                     </li>
                                     <hr />
                                 }
-                                @if (User.IsInRole("Admin"))
+                                @if (User.IsInRole(AccessLevels.Admininistrator))
                                 {
                                     <li>
                                         <a asp-area="settings" asp-controller="main" asp-action="index" class="text-dark text-decoration-none">Server settings</a>

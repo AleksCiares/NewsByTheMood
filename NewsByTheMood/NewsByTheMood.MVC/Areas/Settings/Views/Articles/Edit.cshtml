@@ -7,7 +7,7 @@
 	<div class="article__header d-flex row mb-5">
 		<h4 class="mb-0">@Model.Article.Title</h4>
 	</div>
-	<form asp-antiforgery="true" method="post">
+	<form asp-antiforgery="true" method="post" id="editArticleForm">
 		<div class="form__panel row align-items-start justify-content-between mb-4">
 			<div class="col-auto">
 				<button asp-area="settings" asp-controller="articles" asp-action="edit" type="submit" class="btn btn-outline-primary">Submit</button>
@@ -30,5 +30,56 @@
 
 @section Scripts {
     <script src="~/js/CommonModal.js" asp-append-version="true"></script>
-	<script src="~/js/article-edit.js" asp-append-version="true"></script>
+	<script src="~/js/SelectItemModelCollector.js" asp-append-version="true"></script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			var textarea = document.querySelector('#articleFormBody');
+			if (textarea) {
+				textarea.style.height = 'auto';
+				textarea.style.height = (textarea.scrollHeight) + 'px';
+
+				textarea.addEventListener('input', function () {
+					this.style.height = 'auto';
+					this.style.height = (this.scrollHeight) + 'px';
+				});
+			}
+
+			var tagSearch = document.getElementById('articleFormTagsSearch');
+			var tagSelect = document.getElementById('tags-multiple-select');
+			tagSearch.addEventListener('input', function () {
+				var filter = tagSearch.value.toLowerCase();
+				var options = tagSelect.options;
+
+				for (var i = 0; i < options.length; i++) {
+					var option = options[i];
+					var text = option.text.toLowerCase();
+
+					if (text.includes(filter)) {
+						option.style.display = '';
+					} else {
+						option.style.display = 'none';
+					}
+				}
+			});
+
+			let selectItemModelCollector = new SelectItemModelCollector('editArticleForm');
+			selectItemModelCollector.setModelItems('#tags-multiple-select option', '@(nameof(Model.Tags))');
+			selectItemModelCollector.setModelItems('#tags-multiple-select option:checked', 'Article.Tags');
+			selectItemModelCollector.setModelItems('#sources-single-select option', '@(nameof(Model.Sources))');
+			document.getElementById('editArticleForm').addEventListener('submit', function (event) {
+				selectItemModelCollector.collectModels();
+			});
+
+			let modal = new CommonModal(
+				'Delete Article',
+				'Are you sure to delete this article?',
+				'deleteArticle');
+			modal.setCancelButton('Cancel', 'btn-secondary');
+			modal.setConfirmButton('Confirm', 'btn-danger', () => {
+				let form = document.getElementById('editArticleForm');
+				form.action = form.action.replace('edit', 'delete');
+				form.submit();
+			});
+		});
+	</script>
 }

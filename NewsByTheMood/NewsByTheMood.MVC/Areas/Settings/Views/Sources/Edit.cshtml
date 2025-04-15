@@ -36,22 +36,37 @@
 </div>
 
 @section Scripts {
-	<script src="~/js/source-edit.js" asp-append-version="true"></script>
-    <script src="~/js/CommonModal.js" asp-append-version="true"></script>
-
+	@{
+		var message = "";
+		@if (Model.RelatedArticlesCount > 0)
+		{
+			message = $"This source has {Model.RelatedArticlesCount} related articles. All related articles will be deleted. Are you sure to delete it?";
+		}
+		else
+		{
+			message = "Are you sure to delete this source?";
+		}
+	}
+	<script src="~/js/CommonModal.js" asp-append-version="true"></script>
+	<script src="~/js/SelectItemModelCollector.js" asp-append-version="true"></script>
 	<script>
-		   document.addEventListener('DOMContentLoaded', () => {
-		   let modal = new CommonModal(
-			   'Confirm Deletion',
-			   'This source has @(Model.RelatedArticlesCount) related articles. All related articles will be deleted. Are you sure you want to delete it?',
-			   'Cancel',
-			   'Delete',
-			   'deleteSourceButton',
-			   () => {
-				   let form = document.getElementById('editSourceForm');
-				   form.action = form.action.replace('edit', 'delete');
-				   form.submit();
-			   });
+		document.addEventListener('DOMContentLoaded', function () {
+			let selectItemModelCollector = new SelectItemModelCollector('editSourceForm');
+			selectItemModelCollector.setModelItems('#topics-single-select option', '@(nameof(Model.Topics))');
+			document.getElementById('editSourceForm').addEventListener('submit', function (event) {
+				selectItemModelCollector.collectModels();
+			});
+
+			let modal = new CommonModal(
+				'Confirm Deletion',
+				'@(message)',
+				'deleteSourceButton');
+			modal.setCancelButton('Cancel', 'btn-secondary');
+			modal.setConfirmButton('Confirm', 'btn-danger', () => {
+				let form = document.getElementById('editSourceForm');
+				form.action = form.action.replace('edit', 'delete');
+				form.submit();
+			});
 		});
-	</script>	
+	</script>
 }

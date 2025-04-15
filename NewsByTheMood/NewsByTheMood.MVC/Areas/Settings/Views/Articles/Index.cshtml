@@ -8,10 +8,13 @@
         <h4 class="mb-0">Articles</h4>
     </div>
     <div class="articles__table mb-4">
-        <form asp-area="settings" asp-controller="articles" asp-action="delete" asp-antiforgery="true" method="post">
+        <form asp-area="settings" asp-controller="articles" asp-action="deleterange" asp-antiforgery="true" 
+            method="post" id="deleteArticlesForm">
             <div class="articles__panel row align-items-start justify-content-between mb-4">
                 <div class="col-auto">
-                    <a asp-area="settings" asp-controller="articles" asp-action="create" class="btn btn-outline-primary">Create</a>
+                    <a asp-area="settings" asp-controller="articles" asp-action="create" class="btn btn-outline-primary">
+                        Create
+                    </a>
                 </div>
                 <div class="col-auto">
                     <button type="submit" class="btn btn-danger" id="deleteSelectedArticles" disabled>Delete selected</button>
@@ -35,7 +38,7 @@
                     @foreach (var articlePreview in Model.Articles)
                     {
                         <tr>
-                             <td>
+                            <td>
                                 <input type="checkbox" name="ids" value="@articlePreview.Id" class="selectArticle" />
                             </td>
                             <th scope="row">
@@ -75,7 +78,35 @@
         </div>
     }
 </div>
+
 @section Scripts {
     <script src="~/js/CommonModal.js" asp-append-version="true"></script>
-    <script src="~/js/article-index.js" asp-append-version="true"></script>
+    <script>
+        function toggleDeleteButton() {
+            document.getElementById('deleteSelectedArticles').disabled = (document.querySelectorAll('.selectArticle:checked').length === 0);
+        }
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById('selectAllArticles').addEventListener('change', el => {
+                let checkboxes = document.querySelectorAll('.selectArticle');
+                for (let checkbox of checkboxes) {
+                    checkbox.checked = el.currentTarget.checked;
+                }
+                toggleDeleteButton();
+            });
+            document.querySelectorAll('.selectArticle').forEach(checkbox => {
+                checkbox.addEventListener('change', toggleDeleteButton);
+            });
+            toggleDeleteButton();
+
+            let modal = new CommonModal(
+                'Confirm Deletion',
+                'Are you sure to delete the selected articles?',
+                'deleteSelectedArticles');
+            modal.setCancelButton('Cancel', 'btn-secondary');
+            modal.setConfirmButton('Confirm', 'btn-danger', () => {
+                let form = document.getElementById('deleteArticlesForm');
+                form.submit();
+            });
+        });
+    </script>
 }

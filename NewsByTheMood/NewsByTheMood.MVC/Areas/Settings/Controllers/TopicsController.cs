@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using NewsByTheMood.Core.Settings;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
 using NewsByTheMood.Services.MVC.Mappers;
@@ -10,8 +11,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 {
     // Topics controller
     [Area("Settings")]
-    [Route("Settings/[controller]/[action]")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = AccessLevels.Admininistrator)]
     public class TopicsController : Controller
     {
         private readonly ITopicService _topicService;
@@ -115,8 +115,8 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             }
         }
 
-        // Edit topic item
-        [HttpGet("{id:required}")]
+        // Edit topic items
+        [HttpGet]
         public async Task<IActionResult> Edit([FromRoute] string id)
         {
             try
@@ -142,7 +142,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         }
 
         // Edit topic item proccessing
-        [HttpPost("{id:required}")]
+        [HttpPost]
         public async Task<IActionResult> Edit([FromForm] TopicSettingsEditModel topicEdit)
         {
             try
@@ -173,7 +173,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         }
 
         // Delete topic item
-        [HttpPost("{id:required}")]
+        [HttpPost]
         public async Task<IActionResult> Delete([FromRoute] string id)
         {
             try
@@ -204,7 +204,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             try
             {
                 var isEXists = await _topicService.IsExistsByNameAsync(topic.Name);
-                if (isEXists && !topic.Name.IsNullOrEmpty())
+                if (isEXists && !topic.Name.IsNullOrEmpty() && !topic.Id.Equals("0"))
                 {
                     var topicTemp = await _topicService.GetByIdAsync(long.Parse(topic.Id));
                     if(topicTemp != null && topicTemp.Name.Equals(topic.Name))

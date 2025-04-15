@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NewsByTheMood.Core.Settings;
 using NewsByTheMood.Services.DataProvider.Abstract;
 using NewsByTheMood.Services.ScrapeProvider.Abstract;
 
 namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 {
     [Area("Settings")]
-    [Route("Settings/[controller]/[action]")]
-    [Authorize(Roles = "Admin,Editor")]
+    [Authorize(Roles = $"{AccessLevels.Admininistrator},{AccessLevels.Editor}")]
     public class ArticlesLoadController : Controller
     {
         private readonly IArticleScrapeService _articleLoadService;
@@ -21,7 +21,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             _logger = logger;
         }
 
-        [HttpGet("{id:required}")]
+        [HttpGet]
         public async Task<IActionResult> LoadArticles(string id)
         {
             try

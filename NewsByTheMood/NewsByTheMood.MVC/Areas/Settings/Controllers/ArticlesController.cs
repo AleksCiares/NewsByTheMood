@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using NewsByTheMood.Core.Settings;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
 using NewsByTheMood.Services.MVC.Mappers;
@@ -10,8 +11,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 {
     // Articles controller
     [Area("Settings")]
-    [Route("Settings/[controller]/[action]")]
-    [Authorize(Roles = "Admin,Editor")]
+    [Authorize(Roles = AccessLevels.Admininistrator)]
     public class ArticlesController : Controller
     {
         private readonly IArticleService _articleService;
@@ -129,7 +129,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         }
 
         // Edit article item
-        [HttpGet("{id:required}")]
+        [HttpGet]
         public async Task<IActionResult> Edit([FromRoute] string id)
         {
             try
@@ -157,7 +157,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         }
 
         // Edit article item proccessing
-        [HttpPost("{id:required}")]
+        [HttpPost]
         public async Task<IActionResult> Edit([FromForm] ArticleSettingsEditModel articleEdit)
         {
             try
@@ -188,7 +188,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         }
 
         // Delete article item
-        [HttpPost("{id:required}")]
+        [HttpPost]
         public async Task<IActionResult> Delete([FromRoute] string id)
         {
             try
@@ -215,7 +215,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 
         // Delete article range
         [HttpPost]
-        public async Task<IActionResult> Delete([FromForm] string[] ids)
+        public async Task<IActionResult> DeleteRange([FromForm] string[] ids)
         {
             try
             {
@@ -247,7 +247,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             try
             {
                 var isExists = await _articleService.IsExistsByUrlAsync(article.Url);
-                if (isExists && !string.IsNullOrEmpty(article.Id))
+                if (isExists && !string.IsNullOrEmpty(article.Id) && !article.Id.Equals("0"))
                 {
                     var articleTemp = await _articleService.GetByIdAsync(long.Parse(article.Id));
                     if (articleTemp != null && articleTemp.Url.Equals(article.Url))

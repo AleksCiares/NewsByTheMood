@@ -1,8 +1,9 @@
 ﻿class CommonModal{
 	#modalHtml;
     #modal;
+    #buttons = [];
 
-	constructor(modalLabelText, modalBodyText, modalCancelText, modalSubmitText, preventElementId, submitEventHandler) {
+	constructor(modalLabelText, modalBodyText, preventElementId) {
         this.#modalHtml = `<div class="modal fade" id="commonModal" tabindex="-1" aria-labelledby="commonModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
@@ -13,9 +14,7 @@
                                 <div class="modal-body" id="commonModalBody">
                                     ${modalBodyText}
                                 </div>
-                                <div class="modal-footer">
-                                    <button id="commonModalCancel" type="button" class="btn btn-secondary" data-bs-dismiss="modal">${modalCancelText}</button>
-                                    <button id="commonModalSubmit" type="button" class="btn btn-danger">${modalSubmitText}</button>
+                                <div id="commonModalButtonContainer" class="modal-footer">
                                 </div>
                             </div>
                         </div>
@@ -31,14 +30,27 @@
                 this.#modal.show();
             });
         }
+    }
 
-        let submitButton = document.getElementById("commonModalSubmit");
-        submitButton.addEventListener("click", (e) => {
-            e.preventDefault();
-            if (submitEventHandler) {
-                submitEventHandler();
-            }
-            this.#modal.hide();
-        });
+    setCancelButton(buttonText, buttonCssClass) {
+        let buttonContaier = document.getElementById("commonModalButtonContainer");
+        buttonContaier.insertAdjacentHTML("beforeend", `<button id="commonModalButtonCancel" type="button" class="btn ${buttonCssClass}" data-bs-dismiss="modal">${buttonText}</button>`);
+    }
+
+    setConfirmButton(buttonText, buttonCssClass, eventHandler) {
+        let buttonContaier = document.getElementById("commonModalButtonContainer");
+
+        let buttonId = `commonModalButton${this.#buttons.length}`;
+        this.#buttons.push(buttonId);
+        buttonContaier.insertAdjacentHTML("beforeend", `<button id="${this.#buttons[this.#buttons.length - 1]}" type="button" class="btn ${buttonCssClass}" >${buttonText}</button>`);
+
+        let button = document.getElementById(this.#buttons[this.#buttons.length - 1]);
+        if (eventHandler) {
+            button.addEventListener("click", (e) => {
+                e.preventDefault();
+                eventHandler();
+                this.#modal.hide();
+            });
+        }
     }
 }

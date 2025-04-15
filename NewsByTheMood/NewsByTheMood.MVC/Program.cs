@@ -39,16 +39,9 @@ namespace NewsByTheMood.MVC
                 builder.Services.AddControllersWithViews();
                 builder.Services.AddRazorPages();
 
-                // Auth service
-                builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                    .AddCookie("NewsByTheMood", options =>
-                    {
-                        options.LoginPath = "/identity/account/login";
-                    });
-
                 // Db provider service
                 builder.Services.AddDbContext<NewsByTheMoodDbContext>(
-                    opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default1")));
+                    opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
                 // Identity provider service
                 builder.Services.AddIdentity<User, IdentityRole<Int64>>(options => 
@@ -63,6 +56,22 @@ namespace NewsByTheMood.MVC
                     })
                     .AddEntityFrameworkStores<NewsByTheMoodDbContext>()
                     .AddDefaultTokenProviders();
+
+                builder.Services.ConfigureApplicationCookie(options =>
+                {
+                    options.LoginPath = "/identity/account/login";
+                    options.AccessDeniedPath = "/identity/account/accessdenied";
+                    options.SlidingExpiration = true;
+                    options.ExpireTimeSpan = TimeSpan.FromDays(30);
+                });
+
+                // Auth service
+                /*builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                    .AddCookie("NewsByTheMood", options =>
+                    {
+                        options.LoginPath = "/Identity/Account/Login";
+                        options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+                    });*/
 
                 // Data provider services
                 // Article service
@@ -142,26 +151,30 @@ namespace NewsByTheMood.MVC
                 app.UseAuthentication();
                 app.UseAuthorization();
 
-                /*app.MapControllerRoute(
-                    name: "settings",
-                    pattern: "settings/{controller=Home}/{action=Index}/{id?}",
-                    defaults: new { area = "Settings" });*/
-
+                // Map settings for application
                 app.MapAreaControllerRoute(
-                    name: "AreaSettings",
+                    name: "settings_area",
                     areaName: "Settings",
-                    pattern: "Settings/{controller=Home}/{action=Index}/{id?}");
-
+                    pattern: "settings/{controller=Home}/{action=Index}/{id?}");
                 app.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-
                 app.MapRazorPages();
 
+                // Seed database with init datas
                 using (var scope = app.Services.CreateScope())
                 {
                    await scope.ServiceProvider.GetRequiredService<NewsByTheMoodDbContext>()
-                        .SeedRolesAndSuperAdmin(scope.ServiceProvider);
+                        .SeedData(scope.ServiceProvider, new Core.Settings.InitialData()
+                        { 
+                           User = new Core.Settings.InitialUser()
+                           { 
+                               DisplayedName = "Admin",
+                               UserName = "SuperPuperAdmin",
+                               Email = "admin@admin.com",
+                               Password = "SuperPuperAdmin1234567890!",
+                           }
+                        });
                 }
 
                 Log.Information("Host Started");

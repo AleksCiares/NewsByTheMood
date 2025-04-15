@@ -45,31 +45,41 @@
 </div>
 
 @section Scripts
- {
-	<script src="~/js/topic-edit.js" asp-append-version="true"></script>
-    <script src="~/js/CommonModal.js" asp-append-version="true"></script>
+{
+	<script src="~/js/CommonModal.js" asp-append-version="true"></script>
 	<script>
-		document.addEventListener('DOMContentLoaded', () => {
-			let deleteButton = document.getElementById('deleteTopicButton');
-			let relatedSourceCount = @Model.RelatedSourceCount;
-
-			if (relatedSourceCount > 0) {
-				deleteButton.disabled = true;
-				deleteButton.title = 'This topic has related sources. First of all delete related sources.';
-			} else {
-				let modal = new CommonModal(
-					'Confirm Deletion',
-					'Are you sure you want to delete this topic?',
-					'Cancel',
-					'Delete',
-					'deleteTopicButton',
-					() => {
-						let form = document.getElementById('editTopicForm');
-						form.action = form.action.replace('edit', 'delete');
-						form.submit();
-					});
-			}
+		document.addEventListener('DOMContentLoaded', function () {
+			$(document).on("click", ".icon-item", function () {
+				var clickedIconCssClass = $(this).attr("value");
+				$("#TopicIconCssClass").attr("value", clickedIconCssClass);
+			});
 		});
 	</script>
-}
+
+	
+	@if (Model.RelatedSourceCount == 0)
+	{
+		<script>
+			let modal = new CommonModal(
+				'Delete topic', 
+				'Are you sure to delete this topic?', 
+				'deleteTopicButton');
+			modal.setCancelButton('Cancel', 'btn-secondary');
+			modal.setConfirmButton('Confirm', 'btn-danger', () => {
+				let form = document.getElementById('editTopicForm');
+				form.action = form.action.replace('edit', 'delete');
+				form.submit();
+			})
+		</script>
+	}
+	else
+	{
+		<script>
+			let modal = new CommonModal(
+				'Delete topic', 
+				'Cannot delete Topic with related sources. Please delete related sources first', 
+				'deleteTopicButton');
+			modal.setCancelButton('Cancel', 'btn-secondary');
+		</script>
+	}
 }
