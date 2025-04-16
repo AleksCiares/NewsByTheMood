@@ -1,43 +1,33 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using NewsByTheMood.Data;
+﻿using System.Linq;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.DataProvider.Abstract;
 
 namespace NewsByTheMood.Services.DataProvider.Implement
 {
     public class UserService : IUserService
     {
-        private readonly NewsByTheMoodDbContext _dbContext;
+        private readonly UserManager<User> _userManager;
 
-        public UserService(NewsByTheMoodDbContext dbContext)
+        public UserService(UserManager<User> userManager)
         {
-            _dbContext = dbContext;
+            _userManager = userManager;
         }
 
-        public async Task<bool> IsEmailExistsAsync(string email)
+        public async Task<User?> GetUserAsync(ClaimsPrincipal userPrincipal)
         {
-            if (email.IsNullOrEmpty())
+            var user = await _userManager.GetUserAsync(userPrincipal);
+            if (user != null)
             {
-                return false;
+                var topics = (await _userManager.Users
+                    .Include(u => u.Topics)
+                    .FirstAsync(u => u.Id == user.Id))
+                    .Topics;
             }
 
-            return await this._dbContext.Users
-                .AsNoTracking()
-                .Where(u => u.Email.Equals(email))
-                .AnyAsync();
-        }
-
-        public  async Task<bool> IsUserNameExistsAsync(string username)
-        {
-            if (username.IsNullOrEmpty())
-            {
-                return false;
-            }
-
-            return await this._dbContext.Users
-                .AsNoTracking()
-                .Where(u => u.UserName.Equals(username))
-                .AnyAsync();
+            return user;
         }
     }
 }

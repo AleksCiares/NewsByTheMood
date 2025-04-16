@@ -1,32 +1,30 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using NewsByTheMood.Data.Entities;
+﻿using Microsoft.AspNetCore.Mvc;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
+using NewsByTheMood.Services.Mappers;
 using NewsByTheMood.Services.MVC.Mappers;
 
 namespace NewsByTheMood.MVC.Components
 {
     public class HeaderViewComponent : ViewComponent
     {
-        private readonly SignInManager<User> _signInManager;
-        private readonly UserManager<User> _userManager;
         private readonly ITopicService _topicService;
-        private readonly TopicsMapper _topicMapper;
+        private readonly TopicsMapper _topicsMapper;
+        private readonly IUserService _userService;
+        private readonly UsersMapper _usersMapper;
         private readonly ILogger<HeaderViewComponent> _logger;
 
         public HeaderViewComponent(
-            SignInManager<User> signInManager, 
-            UserManager<User> userManager, 
-            ILogger<HeaderViewComponent> logger,
+            ITopicService topicService,
             TopicsMapper topicMapper,
-            ITopicService topicService)
+            IUserService userService,
+            UsersMapper usersMapper,
+            ILogger<HeaderViewComponent> logger)
         {
-            _signInManager = signInManager;
-            _userManager = userManager;
             _topicService = topicService;
-            _topicMapper = topicMapper;
+            _topicsMapper = topicMapper;
+            _userService = userService;
+            _usersMapper = usersMapper;
             _logger = logger;
         }
 
@@ -35,22 +33,13 @@ namespace NewsByTheMood.MVC.Components
             try
             {
                 var topics = (await this._topicService.GetAllAsync())
-                    .Select(topic => _topicMapper.TopicToTopicModel(topic))
+                    .Select(topic => _topicsMapper.TopicToTopicModel(topic))
                     .ToArray();
-                UserPreviewModel? user = null;
 
-                if (_signInManager.IsSignedIn((ClaimsPrincipal)User))
+                UserPreviewModel? user = null;
+                if (HttpContext.User.Identity?.IsAuthenticated == true)
                 {
-                    var userPrincipal = await _userManager.GetUserAsync((ClaimsPrincipal)User);
-                    if (userPrincipal != null)
-                    {
-                        user = new UserPreviewModel
-                        {
-                            UserName = userPrincipal.UserName!,
-                            DisplayedName = userPrincipal.DisplayedName,
-                            AvatarUrl = userPrincipal.AvatarUrl
-                        };
-                    }
+                    user = _usersMapper.UserToUserPreviewModel(await _userService.GetUserAsync(HttpContext.User));
                 }
 
                 return View(new HeaderModel() 

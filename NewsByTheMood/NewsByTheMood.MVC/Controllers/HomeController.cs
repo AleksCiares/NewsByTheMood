@@ -1,8 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using NewsByTheMood.Data.Entities;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
 using NewsByTheMood.Services.Mappers;
@@ -15,24 +13,25 @@ namespace NewsByTheMood.MVC.Controllers
     {
         private readonly IArticleService _articleService;
         private readonly ITopicService _topicService;
-        private readonly ILogger<HomeController> _logger;
+        private readonly IUserService _userService;
         private readonly ArticlesMapper _articleMapper;
-        private readonly UsersMapper _userMapper;
-        private readonly UserManager<User> _userManager;
+        private readonly UsersMapper _usersMapper;
+        private readonly ILogger<HomeController> _logger;
 
-        public HomeController(IArticleService articleService, 
-            ITopicService topicService, 
-            ILogger<HomeController> logger, 
+        public HomeController(
+            IArticleService articleService, 
+            ITopicService topicService,
+            IUserService userService,
             ArticlesMapper articleMapper,
             UsersMapper userMapper,
-            UserManager<User> userManager)
+            ILogger<HomeController> logger)
         {
             _articleService = articleService;
             _topicService = topicService;
-            _logger = logger;
+            _userService = userService;
             _articleMapper = articleMapper;
-            _userMapper = userMapper;
-            _userManager = userManager;
+            _usersMapper = userMapper;
+            _logger = logger;
         }
 
         // Get range of articles previews
@@ -152,7 +151,7 @@ namespace NewsByTheMood.MVC.Controllers
         }
 
         // Get favorite articles
-        [HttpGet("favorite")]
+        [HttpGet("favorites")]
         [Authorize]
         public async Task<IActionResult> Favorites([FromQuery] PaginationModel pagination)
         {
@@ -241,9 +240,9 @@ namespace NewsByTheMood.MVC.Controllers
         {
             if (HttpContext.User.Identity?.IsAuthenticated == true)
             {
-                var user = await _userManager.GetUserAsync(HttpContext.User);
-                return _userMapper.UserToUserModel(user) ?? new UserModel();
+                return _usersMapper.UserToUserModel(await _userService.GetUserAsync(HttpContext.User)) ?? new UserModel();
             }
+
             return new UserModel();
         }
     }

@@ -41,7 +41,7 @@ namespace NewsByTheMood.MVC
 
                 // Db provider service
                 builder.Services.AddDbContext<NewsByTheMoodDbContext>(
-                    opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+                    opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default1")));
 
                 // Identity provider service
                 builder.Services.AddIdentity<User, IdentityRole<Int64>>(options => 
