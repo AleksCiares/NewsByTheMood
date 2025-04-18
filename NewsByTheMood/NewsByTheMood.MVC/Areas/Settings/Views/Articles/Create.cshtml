@@ -18,7 +18,7 @@
 			<div class="form__warp">
 				<partial name="_ArticleFormPartial" model="@Model" />
 				<div class="id form-floating mb-3" style="display:none;">
-					<input asp-for="@Model.Article!.Id" type="number" value="0" class="form-control" />
+					<input asp-for="@Model.Article!.Id" type="text" value="0" class="form-control" />
 				</div>
 			</div>
 		</div>
@@ -26,9 +26,10 @@
 </div>
 
 @section Scripts {
-	<script src="~/js/SelectItemModelCollector.js" asp-append-version="true"></script>
-	<script>
-        document.addEventListener("DOMContentLoaded", function () {
+	<script src="~/js/ModelProperty.js" asp-append-version="true"></script>
+	<script src="~/js/JavaScript.js" asp-append-version="true"></script>
+	@* <script>
+				document.addEventListener("DOMContentLoaded", function () {
 			var textarea = document.querySelector('#articleFormBody');
 			if (textarea) {
 				textarea.style.height = 'auto';
@@ -66,5 +67,5 @@
 				selectItemModelCollector.collectModels();
 			});
 		});
-	</script>
+	</script> *@
 }
