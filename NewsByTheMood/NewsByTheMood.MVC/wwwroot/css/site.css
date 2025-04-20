@@ -4,49 +4,40 @@
     --main-highlight-color: rgb(119, 7, 187);
     --main-background-color: white;
 }
-
 html {
   font-size: 14px;
 }
-
 @media (min-width: 768px) {
   html {
     font-size: 16px;
   }
 }
-
 html {
   position: relative;
   min-height: 100%;
 }
-
 body {
   margin-bottom: 60px;
 }
-
 /* width */
 ::-webkit-scrollbar {
     width: 0.5em;
 }
-
 /* Track */
 ::-webkit-scrollbar-track {
     background: transparent;
     box-shadow: inset 0 0 5px grey;
     border-radius: 10px;
 }
-
 /* Handle */
 ::-webkit-scrollbar-thumb {
     background: #888;
     border-radius: 10px;
 }
-
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
-
 a {
     color: var(--main-highlight-color) !important;
     text-decoration-line: none;
@@ -69,7 +60,6 @@ a.nav-link, a.dropdown-item {
 .aside-bar {
     border-right: 1px solid #dee2e6;
 }
-
 .error-feedback {
     display: inline-block !important;
 }

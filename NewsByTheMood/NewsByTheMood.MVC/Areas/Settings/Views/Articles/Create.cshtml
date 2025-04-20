@@ -26,10 +26,9 @@
 </div>
 
 @section Scripts {
-	<script src="~/js/ModelProperty.js" asp-append-version="true"></script>
-	<script src="~/js/JavaScript.js" asp-append-version="true"></script>
-	@* <script>
-				document.addEventListener("DOMContentLoaded", function () {
+	<script src="~/js/SelectItemModelCollector.js" asp-append-version="true"></script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
 			var textarea = document.querySelector('#articleFormBody');
 			if (textarea) {
 				textarea.style.height = 'auto';
@@ -66,6 +65,5 @@
 			document.getElementById('createArticleForm').addEventListener('submit', function (event) {
 				selectItemModelCollector.collectModels();
 			});
-		});
-	</script> *@
+	</script>
 }

@@ -1,3 +1,4 @@
+using System.Configuration;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -52,12 +53,6 @@ namespace NewsByTheMood.MVC.Controllers
                         pagination.PageSize))
                         .Select(article => _articleMapper.ArticleToArticlePreviewModel(article))
                         .ToArray();
-
-                    _logger.LogDebug($"Articles were fetch successfully");
-                }
-                else
-                {
-                    _logger.LogDebug("No articles were found");
                 }
 
                 if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
@@ -68,7 +63,7 @@ namespace NewsByTheMood.MVC.Controllers
                 {
                     return View(new ArticlePreviewCollectionModel()
                     {
-                        Articles = articlesPreviews!,
+                        Articles = articlesPreviews,
                         PageInfo = new PageInfoModel()
                         {
                             Page = pagination.Page,
@@ -82,7 +77,7 @@ namespace NewsByTheMood.MVC.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error while getting articles. " +
-                    $"Page: {pagination.Page}, " +
+                    $"PageNumber: {pagination.Page}, " +
                     $"PageSize: {pagination.PageSize}, ");
                 return StatusCode(500);
             }
@@ -97,7 +92,6 @@ namespace NewsByTheMood.MVC.Controllers
                 var topic = await _topicService.GetByNameAsync(id);
                 if (topic == null)
                 {
-                    _logger.LogDebug($"Topic {id} not found");
                     return BadRequest();
                 }
 
@@ -114,12 +108,6 @@ namespace NewsByTheMood.MVC.Controllers
                         pagination.PageSize))
                         .Select(article => _articleMapper.ArticleToArticlePreviewModel(article))
                         .ToArray();
-
-                    _logger.LogDebug($"Articles by topic {topic.Name} were fetch successfully");
-                }
-                else
-                {
-                    _logger.LogDebug($"No articles with topic {topic.Name} were found");
                 }
 
                 if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
@@ -144,7 +132,7 @@ namespace NewsByTheMood.MVC.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while getting articles by topic. " +
-                    $"Page: {pagination.Page}, " +
+                    $"PageNumber: {pagination.Page}, " +
                     $"PageSize: {pagination.PageSize}, ");
                 return StatusCode(500);
             }
@@ -170,12 +158,6 @@ namespace NewsByTheMood.MVC.Controllers
                         pagination.PageSize))
                         .Select(article => _articleMapper.ArticleToArticlePreviewModel(article))
                         .ToArray();
-
-                    _logger.LogDebug($"Articles were fetch successfully");
-                }
-                else
-                {
-                    _logger.LogDebug("No articles were found");
                 }
 
                 if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
@@ -200,14 +182,13 @@ namespace NewsByTheMood.MVC.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while getting favorite articles. " +
-                    $"Page: {pagination.Page}, " +
+                    $"PageNumber: {pagination.Page}, " +
                     $"PageSize: {pagination.PageSize}, ");
                 return StatusCode(500);
             }
         }
 
         // Get certain article
-
         [HttpGet("detail/{id:required}")]
         public async Task<IActionResult> Detail([FromRoute] string id)
         {
@@ -216,7 +197,6 @@ namespace NewsByTheMood.MVC.Controllers
                 var article = await _articleService.GetByIdAsync(long.Parse(id));
                 if (article == null)
                 {
-                    _logger.LogDebug($"Article {id} not found");
                     return BadRequest();
                 }
 
@@ -229,6 +209,48 @@ namespace NewsByTheMood.MVC.Controllers
             }
         }
 
+        // Create comment
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> AddComment([FromForm] AddCommentModel addComment)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return Ok(new 
+                    {
+                        success = false,
+                        errors = ModelState.Values
+                            .SelectMany(v => v.Errors)
+                            .Select(e => e.ErrorMessage)
+                            .ToArray()
+                    });
+                }
+
+                var result = await _articleService.AddCommentAsync(addComment);
+                if (!result)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Failed to add comment. Please try again later."
+                    });
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Comment added successfully."
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error while adding comment in article with id={addComment.ArticleId}");
+                return StatusCode(500);
+            }
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
@@ -236,7 +258,7 @@ namespace NewsByTheMood.MVC.Controllers
         }
 
         [NonAction]
-        private async Task<UserModel> GetCurrentUserModelAsync() // не подт€гивает топики
+        private async Task<UserModel> GetCurrentUserModelAsync()
         {
             if (HttpContext.User.Identity?.IsAuthenticated == true)
             {

@@ -20,6 +20,17 @@
                 <label asp-for="Input.PhoneNumber" class="form-label"></label>
                 <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
             </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.PreferedPositivity" class="form-control" placeholder="Please enter prefered articles positivity." />
+                <label asp-for="Input.PreferedPositivity" class="form-label"></label>
+                <span asp-validation-for="Input.PreferedPositivity" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <select asp-items="@Model.Input.Topics" id="topics-multiple-select" class="form-select"
+                        multiple="multiple" aria-label="Topics" size="7">
+                </select>
+                <span asp-validation-for="@Model.Input.Topics" class="error-feedback invalid-feedback"></span>
+            </div>
             <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
         </form>
     </div>
@@ -27,4 +38,13 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/SelectItemModelCollector.js" asp-append-version="true"></script>
+
+    <script>
+        let selectItemModelCollector = new SelectItemModelCollector('profile-form');
+        selectItemModelCollector.setModelItems('#topics-multiple-select option', 'Input.Topics');
+        document.getElementById('profile-form').addEventListener('submit', function (event) {
+            selectItemModelCollector.collectModels();
+        });
+    </script>
 }

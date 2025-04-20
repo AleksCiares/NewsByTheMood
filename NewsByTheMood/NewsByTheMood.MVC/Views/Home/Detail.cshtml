@@ -12,7 +12,50 @@
             @if (Model.PreviewImgUrl != null)
             {
                 <div class="article__preview-img row rounded mb-3">
-                    <img src="@Model.PreviewImgUrl" alt="@Model.Title">
+                    <div class="article__preview-img-wrap">
+                        <img src="@Model.PreviewImgUrl" alt="@Model.Title">
+                        <div class="overlay bottom-0 start-0 w-100 p-2 text-white">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    @switch (Model.Positivity)
+                                    {
+                                        case 10:
+                                        case 9:
+                                            <i class="bi bi-emoji-smile" style="color: limegreen;"></i>
+                                            break;
+
+                                        case 8:
+                                        case 7:
+                                            <i class="bi bi-emoji-smile" style="color: yellowgreen;"></i>
+                                            break;
+
+                                        case 6:
+                                        case 5:
+                                            <i class="bi bi-emoji-neutral" style="color: orange;"></i>
+                                            break;
+
+                                        case 4:
+                                        case 3:
+                                            <i class="bi bi-emoji-frown" style="color: orangered;"></i>
+                                            break;
+
+                                        case 2:
+                                        case 1:
+                                            <i class="bi bi-emoji-frown" style="color: red;"></i>
+                                            break;
+
+                                        default:
+                                            <i class="bi bi-emoji-tear" style="color: antiquewhite"></i>
+                                            break;
+                                    }
+                                    <span>@Model.PublishDate</span>
+                                </div>
+                                <div>
+                                    <span>@Model.TopicName</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             }
             <div class="article__body row mb-3">
@@ -33,6 +76,9 @@
                     </div>
                 }
             </div>
+            <div class="article">
+
+            </div>
         </div>
     </div>
 </div>
@@ -40,6 +86,36 @@
 @section Footer
 {
     <partial name="_FooterPartial" />
+}
+
+@section Scripts
+{
+   <script>
+               $('#addCommentForm').on('submit', function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: '/Home/AddComment',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+                        // Обновить список комментариев или выполнить другие действия
+                    } else {
+                        if (response.errors) {
+                            alert('Validation errors: ' + response.errors.join(', '));
+                        } else {
+                            alert(response.message);
+                        }
+                    }
+                },
+                error: function () {
+                    alert('An unexpected error occurred. Please try again later.');
+                }
+            });
+        });
+   </script>
 }
 
 

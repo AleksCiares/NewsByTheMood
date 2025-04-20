@@ -21,7 +21,7 @@
 			<div class="form__warp">
 				<partial name="_ArticleFormPartial" model="@(new ArticleSettingsCreateModel(){ Article = Model.Article, Sources = Model.Sources, Tags = Model.Tags})" />
 				<div class="id form-floating mb-3" style="display:none;">
-					<input asp-for="@Model.Article.Id" type="number" value="@Model.Article.Id" class="form-control" />
+					<input asp-for="@Model.Article.Id" type="text" value="@Model.Article.Id" class="form-control" />
 				</div>
 			</div>
 		</div>
@@ -71,7 +71,7 @@
 			});
 
 			let modal = new CommonModal(
-				'Delete Article',
+				'Delete article',
 				'Are you sure to delete this article?',
 				'deleteArticle');
 			modal.setCancelButton('Cancel', 'btn-secondary');

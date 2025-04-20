@@ -62,8 +62,6 @@
 
         $(document).ready(() => {
             var ajaxArticleLoader = new AjaxArticleLoader(1, @Model.PageInfo.TotalPages, @Model.PageInfo.PageSize, window.location.pathname);
-
-
             $(window).scroll(() => {
                 if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
                     ajaxArticleLoader.load();

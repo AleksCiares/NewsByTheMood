@@ -81,7 +81,7 @@ namespace NewsByTheMood.MVC.Models
         public string? ArticleTagPath { get; set; }
 
         [Required]
-        [Range(0, Int64.MaxValue)]
+        [StringLength(100, MinimumLength = 1)]
         public required string TopicId { get; set; }
     }
 }

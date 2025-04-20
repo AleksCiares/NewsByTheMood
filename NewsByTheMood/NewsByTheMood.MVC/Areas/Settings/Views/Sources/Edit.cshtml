@@ -28,7 +28,7 @@
 				</div>
 				<partial name="_SourceFormPartial" model="new SourceSettingsCreateModel(){Source = Model.Source, Topics = Model.Topics}" />
 				<div class="id form-floating mb-3" style="display:none;">
-					<input asp-for="@Model.Source.Id" type="number" value="@Model.Source.Id" class="form-control" />
+					<input asp-for="@Model.Source.Id" type="text" value="@Model.Source.Id" class="form-control" />
 				</div>
 			</div>
 		</div>

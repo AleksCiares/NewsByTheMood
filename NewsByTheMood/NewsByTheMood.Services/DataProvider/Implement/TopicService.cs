@@ -27,7 +27,14 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 return null;
             }
 
-            return await _mediator.Send(new GetTopicByIdQuery() { Id = id }, cancellationToken);
+            var result = await _mediator.Send(new GetTopicByIdQuery() { Id = id }, cancellationToken);
+            if (result == null)
+            {
+                _logger.LogWarning($"Topic with id {id} does not exist.");
+                return null;
+            }
+
+            return result;
         }
 
         public async Task<Topic?> GetByNameAsync(string topicName, CancellationToken cancellationToken = default)
@@ -38,7 +45,15 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 return null;
             }
 
-            return await _mediator.Send(new GetTopicByNameQuery() { TopicName = topicName }, cancellationToken);
+            var result = await _mediator.Send(new GetTopicByNameQuery() { TopicName = topicName }, cancellationToken);
+
+            if (result == null)
+            {
+                _logger.LogWarning($"Topic with name {topicName} does not exist.");
+                return null;
+            }
+
+            return result;
         }
 
         public async Task<IEnumerable<Topic>> GetRangeAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)

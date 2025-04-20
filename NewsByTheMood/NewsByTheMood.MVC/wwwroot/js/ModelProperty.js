@@ -16,6 +16,8 @@
     }
 
     getValues() {
+        console.log(typeof (this.#selector));
+        console.log(typeof (String));
         if (typeof (this.#selector) === typeof (ModelProperty)) {
             return this.#getValuesFromModelProperty();
         }
@@ -132,9 +134,8 @@
 
 function parseModelProperty(modelProperty, formId) {
     const form = document.getElementById(formId);
-    const hiddenDataContainer;
     if (form) {
-        hiddenDataContainer = document.createElement("div");
+        const hiddenDataContainer = document.createElement("div");
         hiddenDataContainer.classList.add("hidden-data");
         hiddenDataContainer.style.display = "none";
         form.appendChild(hiddenDataContainer);

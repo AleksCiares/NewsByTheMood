@@ -6,3 +6,14 @@
 .article .article__tags div {
     border-color: var(--main-highlight-color) !important;
 }
+.article__preview-img-wrap {
+    position: relative;
+}
+
+.article__preview-img .overlay {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 10px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}

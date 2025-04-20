@@ -9,8 +9,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using NewsByTheMood.Data.Entities;
-using NewsByTheMood.MVC.Models;
+using NewsByTheMood.Services.DataProvider.Abstract;
 
 namespace NewsByTheMood.MVC.Areas.Identity.Pages.Account.Manage
 {
@@ -18,13 +20,19 @@ namespace NewsByTheMood.MVC.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly ITopicService _topicService;
+        private readonly IUserService _userService;
 
         public IndexModel(
             UserManager<User> userManager,
-            SignInManager<User> signInManager)
+            SignInManager<User> signInManager,
+            ITopicService topicService,
+            IUserService userService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _topicService = topicService;
+            _userService = userService;
         }
 
         /// <summary>
@@ -60,18 +68,39 @@ namespace NewsByTheMood.MVC.Areas.Identity.Pages.Account.Manage
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+
+            [Range(0, 10)]
+            [Display(Name = "Prefered positivity")]
+            public short PreferedPositivity { get; set; }
+
+            public List<SelectListItem> Topics { get; set; }
         }
 
         private async Task LoadAsync(User user)
         {
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+            user.Topics = (await _userManager.Users
+                .Include(u => u.Topics)
+                .FirstAsync(u => u.Id == user.Id))
+                .Topics;
+
+            var topics = (await _topicService.GetAllAsync())
+                .Select(topic => new SelectListItem
+                {
+                    Value = topic.Id.ToString(),
+                    Text = topic.Name,
+                    Selected = user.Topics.Any(t => t.Id == topic.Id)
+                })
+                .ToList();
 
             Username = userName;
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                PreferedPositivity = user.PreferedPositivity,
+                Topics = topics
             };
         }
 
@@ -110,6 +139,21 @@ namespace NewsByTheMood.MVC.Areas.Identity.Pages.Account.Manage
                     StatusMessage = "Unexpected error when trying to set phone number.";
                     return RedirectToPage();
                 }
+            }
+
+            user.Topics = Input.Topics.Where(t => t.Selected == true).Select(t => new Topic()
+                {
+                    Id = Int64.Parse(t.Value),
+                    Name = t.Text,
+                })
+                .ToList();
+            user.PreferedPositivity = Input.PreferedPositivity;
+
+            var result = await _userService.UpdateAsync(user);
+            if (!result)
+            {
+                StatusMessage = "Unexpected error when trying to update user details.";
+                RedirectToPage();
             }
 
             await _signInManager.RefreshSignInAsync(user);
