@@ -208,6 +208,7 @@ namespace NewsByTheMood.Services.ScrapeProvider.Implement
             return path;
         }
 
+        // TODO: change article publish date from local service to UTC via source local time
         private DateTime? GetPublishDate(Source source, PrettyScraper scraper)
         {
             if (source.ArticlePdatePath.IsNullOrEmpty())

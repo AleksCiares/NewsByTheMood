@@ -8,11 +8,12 @@ namespace NewsByTheMood.Services.Mappers
     public partial class UsersMapper
     {
         [MapperIgnoreSource(nameof(User.AccessFailedCount))]
+        [MapperIgnoreSource(nameof(User.AvatarUrl))]
         [MapperIgnoreSource(nameof(User.Comments))]
         [MapperIgnoreSource(nameof(User.ConcurrencyStamp))]
+        [MapperIgnoreSource(nameof(User.DisplayedName))]
         [MapperIgnoreSource(nameof(User.Email))]
         [MapperIgnoreSource(nameof(User.EmailConfirmed))]
-        [MapperIgnoreSource(nameof(User.Id))]
         [MapperIgnoreSource(nameof(User.LockoutEnabled))]
         [MapperIgnoreSource(nameof(User.LockoutEnd))]
         [MapperIgnoreSource(nameof(User.NormalizedEmail))]

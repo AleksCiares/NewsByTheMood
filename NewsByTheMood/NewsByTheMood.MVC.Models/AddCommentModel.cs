@@ -5,11 +5,7 @@ namespace NewsByTheMood.MVC.Models
     public class AddCommentModel
     {
         [Required]
-        [StringLength(500, MinimumLength = 10, ErrorMessage = "Comment cannot be longer than 500 characters.")]
+        [StringLength(500, MinimumLength = 1, ErrorMessage = "Comment cannot be longer than 500 characters and empty")]
         public required string Text { get; set; }
-
-        [Required]
-        [StringLength(100, MinimumLength = 1)]
-        public required string ArticleId { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NewsByTheMood.Data;
 
@@ -11,9 +12,11 @@ using NewsByTheMood.Data;
 namespace NewsByTheMood.Data.Migrations
 {
     [DbContext(typeof(NewsByTheMoodDbContext))]
-    partial class NewsByTheMoodDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250422172331_Added_PublishDate_To_Comment")]
+    partial class Added_PublishDate_To_Comment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

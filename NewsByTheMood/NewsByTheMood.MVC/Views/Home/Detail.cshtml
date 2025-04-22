@@ -69,15 +69,23 @@
             <div class="article__tags row align-items-center justify-content-start mb-3">
                 @foreach (var tag in Model.Tags)
                 {
-                    <div class="col-auto px-1 mb-2">
+                    <div class="col-auto mb-2">
                         <div class="border rounded-3">
                             <span class="mx-1">@tag</span>
-                        </div>   
+                        </div>
                     </div>
                 }
             </div>
-            <div class="article">
-
+            <div class="article__comments">
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <form asp-antiforgery="true" method="post" id="addCommentForm">
+                        <textarea name="Text" class="form-control" id="commentForm" placeholder="Type your comment..." rows="5"
+                            style="resize:none; overflow: hidden;"></textarea>
+                        <span class="error-feedback invalid-feedback"></span>
+                        <button type="submit" class="btn btn-outline-primary">Submit</button>
+                    </form>
+                }
             </div>
         </div>
     </div>
@@ -91,28 +99,41 @@
 @section Scripts
 {
    <script>
-               $('#addCommentForm').on('submit', function (e) {
-            e.preventDefault();
+        document.addEventListener("DOMContentLoaded", function () {
+            var textarea = document.querySelector('#commentForm');
+            if (textarea) {
+                textarea.style.height = 'auto';
+                textarea.style.height = (textarea.scrollHeight) + 'px';
 
-            $.ajax({
-                url: '/Home/AddComment',
-                type: 'POST',
-                data: $(this).serialize(),
-                success: function (response) {
-                    if (response.success) {
-                        alert(response.message);
-                        // Обновить список комментариев или выполнить другие действия
-                    } else {
-                        if (response.errors) {
-                            alert('Validation errors: ' + response.errors.join(', '));
-                        } else {
+                textarea.addEventListener('input', function () {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
+            }
+
+            $('#addCommentForm').on('submit', function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: '/Home/AddComment/1',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        if (response.success) {
                             alert(response.message);
+                            // Обновить список комментариев или выполнить другие действия
+                        } else {
+                            if (response.errors) {
+                                alert('Validation errors: ' + response.errors.join(', '));
+                            } else {
+                                alert(response.message);
+                            }
                         }
+                    },
+                    error: function () {
+                        alert('An unexpected error occurred. Please try again later.');
                     }
-                },
-                error: function () {
-                    alert('An unexpected error occurred. Please try again later.');
-                }
+                });
             });
         });
    </script>

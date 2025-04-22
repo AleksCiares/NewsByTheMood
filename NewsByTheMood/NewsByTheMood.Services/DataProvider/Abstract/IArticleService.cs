@@ -27,6 +27,9 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
         // Get article by certain id
         public Task<Article?> GetByIdAsync(Int64 id, CancellationToken cancellationToken = default);
 
+        // Add comment to article
+        public Task<bool> AddCommentAsync(AddCommentModel addComment, Int64 userId, Int64 articleId, CancellationToken cancellationToken = default);
+
         // Is exist article with current url
         public Task<bool> IsExistsByUrlAsync(string articleUrl, CancellationToken cancellationToken = default);
 

@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using NewsByTheMood.CQS.Commands;
 using NewsByTheMood.CQS.Queries;
 using NewsByTheMood.Data.Entities;
+using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
 
 namespace NewsByTheMood.Services.DataProvider.Implement
@@ -203,6 +204,24 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             }
 
             return result;
+        }
+
+        public async Task<bool> AddCommentAsync(AddCommentModel addComment, Int64 userId, Int64 articleId, CancellationToken cancellationToken = default)
+        {
+            if (userId <= 0 || articleId <= 0)
+            {
+                _logger.LogWarning($"UserId/ArticleId is less than or equal to 0. UserId: {userId}, ArticleId: {articleId}");
+                return false;
+            }
+
+            await _mediator.Send(new AddCommentCommand()
+            {
+                ArticleId = articleId,
+                UserId = userId,
+                Text = addComment.Text
+            });
+
+            return true;
         }
 
         public async Task<bool> IsExistsByUrlAsync(string articleUrl, CancellationToken cancellationToken = default)

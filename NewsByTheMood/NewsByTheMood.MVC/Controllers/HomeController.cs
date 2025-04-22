@@ -1,7 +1,7 @@
-using System.Configuration;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
 using NewsByTheMood.Services.Mappers;
@@ -216,37 +216,42 @@ namespace NewsByTheMood.MVC.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
+                var id = HttpContext.Request.Headers["Referer"].ToString().Split('/').Last();
+
+                if (!ModelState.IsValid && id.IsNullOrEmpty())
                 {
-                    return Ok(new 
+                    return Ok(new
                     {
                         success = false,
-                        errors = ModelState.Values
-                            .SelectMany(v => v.Errors)
-                            .Select(e => e.ErrorMessage)
-                            .ToArray()
+                        errors = "Failed to add comment. Please try again later."
                     });
                 }
 
-                var result = await _articleService.AddCommentAsync(addComment);
-                if (!result)
+                var result = await _articleService.AddCommentAsync( 
+                    addComment,
+                    Int64.Parse((await GetCurrentUserModelAsync()).Id),
+                    Int64.Parse(id)
+                );
+                if (result)
                 {
-                    return Json(new
+                    return Ok(new
+                    {
+                        success = true,
+                        message = "Comment added successfully."
+                    });
+                }
+                else
+                {
+                    return Ok(new
                     {
                         success = false,
                         message = "Failed to add comment. Please try again later."
                     });
                 }
-
-                return Json(new
-                {
-                    success = true,
-                    message = "Comment added successfully."
-                });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error while adding comment in article with id={addComment.ArticleId}");
+                _logger.LogError(ex, $"Error while adding comment in article");
                 return StatusCode(500);
             }
         }
