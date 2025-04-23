@@ -11,7 +11,7 @@
 		<div class="form__panel row align-items-start justify-content-between mb-4">
 			<div class="col-auto">
 				<button asp-area="settings" asp-controller="sources" asp-action="edit" asp-route-id="@Model.Source.Id" class="btn btn-outline-primary" type="submit">Submit</button>
-				<a asp-area="settings" asp-controller="articlesload" asp-action="loadarticles" asp-route-id="@Model.Source.Id" class="btn btn-outline-primary">Load articles</a>
+				<a asp-area="settings" asp-controller="articlesload" asp-action="LoadBySourceManually" asp-route-sourceId="@Model.Source.Id" class="btn btn-outline-primary">Load articles</a>
 				<a asp-area="settings" asp-controller="sources" asp-action="index" class="btn btn-outline-secondary">Cancel</a>
 			</div>
 			<div class="col-auto">

@@ -10,39 +10,119 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
     [Authorize(Roles = $"{AccessLevels.Admininistrator},{AccessLevels.Editor}")]
     public class ArticlesLoadController : Controller
     {
-        private readonly IArticleScrapeService _articleLoadService;
+        private readonly IArticleScrapeService _articleScrapeService;
         private readonly ISourceService _sourceService;
+        private readonly IArticleService _articleService;
         private readonly ILogger<ArticlesLoadController> _logger;
 
-        public ArticlesLoadController(IArticleScrapeService articleLoadService, ISourceService sourceService, ILogger<ArticlesLoadController> logger)
+        public ArticlesLoadController(
+            IArticleScrapeService articleLoadService, 
+            ISourceService sourceService, 
+            IArticleService articleService,
+            ILogger<ArticlesLoadController> logger)
         {
-            _articleLoadService = articleLoadService;
+            _articleScrapeService = articleLoadService;
             _sourceService = sourceService;
+            _articleService = articleService;
             _logger = logger;
         }
 
         [HttpGet]
-        public async Task<IActionResult> LoadArticles(string id)
+        public async Task<IActionResult> LoadBySourceManually([FromQuery] string sourceId)
         {
             try
             {
-                var source = await _sourceService.GetByIdAsync(long.Parse(id));
+                var source = await _sourceService.GetByIdAsync(long.Parse(sourceId));
                 if (source == null)
                 {
-                    _logger.LogWarning($"Source with id {id} was not found");
-                    return RedirectToAction("Index", "Sources");
+                    return NotFound(new 
+                    {
+                        success = false,
+                        message = "Something gone wrong. Watch logs for more information."
+                    });
                 }
 
-                await _articleLoadService.LoadArticles(source);
-
-                _logger.LogInformation($"Articles from source {source.Name} were loaded successfully");
-
-                return RedirectToAction("Index", "Sources");
+                var result = await _articleScrapeService.ScrapeLatestBySourceAsync(source);
+                if (await _articleService.AddRangeAsync(result))
+                {
+                    return Ok(new
+                    {
+                        success = true,
+                        message = "Article was updated successfully."
+                    });
+                }
+                else
+                {
+                    return NotFound(new
+                    {
+                        success = false,
+                        message = "Something gone wrong. Watch logs for more information."
+                    });
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error while loading articles from source. SourceId: {id}");
-                return StatusCode(500);
+                _logger.LogError(ex, $"Error while loading articles from source. SourceId: {sourceId}");
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Something gone wrong. Watch logs for more information."
+                });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> UpdateManually([FromQuery] string articleId)
+        {
+            try
+            {
+                var article = await _articleService.GetByIdAsync(long.Parse(articleId));
+                if (article == null)
+                {
+                    return NotFound(new 
+                    {
+                        success = false,
+                        message = "Something gone wrong. Watch logs for more information."
+                    });
+                }
+
+                var source = await _sourceService.GetByIdAsync(article.SourceId);
+                if (source == null)
+                {
+                    return NotFound(new
+                    {
+                        success = false,
+                        message = "Something gone wrong. Watch logs for more information."
+                    });
+                }
+
+                var result = await _articleScrapeService.ScrapeAsync(source, article.Url);
+                result.Id = article.Id;
+                if (await _articleService.UpdateAsync(result))
+                {
+                    return Ok(new
+                    {
+                        success = true,
+                        message = "Article was updated successfully."
+                    });
+                }
+                else
+                {
+                    return NotFound(new
+                    {
+                        success = false,
+                        message = "Something gone wrong. Watch logs for more information."
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error while updating article with id={articleId} from source.");
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Something gone wrong. Watch logs for more information."
+                });
             }
         }
     }

@@ -1,64 +1,31 @@
-﻿@model NewsByTheMood.MVC.Models.ArticleModel
+﻿@addTagHelper NewsByTheMood.MVC.TagHelpers.PositivityIconTagHelper, NewsByTheMood.MVC
+@model NewsByTheMood.MVC.Models.ArticleModel
 @{
     ViewData["PageTitle"] = Model.Title;
 }
 
 <div class="article container">
     <div class="row justify-content-center align-content-start mb-4">
-        <div class="container col-8">
-            <div class="article__title row mb-3">
+        <div class="col-8">
+            <div class="article__title mb-3">
                 <h3>@Model.Title</h3>
             </div>
+            <div class="article__preview-img rounded mb-3">
             @if (Model.PreviewImgUrl != null)
             {
-                <div class="article__preview-img row rounded mb-3">
-                    <div class="article__preview-img-wrap">
-                        <img src="@Model.PreviewImgUrl" alt="@Model.Title">
-                        <div class="overlay bottom-0 start-0 w-100 p-2 text-white">
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    @switch (Model.Positivity)
-                                    {
-                                        case 10:
-                                        case 9:
-                                            <i class="bi bi-emoji-smile" style="color: limegreen;"></i>
-                                            break;
-
-                                        case 8:
-                                        case 7:
-                                            <i class="bi bi-emoji-smile" style="color: yellowgreen;"></i>
-                                            break;
-
-                                        case 6:
-                                        case 5:
-                                            <i class="bi bi-emoji-neutral" style="color: orange;"></i>
-                                            break;
-
-                                        case 4:
-                                        case 3:
-                                            <i class="bi bi-emoji-frown" style="color: orangered;"></i>
-                                            break;
-
-                                        case 2:
-                                        case 1:
-                                            <i class="bi bi-emoji-frown" style="color: red;"></i>
-                                            break;
-
-                                        default:
-                                            <i class="bi bi-emoji-tear" style="color: antiquewhite"></i>
-                                            break;
-                                    }
-                                    <span>@Model.PublishDate</span>
-                                </div>
-                                <div>
-                                    <span>@Model.TopicName</span>
-                                </div>
-                            </div>
-                        </div>
+                <img src="@Model.PreviewImgUrl" alt="@Model.Title">
+            }
+                <div class="overlay d-flex justify-content-between align-items-center w-100">
+                    <div>
+                        <positivity-icon positivity="@Model.Positivity"/>
+                        <span>@Model.PublishDate</span>
+                    </div>
+                    <div>
+                        <span>@Model.TopicName</span>
                     </div>
                 </div>
-            }
-            <div class="article__body row mb-3">
+            </div>
+            <div class="article__body mb-3">
                 @Html.Raw(@Model.Body)
             </div>
             <div class="article__source row align-items-center justify-content-end mb-3">
@@ -77,15 +44,13 @@
                 }
             </div>
             <div class="article__comments">
-                @if (User.Identity != null && User.Identity.IsAuthenticated)
-                {
-                    <form asp-antiforgery="true" method="post" id="addCommentForm">
-                        <textarea name="Text" class="form-control" id="commentForm" placeholder="Type your comment..." rows="5"
-                            style="resize:none; overflow: hidden;"></textarea>
-                        <span class="error-feedback invalid-feedback"></span>
-                        <button type="submit" class="btn btn-outline-primary">Submit</button>
-                    </form>
-                }
+                <div class="section-divider">
+                    <span class="section-title">Comments</span>
+                </div>
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                <partial name="_CommentFormPartial" model="new AddCommentModel()"/>
+            }
             </div>
         </div>
     </div>

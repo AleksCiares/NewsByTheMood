@@ -10,6 +10,8 @@
         public IDocumentParser Init(string selector);
         public IDocumentParser Select(string selector);
         public IDocumentParser SelectAll(string selector);
+        public IDocumentParser RemoveAll(string selector);
+        public IDocumentParser WrapAll(string selector, string wrapper, string wrapperClasses);
         public string? GetAttribute(string name);
         public List<string> GetAttributes(string name);
         public List<string> TextContent();

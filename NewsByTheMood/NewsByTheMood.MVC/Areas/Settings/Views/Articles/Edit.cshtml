@@ -12,6 +12,8 @@
 			<div class="col-auto">
 				<button asp-area="settings" asp-controller="articles" asp-action="edit" type="submit" class="btn btn-outline-primary">Submit</button>
 				<a asp-area="settings" asp-controller="articles" asp-action="index" class="btn btn-outline-secondary">Cancel</a>
+				<a asp-area="settings" asp-controller="articlesload" asp-action="updatemanually" asp-route-articleId="@Model.Article.Id" class="btn btn-outline-primary">Reload from source</a>
+
 			</div>
 			<div class="col-auto">
 				<button formnovalidate asp-area="settings" asp-controller="articles" asp-action="delete" asp-route-id="@Model.Article.Id" class="btn btn-danger">Delete</button>

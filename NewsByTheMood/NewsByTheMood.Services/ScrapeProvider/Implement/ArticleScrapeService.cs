@@ -18,56 +18,45 @@ namespace NewsByTheMood.Services.ScrapeProvider.Implement
         private readonly IArticleService _articleService;
         private readonly ILogger<ArticleScrapeService> _logger;
 
-        public ArticleScrapeService(IOptions<WebScrapeOptions> options, IArticleService articleService, ILogger<ArticleScrapeService> logger)
+        public ArticleScrapeService(
+            IOptions<WebScrapeOptions> options, 
+            IArticleService articleService,
+            ILogger<ArticleScrapeService> logger)
         {
             _options = options.Value;
             _articleService = articleService;
             _logger = logger;
         }
 
-        public async Task LoadArticle(Source source, string articleUrl)
+        public async Task<IEnumerable<Article>> ScrapeLatestBySourceAsync(Source source)
         {
-            var scraper = CreateScraper(source);
-            try
-            {
-                await scraper.GetPageAsync(articleUrl);
-                var article = ParseArticle(source, scraper);
-                article.Url = articleUrl;
+            _logger.LogInformation($"Scraping latest articles from source. SourceName: {source.Name}, Id: {source.Id}");
 
-                await _articleService.AddAsync(article);
-            }
-            catch (Exception e)
-            {
-                throw new Exception($"Error while loading article from {articleUrl} with source id {source.Id}", e);
-            }
-            finally
-            {
-                scraper.Dispose();
-            }
-        }
-
-        public async Task LoadArticles(Source source)
-        {
+            // create scraper
             var scraper = CreateScraper(source);
 
+            // load page
             try
             {
                 await scraper.GetPageAsync(source.Url);
+                _logger.LogDebug($"Article container page loaded successfully from {source.Url}. SourceName: {source.Name}, Id: {source.Id}");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 scraper.Dispose();
-                throw new Exception($"Error while loading source {source.Name}", e);
+                throw new Exception($"Error while loading page from {source.Url}. SourceName: {source.Name}, Id: {source.Id}", ex);
             }
 
+            // parse articles urls
             var articlesUrls = scraper.Parser.Init(source.ArticleCollectionsPath)
                 .SelectAll(source.ArticleItemPath)
                 .SelectAll(source.ArticleUrlPath)
                 .GetAttributes("href");
             articlesUrls.Reverse();
+            _logger.LogDebug($"Successfully parsed {articlesUrls.Count} articles urls from page. SourceName: {source.Name}, Id: {source.Id}.\n" +
+                $"Parsed urls: {String.Join("\n", articlesUrls.ToArray())}");
 
-            _logger.LogDebug($"Parsed {articlesUrls.Count} artticles from source {source.Name} with id {source.Id}");
-
+            // remove duplicates
             for (var i = articlesUrls.Count - 1; i >= 0; i--)
             {
                 if (!Uri.IsWellFormedUriString(articlesUrls[i], uriKind: UriKind.Absolute))
@@ -80,40 +69,76 @@ namespace NewsByTheMood.Services.ScrapeProvider.Implement
                     articlesUrls.RemoveAt(i);
                 }
             }
+            _logger.LogDebug($"Removed duplicates. {articlesUrls.Count} articles urls left from page. SourceName: {source.Name}, Id: {source.Id}.\n" +
+                $"Lefted urls: {String.Join("\n", articlesUrls.ToArray())}");
 
             var articles = new List<Article>();
             foreach (var url in articlesUrls)
             {
                 Article? article = null;
-
                 try
                 {
+                    // load article page
                     await scraper.GetPageAsync(url);
+                    _logger.LogDebug($"Article page loaded successfully from {url}. SourceName: {source.Name}, Id: {source.Id}");
+
+                    // parse article
                     article = ParseArticle(source, scraper);
+                    _logger.LogDebug($"Article parsed successfully from {url}. ArticleTitle: {article.Title}, SourceName: {source.Name}, Id: {source.Id}");
 
                     article.IsActive = true;
                     article.FailedLoaded = false;
                 }
-                catch(Exception e)
+                catch(Exception ex)
                 {
                     article = new Article();
                     article.Positivity = 0;
                     article.Rating = 0;
                     article.Title = "Error while loading article";
                     article.SourceId = source.Id;
-
                     article.FailedLoaded = true;
                     article.IsActive = false;
 
-                    _logger.LogError(e, $"Error while loading article from {url} with source id {source.Id}");
+                    _logger.LogError(ex, $"Error while loading article from {url}. SourceName: {source.Name}, Id: {source.Id}");
                 }
 
                 article.Url = url;
                 articles.Add(article);
             }
 
+            _logger.LogInformation($"Scraped {articles.Count} articles from page. SourceName: {source.Name}, Id: {source.Id}.\n" +
+                $"Parsed articles: {String.Join("\n", articles.Select(a => a.Url).ToArray())}");
+
             scraper.Dispose();
-            await _articleService.AddRangeAsync(articles.ToArray());
+            return articles;
+        }
+
+        public async Task<Article> ScrapeAsync(Source source, string articleUrl)
+        {
+            _logger.LogInformation($"Scraping latest articles from source. SourceName: {source.Name}, Id: {source.Id}");
+
+            // create scraper
+            var scraper = CreateScraper(source);
+
+            try
+            {
+                // load page
+                await scraper.GetPageAsync(articleUrl);
+                _logger.LogDebug($"Article page loaded successfully from {articleUrl}. SourceName: {source.Name}, Id: {source.Id}");
+            }
+            catch (Exception ex)
+            {
+                scraper.Dispose();
+                throw new Exception($"Error while loading article from {articleUrl}. SourceName: {source.Name}, Id: {source.Id}", ex);
+            }
+
+            // parse article
+            var article = ParseArticle(source, scraper);
+            article.Url = articleUrl;
+            _logger.LogDebug($"Article parsed successfully from {articleUrl}. ArticleTitle: {article.Title}, SourceName: {source.Name}, Id: {source.Id}");
+
+            scraper.Dispose();
+            return article;
         }
 
         private PrettyScraper CreateScraper(Source source)
@@ -249,7 +274,15 @@ namespace NewsByTheMood.Services.ScrapeProvider.Implement
 
         private string? GetBody(Source source, PrettyScraper scraper)
         {
-            var body = scraper.Parser.Init(source.ArticleBodyCollectionsPath).SelectAll(source.ArticleBodyItemPath).ToHtml();
+            var body = scraper.Parser
+                .Init(source.ArticleBodyCollectionsPath)
+                .SelectAll(source.ArticleBodyItemPath)
+                .RemoveAll("script")
+                .WrapAll("iframe", "div", "ratio ratio-16x9")
+                .WrapAll("embed", "div", "ratio ratio-16x9")
+                .WrapAll("video", "div", "ratio ratio-16x9")
+                .ToHtml();
+
             return body;
         }
     }

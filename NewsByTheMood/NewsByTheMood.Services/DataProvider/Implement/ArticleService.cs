@@ -35,7 +35,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
 
             if (result == 0)
             {
-                _logger.LogDebug($"No articles were found. Positivity {positivity}");
+                _logger.LogDebug($"No articles were found. Positivity: {positivity}");
             }
 
             return result;
@@ -64,7 +64,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             }
             else
             {
-                _logger.LogDebug($"No articles were found. Positivity {positivity}, PageNumber {pageNumber}, " +
+                _logger.LogDebug($"No articles were found. Positivity: {positivity}, PageNumber: {pageNumber}, " +
                     $"PageSize {pageSize}");
             }
 
@@ -90,7 +90,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
 
             if (result == 0)
             {
-                _logger.LogDebug($"No articles were found. Positivity {positivity}, TopicId {topicId}");
+                _logger.LogDebug($"No articles were found. Positivity: {positivity}, TopicId: {topicId}");
             }
 
             return result;
@@ -122,8 +122,8 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             }
             else
             {
-                _logger.LogDebug($"No articles were found. Positivity {positivity}, TopicId {topicId}, " +
-                    $"PageNumber {pageNumber}, PageSize {pageSize}");
+                _logger.LogDebug($"No articles were found. Positivity: {positivity}, TopicId: {topicId}, " +
+                    $"PageNumber: {pageNumber}, PageSize: {pageSize}");
             }
 
             return result;
@@ -148,7 +148,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
 
             if (result == 0)
             {
-                _logger.LogDebug($"No articles were found. Positivity {positivity}, TopicsIds {topicsIds.ToString()}");
+                _logger.LogDebug($"No articles were found. Positivity: {positivity}, TopicsIds: {topicsIds.ToString()}");
             }
 
             return result;
@@ -180,8 +180,8 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             }
             else
             {
-                _logger.LogDebug($"No articles were found. Positivity {positivity}, TopicsIds {topicsIds.ToString()}, " +
-                    $"PageNumber {pageNumber}, PageSize {pageSize}");
+                _logger.LogDebug($"No articles were found. Positivity: {positivity}, TopicsIds: {topicsIds.ToString()}, " +
+                    $"PageNumber: {pageNumber}, PageSize: {pageSize}");
             }
 
             return result;
@@ -199,7 +199,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
 
             if (result == null)
             {
-                _logger.LogWarning($"Article with id {id} does not exist.");
+                _logger.LogWarning($"Article with id={id} does not exist.");
                 return null;
             }
 

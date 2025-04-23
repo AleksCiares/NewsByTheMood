@@ -7,7 +7,7 @@ namespace NewsByTheMood.Services.ScrapeProvider.Abstract
     /// </summary>
     public interface IArticleScrapeService
     {
-        public Task LoadArticles(Source source);
-        public Task LoadArticle(Source source, string articleUrl);
+        public Task<IEnumerable<Article>> ScrapeLatestBySourceAsync(Source source);
+        public Task<Article> ScrapeAsync(Source source, string articleUrl);
     }
 }

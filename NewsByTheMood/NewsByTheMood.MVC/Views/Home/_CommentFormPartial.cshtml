@@ -1,0 +1,8 @@
+﻿@model AddCommentModel
+
+<form asp-antiforgery="true" method="post" id="addCommentForm" class="row">
+    <textarea asp-for="@Model.Text" class="form-control" id="commentForm" placeholder="Type your comment..." rows="5"
+              style="resize:none; overflow: hidden;"></textarea>
+    <span asp-validation-for="@Model.Text" class="error-feedback invalid-feedback"></span>
+    <button type="submit" class="btn btn-outline-primary">Submit</button>
+</form>

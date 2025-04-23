@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using NewsByTheMood.CQS.Commands;
 using NewsByTheMood.Data;
+using NewsByTheMood.Data.Entities;
 
 namespace NewsByTheMood.CQS.CommandHandlers
 {
@@ -30,23 +31,29 @@ namespace NewsByTheMood.CQS.CommandHandlers
                 }
 
                 // Обновление тегов
-                var newTagIds = request.Article.Tags.Select(t => t.Id).ToList();
-                var currentTagIds = existingArticle.Tags.Select(t => t.Id).ToList();
+                var newTagIds = request.Article.Tags.Select(t => t.Name).ToList();
+                var currentTagIds = existingArticle.Tags.Select(t => t.Name).ToList();
 
                 // Удаление тегов, которые больше не указаны
-                var tagsToRemove = existingArticle.Tags.Where(t => !newTagIds.Contains(t.Id)).ToList();
+                var tagsToRemove = existingArticle.Tags.Where(t => !newTagIds.Contains(t.Name)).ToList();
                 foreach (var tag in tagsToRemove)
                 {
                     existingArticle.Tags.Remove(tag);
                 }
 
                 // Добавление новых тегов
-                var tagsToAdd = newTagIds.Where(id => !currentTagIds.Contains(id)).ToList();
-                foreach (var tagId in tagsToAdd)
+                var tagsToAdd = newTagIds.Where(name => !currentTagIds.Contains(name)).ToList();
+                foreach (var tagName in tagsToAdd)
                 {
-                    var tag = await _dbContext.Tags.FindAsync(new object[] { tagId }, cancellationToken);
+                    var tag = await _dbContext.Tags.SingleOrDefaultAsync(tag => tag.Name.Equals(tagName), cancellationToken);
                     if (tag != null)
                     {
+                        existingArticle.Tags.Add(tag);
+                    }
+                    else
+                    {
+                        tag = new Tag() { Name = tagName };
+                        await _dbContext.Tags.AddAsync(tag);
                         existingArticle.Tags.Add(tag);
                     }
                 }

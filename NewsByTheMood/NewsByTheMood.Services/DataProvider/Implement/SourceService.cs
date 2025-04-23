@@ -27,7 +27,15 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 return null;
             }
 
-            return await _mediator.Send(new GetSourceByIdQuery() { Id = id }, cancellationToken);
+            var result = await _mediator.Send(new GetSourceByIdQuery() { Id = id }, cancellationToken);
+
+            if (result == null)
+            {
+                _logger.LogWarning($"Source with id={id} does not exist.");
+                return null;
+            }
+
+            return result;
         }
 
         public async Task<IEnumerable<Source>> GetRangeAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)

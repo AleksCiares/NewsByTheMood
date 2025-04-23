@@ -93,6 +93,52 @@ namespace WebScraper.Core.Parsers.Implement
             return this;
         }
 
+        public IDocumentParser RemoveAll(string selector)
+        {
+            if(_elements == null)
+            {
+                throw new Exception();
+            }
+
+            foreach (var element in _elements)
+            {
+                var elmentsToRemove = element.QuerySelectorAll(selector);
+                foreach (var elementToDelete in elmentsToRemove)
+                {
+                    element.RemoveChild(elementToDelete);
+                }
+            }
+
+            return this;
+        }
+
+        public IDocumentParser WrapAll(string selector, string wrapper, string wrapperClasses)
+        {
+            if (_elements == null)
+            {
+                throw new Exception();
+            }
+            
+            if(_document == null)
+            {
+                throw new Exception();
+            }
+
+            foreach (var element in _elements)
+            {
+                var elementsToWrap = element.QuerySelectorAll(selector);
+                foreach (var elementToWrap in elementsToWrap)
+                {
+                    var wrapperTag = _document.CreateElement(wrapper);
+                    wrapperTag.ClassList.Add(wrapperClasses);
+                    elementToWrap.ParentElement?.InsertBefore(wrapperTag, elementToWrap);
+                    wrapperTag.AppendChild(elementToWrap);
+                }
+            }
+
+            return this;
+        }
+
         public string? GetAttribute(string name)
         {
             if (_elements == null)
