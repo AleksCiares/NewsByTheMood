@@ -19,5 +19,10 @@ namespace NewsByTheMood.Services.MVC.Mappers
         [MapperIgnoreSource(nameof(Topic.Users))]
         [MapperIgnoreSource(nameof(Topic.Sources))]
         public partial TopicModel TopicToTopicModel(Topic topic);
+
+        [MapperIgnoreSource(nameof(Topic.IconCssClass))]
+        [MapperIgnoreSource(nameof(Topic.Users))]
+        [MapperIgnoreSource(nameof(Topic.Sources))]
+        public partial TopicSearchModel? TopicToTopicSearchModel(Topic? topic);
     }
 }

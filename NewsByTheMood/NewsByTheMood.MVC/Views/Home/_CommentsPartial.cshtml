@@ -1,0 +1,19 @@
+﻿@model IEnumerable<CommentModel>
+
+@foreach (var comment in Model)
+{
+    <div class="card comment" style="width: 100%">
+        <div class="card-header d-flex justify-content-start">
+            <div>
+                <img style="width: 10px;height: 10px;" src="@comment.UserAvatar" class="user-avatar rounded-circle border" />
+            </div>
+            <div>
+                @comment.UserDisplayName
+                (
+                    @comment.UserName
+                )
+            </div>
+        </div>
+        <div class="card-body">@comment.Text</div>
+    </div>
+}

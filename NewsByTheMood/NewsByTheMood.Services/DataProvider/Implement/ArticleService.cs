@@ -206,24 +206,6 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             return result;
         }
 
-        public async Task<bool> AddCommentAsync(AddCommentModel addComment, Int64 userId, Int64 articleId, CancellationToken cancellationToken = default)
-        {
-            if (userId <= 0 || articleId <= 0)
-            {
-                _logger.LogWarning($"UserId/ArticleId is less than or equal to 0. UserId: {userId}, ArticleId: {articleId}");
-                return false;
-            }
-
-            await _mediator.Send(new AddCommentCommand()
-            {
-                ArticleId = articleId,
-                UserId = userId,
-                Text = addComment.Text
-            });
-
-            return true;
-        }
-
         public async Task<bool> IsExistsByUrlAsync(string articleUrl, CancellationToken cancellationToken = default)
         {
             if (articleUrl.IsNullOrEmpty())
@@ -233,6 +215,28 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             }
 
             return await _mediator.Send(new IsExistsArticleByUrlQuery() { ArticleUrl = articleUrl }, cancellationToken);
+        }
+
+        public async Task<bool> IsExistsByIdAsync(long articleId, CancellationToken cancellationToken = default)
+        {
+            if (articleId <= 0)
+            {
+                _logger.LogWarning($"ArticleId is less than or equal to 0. ArticleId: {articleId}");
+                return false;
+            }
+
+            var result = await _mediator.Send(new IsExistsArticleByIdQuery() { Id = articleId }, cancellationToken);
+
+            if (result)
+            {
+                _logger.LogDebug($"Article with id={articleId} exists.");
+            }
+            else
+            {
+                _logger.LogDebug($"Article with id={articleId} does not exist.");
+            }
+
+            return result;
         }
 
         public async Task<bool> AddAsync(Article article, CancellationToken cancellationToken = default)

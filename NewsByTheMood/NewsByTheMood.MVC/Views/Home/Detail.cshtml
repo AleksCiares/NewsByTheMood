@@ -52,8 +52,10 @@
                 <section-divider>Comments</section-divider>
                 @if (User.Identity != null && User.Identity.IsAuthenticated)
                 {
-                    <partial name="_CommentFormPartial" model="new AddCommentModel()" />
+                    <partial name="_CommentFormPartial" model="new CommentCreateModel()" />
                 }
+                <div class="user-comments" id="userComments">
+                </div>
             </div>
         </div>
     </div>
@@ -69,9 +71,9 @@
     @if (User.Identity != null && User.Identity.IsAuthenticated)
     {
         <partial name="_ValidationScriptsPartial" />
-        <script src="~/js/article-comment-form.js" asp-append-version="true"></script>
+        <script src="~/js/comment-form.js" asp-append-version="true"></script>
     }
-
+    <script src="~/js/comments-loader.js" asp-append-version="true"></script>
 }
 
 

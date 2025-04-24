@@ -28,7 +28,7 @@ namespace NewsByTheMood.Services.MVC.Mappers
         [MapperIgnoreSource(nameof(Article.FailedLoaded))]
         [MapperIgnoreSource(nameof(Article.SourceId))]
         [MapperIgnoreSource(nameof(Article.Comments))]
-        public partial ArticleModel ArticleToArticleModel(Article article);
+        public partial ArticleModel? ArticleToArticleModel(Article? article);
 
         [MapProperty([nameof(Article.Source), nameof(Article.Source.Topic), nameof(Article.Source.Topic.Name)],
             nameof(ArticleSettingsPreviewModel.TopicName))]

@@ -6,7 +6,7 @@ namespace NewsByTheMood.MVC.TagHelpers
 {
     public class DynamicTextAreaTagHelper : TextAreaTagHelper
     {
-        public required string areaSelector { get; set; }
+        public required string tagSelector { get; set; }
         public required int rows { get; set; }
         public int? maxRows { get; set; }
 
@@ -21,7 +21,7 @@ namespace NewsByTheMood.MVC.TagHelpers
             var script = $@"
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {{
-                        var textarea = document.querySelector('[text-area-selector=""{areaSelector}""]');
+                        var textarea = document.querySelector('[text-area-selector=""{tagSelector}""]');
                         if (textarea) {{
                             textarea.style.height = 'auto';
                             textarea.style.height = (textarea.scrollHeight) + 'px';
@@ -46,7 +46,7 @@ namespace NewsByTheMood.MVC.TagHelpers
 
             output.TagName = "textarea";
             output.TagMode = TagMode.StartTagAndEndTag;
-            output.Attributes.Add("text-area-selector", areaSelector);
+            output.Attributes.Add("text-area-selector", tagSelector);
             output.Attributes.Add("style", "resize: none; overflow: hidden;");
             output.Attributes.Add("rows", rows.ToString());
             if (maxRows.HasValue)

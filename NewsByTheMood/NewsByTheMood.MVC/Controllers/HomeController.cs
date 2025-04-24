@@ -15,23 +15,32 @@ namespace NewsByTheMood.MVC.Controllers
         private readonly IArticleService _articleService;
         private readonly ITopicService _topicService;
         private readonly IUserService _userService;
+        private readonly ICommentService _commentService;
         private readonly ArticlesMapper _articleMapper;
+        private readonly TopicsMapper _topicMapper;
         private readonly UsersMapper _usersMapper;
+        private readonly CommentsMapper _commentMapper;
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(
-            IArticleService articleService, 
+            IArticleService articleService,
             ITopicService topicService,
             IUserService userService,
+            ICommentService commentService,
             ArticlesMapper articleMapper,
+            TopicsMapper topicMapper,
             UsersMapper userMapper,
+            CommentsMapper commentMapper,
             ILogger<HomeController> logger)
         {
             _articleService = articleService;
             _topicService = topicService;
             _userService = userService;
+            _commentService = commentService;
             _articleMapper = articleMapper;
+            _topicMapper = topicMapper;
             _usersMapper = userMapper;
+            _commentMapper = commentMapper;
             _logger = logger;
         }
 
@@ -41,10 +50,16 @@ namespace NewsByTheMood.MVC.Controllers
         {
             try
             {
-                var user = await GetCurrentUserModelAsync();
-                var totalArticles = await _articleService.CountAsync(user.PreferedPositivity);
-                var articlesPreviews = Array.Empty<ArticlePreviewModel>();
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
 
+                var user = await GetCurrentUserModelAsync();
+                var articlesPreviews = Array.Empty<ArticlePreviewModel>();
+                var totalArticles = await _articleService.CountAsync(user.PreferedPositivity);
+
+                // TODO: check if pagination dont more that totalArticles
                 if (totalArticles > 0)
                 {
                     articlesPreviews = (await _articleService.GetRangeLatestAsync(
@@ -89,16 +104,19 @@ namespace NewsByTheMood.MVC.Controllers
         {
             try
             {
-                var topic = await _topicService.GetByNameAsync(id);
-                if (topic == null)
+                var topic = _topicMapper.TopicToTopicSearchModel(await _topicService.GetByNameAsync(id));
+
+                if (!ModelState.IsValid ||
+                    topic == null)
                 {
                     return BadRequest();
                 }
 
                 var user = await GetCurrentUserModelAsync();
-                var totalArticles = await _articleService.CountByTopicAsync(user.PreferedPositivity, topic.Id);
                 var articlesPreviews = Array.Empty<ArticlePreviewModel>();
+                var totalArticles = await _articleService.CountByTopicAsync(user.PreferedPositivity, topic.Id);
 
+                // TODO: check if pagination dont more that totalArticles
                 if (totalArticles > 0)
                 {
                     articlesPreviews = (await _articleService.GetRangeByTopicAsync(
@@ -145,10 +163,16 @@ namespace NewsByTheMood.MVC.Controllers
         {
             try
             {
-                var user = await GetCurrentUserModelAsync();
-                var totalArticles = await _articleService.CountFavoriteAsync(user.PreferedPositivity, user.TopicsIds);
-                var articlesPreviews = Array.Empty<ArticlePreviewModel>();
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
 
+                var user = await GetCurrentUserModelAsync();
+                var articlesPreviews = Array.Empty<ArticlePreviewModel>();
+                var totalArticles = await _articleService.CountFavoriteAsync(user.PreferedPositivity, user.TopicsIds);
+
+                // TODO: check if pagination dont more that totalArticles
                 if (totalArticles > 0)
                 {
                     articlesPreviews = (await _articleService.GetRangeFavoriteAsync(
@@ -194,13 +218,15 @@ namespace NewsByTheMood.MVC.Controllers
         {
             try
             {
-                var article = await _articleService.GetByIdAsync(long.Parse(id));
-                if (article == null)
+                var article = _articleMapper.ArticleToArticleModel(
+                    await _articleService.GetByIdAsync(long.Parse(id)));
+
+                if(article == null)
                 {
                     return BadRequest();
                 }
 
-                return View(_articleMapper.ArticleToArticleModel(article));
+                return View(article);
             }
             catch (Exception ex)
             {
@@ -211,47 +237,80 @@ namespace NewsByTheMood.MVC.Controllers
 
         // Create comment
         [HttpPost]
+        [Route("addcommenttoarticle")]
+        [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> AddComment([FromForm] AddCommentModel addComment)
+        public async Task<IActionResult> AddCommentToArticle([FromForm] CommentCreateModel addComment)
         {
             try
             {
-                var id = HttpContext.Request.Headers["Referer"].ToString().Split('/').Last();
+                var articleId = HttpContext.Request.Headers["Referer"].ToString().Split('/').Last();
 
-                if (!ModelState.IsValid && id.IsNullOrEmpty())
+                if (!ModelState.IsValid || 
+                    articleId.IsNullOrEmpty() ||
+                    !await _articleService.IsExistsByIdAsync(long.Parse(articleId)))
                 {
-                    return Ok(new
-                    {
-                        success = false,
-                        errors = "Failed to add comment. Please try again later."
-                    });
+                    return BadRequest();
                 }
 
-                var result = await _articleService.AddCommentAsync( 
+                var result = await _commentService.AddCommentAsync( 
                     addComment,
                     Int64.Parse((await GetCurrentUserModelAsync()).Id),
-                    Int64.Parse(id)
-                );
+                    Int64.Parse(articleId));
+
                 if (result)
                 {
-                    return Ok(new
-                    {
-                        success = true,
-                        message = "Comment added successfully."
-                    });
+                    return Ok();
                 }
                 else
                 {
-                    return Ok(new
-                    {
-                        success = false,
-                        message = "Failed to add comment. Please try again later."
-                    });
+                    return BadRequest();
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error while adding comment in article");
+                return StatusCode(500);
+            }
+        }
+
+        [HttpPost]
+        [Route("getcomments")]
+        public async Task<IActionResult> GetComments([FromBody] PaginationModel pagination)
+        {
+            try
+            {
+                var articleId = HttpContext.Request.Headers["Referer"].ToString().Split('/').Last();
+
+                if (!ModelState.IsValid || 
+                    articleId.IsNullOrEmpty() || 
+                    !await _articleService.IsExistsByIdAsync(long.Parse(articleId)))
+                {
+                    return BadRequest();
+                }
+
+                var totalComments = await _commentService.CountByArticleIdAsync(
+                    Int64.Parse(articleId));
+
+                if (totalComments > 0 && ItemsNotOver(pagination, totalComments))
+                {
+                    var comments = (await _commentService.GetRangeByArticleIdAsync(
+                        Int64.Parse(articleId),
+                        pagination.Page,
+                        pagination.PageSize))
+                        .Select(comment => _commentMapper.CommentToCommentModel(comment))
+                        .ToArray();
+
+                    return PartialView("_CommentsPartial", comments);
+                }
+                else
+                {
+                    return StatusCode(204);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error while getting comments");
                 return StatusCode(500);
             }
         }
@@ -271,6 +330,18 @@ namespace NewsByTheMood.MVC.Controllers
             }
 
             return new UserModel();
+        }
+
+        [NonAction]
+        private bool ItemsNotOver(PaginationModel pagination, int totalItems)
+        {
+            var pageCount = (int)Math.Ceiling((double)totalItems / pagination.PageSize);
+            if (pagination.Page <= pageCount)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
