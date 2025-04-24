@@ -1,8 +1,13 @@
-﻿@model AddCommentModel
+﻿@addTagHelper NewsByTheMood.MVC.TagHelpers.DynamicTextAreaTagHelper, NewsByTheMood.MVC
+@model AddCommentModel
 
-<form asp-antiforgery="true" method="post" id="addCommentForm" class="row">
-    <textarea asp-for="@Model.Text" class="form-control" id="commentForm" placeholder="Type your comment..." rows="5"
-              style="resize:none; overflow: hidden;"></textarea>
+<form asp-antiforgery="true" method="post" id="addCommentForm">
+    <div class="comment-form__text-wrap">
+        <dynamic-text-area asp-for="@Model.Text" area-selector="textCommentForm" rows="3" max-rows="15"
+                           class="form-control pb-5" placeholder="Type your comment..."></dynamic-text-area>
+        <button type="submit" class="btn">
+            <i class="bi bi-send"></i>
+        </button>
+    </div>
     <span asp-validation-for="@Model.Text" class="error-feedback invalid-feedback"></span>
-    <button type="submit" class="btn btn-outline-primary">Submit</button>
 </form>

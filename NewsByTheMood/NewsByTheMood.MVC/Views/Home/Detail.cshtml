@@ -1,4 +1,5 @@
 ﻿@addTagHelper NewsByTheMood.MVC.TagHelpers.PositivityIconTagHelper, NewsByTheMood.MVC
+@addTagHelper NewsByTheMood.MVC.TagHelpers.SectionDividerTagHelper, NewsByTheMood.MVC
 @model NewsByTheMood.MVC.Models.ArticleModel
 @{
     ViewData["PageTitle"] = Model.Title;
@@ -28,29 +29,31 @@
             <div class="article__body mb-3">
                 @Html.Raw(@Model.Body)
             </div>
-            <div class="article__source row align-items-center justify-content-end mb-3">
-                <div class="col-auto">
+            <div class="article__source d-flex align-items-center justify-content-end mb-3">
+                <div>
                     <a href="@Model.Url" target="_blank" class="text-decoration-none">@Model.SourceName</a>
                 </div>
             </div>
-            <div class="article__tags row align-items-center justify-content-start mb-3">
+            <div class="article__tags d-flex align-items-center justify-content-start mb-3">
                 @foreach (var tag in Model.Tags)
                 {
-                    <div class="col-auto mb-2">
+                    <div class="pe-2 mb-2">
                         <div class="border rounded-3">
                             <span class="mx-1">@tag</span>
                         </div>
                     </div>
                 }
             </div>
+        </div>
+    </div>
+    <div class="row justify-content-center align-content-start mb-4">
+        <div class="col-8">
             <div class="article__comments">
-                <div class="section-divider">
-                    <span class="section-title">Comments</span>
-                </div>
-            @if (User.Identity != null && User.Identity.IsAuthenticated)
-            {
-                <partial name="_CommentFormPartial" model="new AddCommentModel()"/>
-            }
+                <section-divider>Comments</section-divider>
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <partial name="_CommentFormPartial" model="new AddCommentModel()" />
+                }
             </div>
         </div>
     </div>
@@ -63,45 +66,12 @@
 
 @section Scripts
 {
-   <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            var textarea = document.querySelector('#commentForm');
-            if (textarea) {
-                textarea.style.height = 'auto';
-                textarea.style.height = (textarea.scrollHeight) + 'px';
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        <partial name="_ValidationScriptsPartial" />
+        <script src="~/js/article-comment-form.js" asp-append-version="true"></script>
+    }
 
-                textarea.addEventListener('input', function () {
-                    this.style.height = 'auto';
-                    this.style.height = (this.scrollHeight) + 'px';
-                });
-            }
-
-            $('#addCommentForm').on('submit', function (e) {
-                e.preventDefault();
-
-                $.ajax({
-                    url: '/Home/AddComment/1',
-                    type: 'POST',
-                    data: $(this).serialize(),
-                    success: function (response) {
-                        if (response.success) {
-                            alert(response.message);
-                            // Обновить список комментариев или выполнить другие действия
-                        } else {
-                            if (response.errors) {
-                                alert('Validation errors: ' + response.errors.join(', '));
-                            } else {
-                                alert(response.message);
-                            }
-                        }
-                    },
-                    error: function () {
-                        alert('An unexpected error occurred. Please try again later.');
-                    }
-                });
-            });
-        });
-   </script>
 }
 
 

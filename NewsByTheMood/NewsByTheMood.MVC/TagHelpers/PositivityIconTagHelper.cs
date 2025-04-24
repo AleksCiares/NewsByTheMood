@@ -6,6 +6,7 @@ namespace NewsByTheMood.MVC.TagHelpers
     public class PositivityIconTagHelper : TagHelper
     {
         public required short Positivity;
+
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             var icon = new TagBuilder("i");
@@ -62,7 +63,15 @@ namespace NewsByTheMood.MVC.TagHelpers
                 _ => "Unknown"
             };
 
-            var script = "<script>document.addEventListener(\"DOMContentLoaded\", function () {\r\n    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle=\"tooltip\"]'));\r\n    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {\r\n        return new bootstrap.Tooltip(tooltipTriggerEl);\r\n    });\r\n});</script>";
+            var script = 
+                "<script>" +
+                    "document.addEventListener('DOMContentLoaded', function () {" +
+                        "var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle=\"tooltip\"]'));" +
+                        "var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {" +
+                            "return new bootstrap.Tooltip(tooltipTriggerEl);" +
+                        "});" +
+                    "});" +
+                "</script>";
 
             output.TagName = "span";
             output.TagMode = TagMode.StartTagAndEndTag;
