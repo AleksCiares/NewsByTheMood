@@ -25,7 +25,7 @@
 
         switch (result) {
             case 200:
-                this.style.display = "block";
+                /*this.style.display = "block";*/
                 break;
             case 204:
                 this.style.display = "none";

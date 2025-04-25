@@ -26,7 +26,14 @@
         if (response.ok) {
             const data = await response.text();
             document.getElementById("asyncLoadItemsContainer").insertAdjacentHTML("afterbegin", data);
+
             form.reset();
+
+            // restore textarea height
+            const textArea = form.querySelector("[dynamic-textarea]");
+            if (textArea) {
+                textArea.style.height = "";
+            }
         }
         else {
             const message = "Failed saving comment.";

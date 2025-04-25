@@ -21,7 +21,7 @@ namespace NewsByTheMood.MVC.TagHelpers
             var script = $@"
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {{
-                        var textarea = document.querySelector('[text-area-selector=""{textAreaSelector}""]');
+                        var textarea = document.querySelector('[dynamic-textarea-selector=""{textAreaSelector}""]');
                         if (textarea) {{
                             textarea.style.height = 'auto';
                             textarea.style.height = (textarea.scrollHeight) + 'px';
@@ -46,7 +46,8 @@ namespace NewsByTheMood.MVC.TagHelpers
 
             output.TagName = "textarea";
             output.TagMode = TagMode.StartTagAndEndTag;
-            output.Attributes.Add("text-area-selector", textAreaSelector);
+            output.Attributes.Add("dynamic-textarea","");
+            output.Attributes.Add("dynamic-textarea-selector", textAreaSelector);
             output.Attributes.Add("style", "resize: none; overflow: hidden;");
             output.Attributes.Add("rows", rows.ToString());
             if (maxRows.HasValue)

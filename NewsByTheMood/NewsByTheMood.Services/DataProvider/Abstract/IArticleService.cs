@@ -13,10 +13,10 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
         public Task<IEnumerable<Article>> GetRangeLatestAsync(short positivity, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 
         // Get article count with certain positivity and topic
-        public Task<int> CountByTopicAsync(short positivity, Int64 topicId, CancellationToken cancellationToken = default);
+        public Task<int> CountByTopicAsync(short positivity, long topicId, CancellationToken cancellationToken = default);
 
         // Get latest articles range with certain positivity and topic
-        public Task<IEnumerable<Article>> GetRangeByTopicAsync(short positivity, Int64 topicId, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+        public Task<IEnumerable<Article>> GetRangeByTopicAsync(short positivity, long topicId, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 
         // Get article count with certain positivity and topics
         public Task<int> CountFavoriteAsync(short positivity, IEnumerable<long> topicsIds, CancellationToken cancellationToken = default);
@@ -25,7 +25,7 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
         public Task<IEnumerable<Article>> GetRangeFavoriteAsync(short positivity, IEnumerable<long> topicsIds, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 
         // Get article by certain id
-        public Task<Article?> GetByIdAsync(Int64 id, CancellationToken cancellationToken = default);
+        public Task<Article?> GetByIdAsync(long id, CancellationToken cancellationToken = default);
 
         // Is exist article with current url
         public Task<bool> IsExistsByUrlAsync(string articleUrl, CancellationToken cancellationToken = default);

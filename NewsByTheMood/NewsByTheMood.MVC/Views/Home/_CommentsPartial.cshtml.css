@@ -17,6 +17,7 @@
     -ms-word-wrap: break-word;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    white-space: pre-wrap;
     display: inline-block;
     width: 100%;
 }
