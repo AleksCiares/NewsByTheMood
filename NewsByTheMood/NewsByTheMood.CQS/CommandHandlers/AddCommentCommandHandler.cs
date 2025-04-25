@@ -6,7 +6,7 @@ using NewsByTheMood.Data.Entities;
 
 namespace NewsByTheMood.CQS.CommandHandlers
 {
-    public class AddCommentCommandHandler : IRequestHandler<AddCommentCommand>
+    public class AddCommentCommandHandler : IRequestHandler<AddCommentCommand, long>
     {
         private readonly NewsByTheMoodDbContext _dbContext;
 
@@ -15,7 +15,7 @@ namespace NewsByTheMood.CQS.CommandHandlers
             _dbContext = dbContext;
         }
 
-        public async Task Handle(AddCommentCommand request, CancellationToken cancellationToken)
+        public async Task<long> Handle(AddCommentCommand request, CancellationToken cancellationToken)
         {
             var comment = new Comment()
             {
@@ -28,6 +28,9 @@ namespace NewsByTheMood.CQS.CommandHandlers
 
             await _dbContext.Comments.AddAsync(comment);
             await _dbContext.SaveChangesAsync();
+            _dbContext.Entry(comment).State = EntityState.Detached;
+
+            return comment.Id;
         }
     }
 }

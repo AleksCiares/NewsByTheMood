@@ -2,10 +2,10 @@
 
 namespace NewsByTheMood.CQS.Commands
 {
-    public class AddCommentCommand : IRequest
+    public class AddCommentCommand : IRequest<long>
     {
-        public required Int64 UserId { get; set; }
-        public required Int64 ArticleId { get; set; }
+        public required long UserId { get; set; }
+        public required long ArticleId { get; set; }
         public required string Text { get; set; } 
     }
 }

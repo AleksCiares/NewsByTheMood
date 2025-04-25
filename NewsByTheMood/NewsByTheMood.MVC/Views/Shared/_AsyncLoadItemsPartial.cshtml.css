@@ -1,0 +1,30 @@
+﻿.async-load-items__loader {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+.async-load-items__loader:hover {
+    background-color: #0056b3;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+.async-load-items__loader .btn-text {
+    margin-right: 10px;
+}
+.async-load-items__loader .spinner-border {
+    margin-left: 10px;
+}
+.async-load-items__loader.loading {
+    pointer-events: none;
+    opacity: 0.8;
+}

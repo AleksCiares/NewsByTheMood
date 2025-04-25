@@ -2,18 +2,18 @@
 
 @foreach (var comment in Model)
 {
-    <div class="card comment" style="width: 100%">
-        <div class="card-header d-flex justify-content-start">
-            <div>
-                <img style="width: 10px;height: 10px;" src="@comment.UserAvatar" class="user-avatar rounded-circle border" />
+    <div class="comment mb-3">
+        <div class="comment__header d-flex justify-content-between bg-transparent">
+            <div class="d-flex justify-content-start align-items-center">
+                <img src="@comment.UserAvatar" class="user-avatar rounded-circle border" />
+                 <span >@comment.UserDisplayName</span>
             </div>
             <div>
-                @comment.UserDisplayName
-                (
-                    @comment.UserName
-                )
+                <span>@comment.PublishDate.ToString("dd.mm.yyyy HH:mm")</span>
             </div>
         </div>
-        <div class="card-body">@comment.Text</div>
+        <div class="comment__body">
+            @comment.Text
+        </div>
     </div>
 }

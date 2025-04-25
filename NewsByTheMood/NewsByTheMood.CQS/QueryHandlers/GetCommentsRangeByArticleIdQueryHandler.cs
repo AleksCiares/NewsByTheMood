@@ -1,5 +1,4 @@
-﻿
-using MediatR;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NewsByTheMood.CQS.Queries;
 using NewsByTheMood.Data;
@@ -22,7 +21,7 @@ namespace NewsByTheMood.CQS.QueryHandlers
                 .AsNoTracking()
                 .Where(comment => comment.ArticleId == request.ArticleId)
                 .Include(comment => comment.User)
-                .OrderBy(comment => comment.PublishDate)
+                .OrderByDescending(comment => comment.PublishDate)
                 .Skip((request.PageNumber - 1) * request.PageSize)
                 .Take(request.PageSize)
                 .ToArrayAsync();

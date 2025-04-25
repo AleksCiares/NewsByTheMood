@@ -1,9 +1,9 @@
-﻿form#addCommentForm .comment-form__text-wrap {
+﻿#userForm .user-form__text-wrap {
     position: relative;
     margin-bottom: 0px;
     padding-bottom: 0px;
 }
-form#addCommentForm button.btn {
+#userForm .user-form__text-wrap button.btn {
     position: absolute;
     right: 0;
     bottom: 0;

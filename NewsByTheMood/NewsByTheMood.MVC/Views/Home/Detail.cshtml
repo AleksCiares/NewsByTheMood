@@ -12,10 +12,10 @@
                 <h3>@Model.Title</h3>
             </div>
             <div class="article__preview-img rounded mb-3">
-            @if (Model.PreviewImgUrl != null)
-            {
-                <img src="@Model.PreviewImgUrl" alt="@Model.Title">
-            }
+                @if (Model.PreviewImgUrl != null)
+                {
+                    <img src="@Model.PreviewImgUrl" alt="@Model.Title">
+                }
                 <div class="overlay d-flex justify-content-between align-items-center w-100">
                     <div>
                         <positivity-icon positivity="@Model.Positivity"/>
@@ -34,16 +34,19 @@
                     <a href="@Model.Url" target="_blank" class="text-decoration-none">@Model.SourceName</a>
                 </div>
             </div>
-            <div class="article__tags d-flex align-items-center justify-content-start mb-3">
-                @foreach (var tag in Model.Tags)
-                {
-                    <div class="pe-2 mb-2">
-                        <div class="border rounded-3">
-                            <span class="mx-1">@tag</span>
+            @if (Model.Tags.Length > 0)
+            {
+                <div class="article__tags d-flex align-items-center justify-content-start mb-3">
+                    @foreach (var tag in Model.Tags)
+                    {
+                        <div class="pe-2 mb-2">
+                            <div class="border rounded-3">
+                                <span class="mx-1">@tag</span>
+                            </div>
                         </div>
-                    </div>
-                }
-            </div>
+                    }
+                </div>
+            }
         </div>
     </div>
     <div class="row justify-content-center align-content-start mb-4">
@@ -52,9 +55,12 @@
                 <section-divider>Comments</section-divider>
                 @if (User.Identity != null && User.Identity.IsAuthenticated)
                 {
-                    <partial name="_CommentFormPartial" model="new CommentCreateModel()" />
+                    <div class="comments-form mb-3">
+                        <partial name="_CommentFormPartial" model="new CommentCreateModel()" />
+                    </div>
                 }
-                <div class="user-comments" id="userComments">
+                <div class="comments-container">
+                    <partial name="_AsyncLoadItemsPartial" />
                 </div>
             </div>
         </div>
@@ -71,9 +77,13 @@
     @if (User.Identity != null && User.Identity.IsAuthenticated)
     {
         <partial name="_ValidationScriptsPartial" />
-        <script src="~/js/comment-form.js" asp-append-version="true"></script>
+        <script src="~/js/user-form.js" asp-append-version="true"></script>
     }
-    <script src="~/js/comments-loader.js" asp-append-version="true"></script>
+    <script src="~/js/async-load-items.js" asp-append-version="true"></script>
+    <script>
+        var asyncLoadUrl = "/getcomments";
+        var asyncLoadMethod = "POST";
+    </script>
 }
 
 

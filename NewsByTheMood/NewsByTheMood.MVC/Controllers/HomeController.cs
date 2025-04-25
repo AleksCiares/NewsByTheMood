@@ -253,14 +253,18 @@ namespace NewsByTheMood.MVC.Controllers
                     return BadRequest();
                 }
 
-                var result = await _commentService.AddCommentAsync( 
+                var result = await _commentService.AddAsync( 
                     addComment,
                     Int64.Parse((await GetCurrentUserModelAsync()).Id),
                     Int64.Parse(articleId));
 
-                if (result)
+                if (result > 0)
                 {
-                    return Ok();
+                    var comments = new CommentModel[1]
+                    {
+                         _commentMapper.CommentToCommentModel(await _commentService.GetByIdAsync(result))
+                    };
+                    return PartialView("_CommentsPartial", comments);
                 }
                 else
                 {
@@ -283,19 +287,19 @@ namespace NewsByTheMood.MVC.Controllers
                 var articleId = HttpContext.Request.Headers["Referer"].ToString().Split('/').Last();
 
                 if (!ModelState.IsValid || 
-                    articleId.IsNullOrEmpty() || 
+                    string.IsNullOrEmpty(articleId)|| 
                     !await _articleService.IsExistsByIdAsync(long.Parse(articleId)))
                 {
                     return BadRequest();
                 }
 
                 var totalComments = await _commentService.CountByArticleIdAsync(
-                    Int64.Parse(articleId));
+                    long.Parse(articleId));
 
                 if (totalComments > 0 && ItemsNotOver(pagination, totalComments))
                 {
                     var comments = (await _commentService.GetRangeByArticleIdAsync(
-                        Int64.Parse(articleId),
+                        long.Parse(articleId),
                         pagination.Page,
                         pagination.PageSize))
                         .Select(comment => _commentMapper.CommentToCommentModel(comment))
@@ -326,7 +330,9 @@ namespace NewsByTheMood.MVC.Controllers
         {
             if (HttpContext.User.Identity?.IsAuthenticated == true)
             {
-                return _usersMapper.UserToUserModel(await _userService.GetUserAsync(HttpContext.User)) ?? new UserModel();
+                return _usersMapper.UserToUserModel(
+                    await _userService.GetUserAsync(HttpContext.User)) ?? 
+                    new UserModel();
             }
 
             return new UserModel();

@@ -1,9 +1,12 @@
-﻿document.getElementById("addCommentForm").addEventListener("submit", async function (event) {
+﻿document.getElementById("userForm").addEventListener("submit", async function (event) {
     const form = event.target;
     const validator = $(form).validate();
 
     if (!validator.form()) {
+        const message = "Please fill in all required fields.";
+        console.log(message);
         form.reportValidity();
+
         return;
     }
 
@@ -20,23 +23,24 @@
             }
         });
 
-        if (!response.ok) {
-            const message = "Failed add comment while sending to server.";
-            console.error(message + "Response code: " + response.status);
+        if (response.ok) {
+            const data = await response.text();
+            document.getElementById("asyncLoadItemsContainer").insertAdjacentHTML("afterbegin", data);
+            form.reset();
+        }
+        else {
+            const message = "Failed saving comment.";
+            console.error(message + " Response code: " + response.status);
             validator.showErrors({
                 Text: message
             });
-            return;
-        }
-        else {
-            window.alert("Comment added successfully");
         }
     }
     catch (error) {
         const message = "Error while creating comment.";
         console.error(message, error);
         validator.showErrors({
-            Text: message + " Reload page"
+            Text: message + " Reload page."
         });
     }
 });

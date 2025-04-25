@@ -2,10 +2,10 @@
 {
     public class CommentModel
     {
-        public string Text { get; set; }
-        public DateTime PublishDate { get; set; }
-        public string UserAvatar { get; set; }
-        public string UserDisplayName { get; set; }
-        public string UserName { get; set; }
+        public required string Text { get; set; }
+        public required DateTime PublishDate { get; set; }
+        public required string UserAvatar { get; set; }
+        public required string UserDisplayName { get; set; }
+        public required string UserName { get; set; }
     }
 }
