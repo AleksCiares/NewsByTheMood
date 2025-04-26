@@ -17,9 +17,6 @@ html {
   position: relative;
   min-height: 100%;
 }
-body {
-  margin-bottom: 60px;
-}
 /* width */
 ::-webkit-scrollbar {
     width: 0.5em;
@@ -59,7 +56,27 @@ a:hover, a.nav-link:hover, a.dropdown-item:hover {
     display: inline-block !important;
 }
 
+html, body {
+    height: 100%;
+    margin: 0;
+}
 
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1; /* Заставляет основной контент занимать оставшееся пространство */
+}
+
+footer {
+    border-top: 1px solid #ddd;
+    padding: 10px 0;
+    background-color: #f8f9fa;
+    text-align: center;
+}
 
 
 

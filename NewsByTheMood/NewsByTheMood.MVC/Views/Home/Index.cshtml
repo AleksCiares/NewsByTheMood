@@ -1,72 +1,22 @@
-﻿@model NewsByTheMood.MVC.Models.ArticlePreviewCollectionModel
+﻿@model NewsByTheMood.MVC.Models.AsyncArticleLoadModel
 @{
     ViewData["PageTitle"] = Model.PageTitle;
 }
 
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/positivity-icon.css" asp-append-version="true" />
+}
+
 <div class="articles container">
-    <div class="articles__list row justify-content-start row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-3 row-cols-xxl-3 mb-4" id="articlesList">
-        <partial name="_ArticlePreviewsPartial" model="@Model.Articles"/>
-    </div>
+        <partial name="_AsyncLoadItemsPartial" />
 </div>
 
 @section Scripts
 {
+    <script src="~/js/async-load-items.js" asp-append-version="true"></script>
     <script>
-        function ShowArticlePositivityTip()
-        {
-            $('[data-bs-toggle="tooltip"]').tooltip({
-                title : "<div>Article preview<div>",
-                html : true,
-                delay : {
-                    show: 0,
-                    hide: 500
-                }
-            });
-        }
-
-        class AjaxArticleLoader {
-            #currentPage;
-            #totalPages;
-            #pageSize;
-            #relativePath;
-            #isLoading;
-
-            constructor(currentPage, totalPages, pageSize, relativePath) {
-                this.#currentPage = currentPage;
-                this.#totalPages = totalPages;
-                this.#pageSize = pageSize;
-                this.#relativePath = relativePath;
-                this.#isLoading = false;
-            }
-
-            load() {
-                if (this.#isLoading || this.#currentPage >= this.#totalPages) return;
-
-                this.#isLoading = true;
-                this.#currentPage++;
-
-                $.ajax({
-                    url: this.#relativePath,
-                    type: 'GET',
-                    data: { Page: this.#currentPage, PageSize: this.#pageSize },
-                    success: (data) => {
-                        $('#articlesList').append(data);
-                        this.#isLoading = false;
-                    },
-                    error: () => {
-                        this.#isLoading = false;
-                    }
-                });
-            }
-        }
-
-        $(document).ready(() => {
-            var ajaxArticleLoader = new AjaxArticleLoader(1, @Model.PageInfo.TotalPages, @Model.PageInfo.PageSize, window.location.pathname);
-            $(window).scroll(() => {
-                if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
-                    ajaxArticleLoader.load();
-                }
-            });
-        });
+        var asyncLoadUrl = "@Model.LoadUrl";
+        var asyncLoadMethod = "POST";
     </script>
 }

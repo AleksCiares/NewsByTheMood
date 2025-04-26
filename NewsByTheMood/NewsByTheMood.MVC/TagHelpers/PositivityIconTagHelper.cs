@@ -5,11 +5,13 @@ namespace NewsByTheMood.MVC.TagHelpers
 {
     public class PositivityIconTagHelper : TagHelper
     {
-        public required short Positivity;
+        public required short Positivity { get; set; }
+        public bool UseCssTooltip { get; set; } = false;
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             var icon = new TagBuilder("i");
+
             switch (Positivity)
             {
                 case 10:
@@ -63,24 +65,34 @@ namespace NewsByTheMood.MVC.TagHelpers
                 _ => "Unknown"
             };
 
-            var script = 
-                "<script>" +
-                    "document.addEventListener('DOMContentLoaded', function () {" +
-                        "var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle=\"tooltip\"]'));" +
-                        "var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {" +
-                            "return new bootstrap.Tooltip(tooltipTriggerEl);" +
-                        "});" +
-                    "});" +
-                "</script>";
-
             output.TagName = "span";
             output.TagMode = TagMode.StartTagAndEndTag;
-            output.Attributes.SetAttribute("data-bs-toggle", "tooltip");
-            output.Attributes.SetAttribute("data-bs-placement", "top");
-            output.Attributes.SetAttribute("title", $"Positivity: {positivityDescription}");
-            output.Attributes.SetAttribute("style", "cursor: pointer;");
+
+            if (UseCssTooltip)
+            {
+                output.Attributes.SetAttribute("class", "positivity-icon");
+                output.Attributes.SetAttribute("data-tooltip", $"Positivity: {positivityDescription}");
+            }
+            else
+            {
+                var script =
+                    "<script>" +
+                        "document.addEventListener('DOMContentLoaded', function () {" +
+                            "var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle=\"tooltip\"]'));" +
+                            "var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {" +
+                                "return new bootstrap.Tooltip(tooltipTriggerEl);" +
+                            "});" +
+                        "});" +
+                    "</script>";
+
+                output.Attributes.SetAttribute("data-bs-toggle", "tooltip");
+                output.Attributes.SetAttribute("data-bs-placement", "top");
+                output.Attributes.SetAttribute("style", "cursor: pointer;");
+                output.Attributes.SetAttribute("title", $"Positivity: {positivityDescription}");
+                output.Content.AppendHtml(script);
+            }
+
             output.Content.AppendHtml(icon);
-            output.Content.AppendHtml(script);
         }
     }
 }

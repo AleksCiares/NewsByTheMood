@@ -5,23 +5,24 @@
         itemsIsOver: false,
     }
 
-    document.getElementById("asyncLoadItemsLoader").addEventListener("click", async function () {
+    const loader = document.getElementById("asyncLoadItemsLoader");
+    if (!loader) {
+        console.error("Loader element not found");
+        return;
+    }
+
+    const itemsContainer = document.getElementById("asyncLoadItemsContainer");
+    if (!itemsContainer) {
+        console.error("Items container not found");
+        return;
+    }
+
+    loader.addEventListener("click", async function () {
         if (loadProcess.isLoading || loadProcess.itemsIsOver) {
             return;
         }
-        /*if (loadButton.classList.contains("loading")) {
-            return;
-        }*/
 
-        this.classList.add("loading");
-        this.querySelector(".btn-text").textContent = "Loading...";
-        this.querySelector(".spinner-border").classList.remove("d-none");
-
-        const result = await loadItems(loadProcess);
-
-        this.classList.remove("loading");
-        this.querySelector(".btn-text").textContent = "Load";
-        this.querySelector(".spinner-border").classList.add("d-none");
+        const result = await loadItems(loadProcess, loader, itemsContainer);
 
         switch (result) {
             case 200:
@@ -36,18 +37,19 @@
         }
     });
 
-    await loadItems(loadProcess);
+    loader.click();
 });
 
-async function loadItems(process) {
+async function loadItems(process, loader, itemsContainer) {
     if (process.isLoading) {
         return 100;
     }
 
     try {
         process.isLoading = true;
-        const Page = process.Page || 1;
+        setLoaderAnimation(true, loader);
 
+        const Page = process.Page || 1;
         const response = await fetch(asyncLoadUrl, {
             method: asyncLoadMethod,
             body: JSON.stringify({ Page }),
@@ -59,32 +61,55 @@ async function loadItems(process) {
 
         if (response.status === 200) {
             const data = await response.text();
-            document.getElementById("asyncLoadItemsContainer").insertAdjacentHTML("beforeend", data);
+            if (data && data.trim() !== "") {
+                itemsContainer.insertAdjacentHTML("beforeend", data);
+            }
+
             process.Page++;
             process.isLoading = false;
+            setLoaderAnimation(false, loader);
 
             return 200;
         }
 
         if (response.status === 204) {
             console.log("Items is over");
+
             process.commetsIsOver = true;
             process.isLoading = false;
+            setLoaderAnimation(false, loader);
 
             return 204;
         }
 
         if (!response.ok) {
             console.error("Error loading items:" + response.status);
+
             process.isLoading = false;
+            setLoaderAnimation(false, loader);
 
             return response.status;
         }
     }
     catch (error) {
         console.error("Error loading items:", error);
+
         process.isLoading = false;
+        setLoaderAnimation(false, loader);
 
         return 400;
+    }
+}
+
+function setLoaderAnimation(isLoading, loader) {
+    if (isLoading) {
+        loader.classList.add("loading");
+        loader.querySelector(".btn-text").textContent = "Loading...";
+        loader.querySelector(".spinner-border").classList.remove("d-none");
+    }
+    else {
+        loader.classList.remove("loading");
+        loader.querySelector(".btn-text").textContent = "Load";
+        loader.querySelector(".spinner-border").classList.add("d-none");
     }
 }

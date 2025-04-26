@@ -44,9 +44,21 @@ namespace NewsByTheMood.MVC.Controllers
             _logger = logger;
         }
 
-        // Get range of articles previews
         [HttpGet]
-        public async Task<IActionResult> Index([FromQuery] PaginationModel pagination)
+        public IActionResult Index()
+        {
+            return View(new AsyncArticleLoadModel()
+            { 
+                PageTitle = "Latest",
+                LoadUrl = "/getlatest",
+
+            });
+        }
+
+        // Get range of articles previews
+        [HttpPost]
+        [Route("getlatest")]
+        public async Task<IActionResult> GetLatest([FromBody] PaginationModel pagination)
         {
             try
             {
@@ -56,29 +68,34 @@ namespace NewsByTheMood.MVC.Controllers
                 }
 
                 var user = await GetCurrentUserModelAsync();
-                var articlesPreviews = Array.Empty<ArticlePreviewModel>();
+                //var articles = Array.Empty<ArticlePreviewModel>();
                 var totalArticles = await _articleService.CountAsync(user.PreferedPositivity);
 
-                // TODO: check if pagination dont more that totalArticles
-                if (totalArticles > 0)
+                if (totalArticles > 0 && ItemsNotOver(pagination, totalArticles))
                 {
-                    articlesPreviews = (await _articleService.GetRangeLatestAsync(
+                    var articles = (await _articleService.GetRangeLatestAsync(
                         user.PreferedPositivity,
                         pagination.Page,
                         pagination.PageSize))
                         .Select(article => _articleMapper.ArticleToArticlePreviewModel(article))
                         .ToArray();
+
+                    return PartialView("_ArticlePreviewsPartial", articles);
+                }
+                else
+                {
+                    return StatusCode(204);
                 }
 
-                if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                /*if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
                 {
-                    return PartialView("_ArticlePreviewsPartial", articlesPreviews);
+                    return PartialView("_ArticlePreviewsPartial", articles);
                 }
                 else
                 {
                     return View(new ArticlePreviewCollectionModel()
                     {
-                        Articles = articlesPreviews,
+                        Articles = articles,
                         PageInfo = new PageInfoModel()
                         {
                             Page = pagination.Page,
@@ -87,7 +104,7 @@ namespace NewsByTheMood.MVC.Controllers
                         },
                         PageTitle = "Home"
                     });
-                }
+                }*/
             }
             catch (Exception ex)
             {
@@ -98,13 +115,26 @@ namespace NewsByTheMood.MVC.Controllers
             }
         }
 
-        // Get range of articles privew by topic
         [HttpGet("topic/{id:required}")]
-        public async Task<IActionResult> Topic([FromRoute] string id, [FromQuery] PaginationModel pagination)
+        public IActionResult Topic([FromRoute] string id)
+        {
+            return View("Index", new AsyncArticleLoadModel()
+            {
+                PageTitle = id,
+                LoadUrl = $"/getbytopic/{id}",
+
+            });
+        }
+
+        // Get range of articles privew by topic
+        [HttpPost]
+        [Route("getbytopic/{id:required}")]
+        public async Task<IActionResult> GetByTopic([FromRoute] string id, [FromBody] PaginationModel pagination)
         {
             try
             {
-                var topic = _topicMapper.TopicToTopicSearchModel(await _topicService.GetByNameAsync(id));
+                var topic = _topicMapper.TopicToTopicSearchModel(
+                    await _topicService.GetByNameAsync(id));
 
                 if (!ModelState.IsValid ||
                     topic == null)
@@ -113,30 +143,37 @@ namespace NewsByTheMood.MVC.Controllers
                 }
 
                 var user = await GetCurrentUserModelAsync();
-                var articlesPreviews = Array.Empty<ArticlePreviewModel>();
-                var totalArticles = await _articleService.CountByTopicAsync(user.PreferedPositivity, topic.Id);
+                //var articles = Array.Empty<ArticlePreviewModel>();
+                var totalArticles = await _articleService.CountByTopicAsync(
+                    user.PreferedPositivity, 
+                    topic.Id);
 
-                // TODO: check if pagination dont more that totalArticles
-                if (totalArticles > 0)
+                if (totalArticles > 0 && ItemsNotOver(pagination, totalArticles))
                 {
-                    articlesPreviews = (await _articleService.GetRangeByTopicAsync(
+                    var articles = (await _articleService.GetRangeByTopicAsync(
                         user.PreferedPositivity,
                         topic.Id,
                         pagination.Page,
                         pagination.PageSize))
                         .Select(article => _articleMapper.ArticleToArticlePreviewModel(article))
                         .ToArray();
+
+                    return PartialView("_ArticlePreviewsPartial", articles);
+                }
+                else
+                {
+                    return StatusCode(204);
                 }
 
-                if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                /*if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
                 {
-                    return PartialView("_ArticlePreviewsPartial", articlesPreviews);
+                    return PartialView("_ArticlePreviewsPartial", articles);
                 }
                 else
                 {
                     return View("Index", new ArticlePreviewCollectionModel()
                     {
-                        Articles = articlesPreviews!,
+                        Articles = articles!,
                         PageInfo = new PageInfoModel()
                         {
                             Page = pagination.Page,
@@ -145,7 +182,7 @@ namespace NewsByTheMood.MVC.Controllers
                         },
                         PageTitle = topic.Name,
                     });
-                }
+                }*/
             }
             catch (Exception ex)
             {
@@ -156,10 +193,22 @@ namespace NewsByTheMood.MVC.Controllers
             }
         }
 
-        // Get favorite articles
         [HttpGet("favorites")]
         [Authorize]
-        public async Task<IActionResult> Favorites([FromQuery] PaginationModel pagination)
+        public IActionResult Favorites()
+        {
+            return View("Index", new AsyncArticleLoadModel()
+            {
+                PageTitle = "Favorites",
+                LoadUrl = "/getfavorites",
+            });
+        }
+
+        // Get favorite articles
+        [HttpPost]
+        [Route("getfavorites")]
+        [Authorize]
+        public async Task<IActionResult> GetFavorites([FromBody] PaginationModel pagination)
         {
             try
             {
@@ -169,30 +218,37 @@ namespace NewsByTheMood.MVC.Controllers
                 }
 
                 var user = await GetCurrentUserModelAsync();
-                var articlesPreviews = Array.Empty<ArticlePreviewModel>();
-                var totalArticles = await _articleService.CountFavoriteAsync(user.PreferedPositivity, user.TopicsIds);
+                //var articles = Array.Empty<ArticlePreviewModel>();
+                var totalArticles = await _articleService.CountFavoriteAsync(
+                    user.PreferedPositivity, 
+                    user.TopicsIds);
 
-                // TODO: check if pagination dont more that totalArticles
-                if (totalArticles > 0)
+                if (totalArticles > 0 && ItemsNotOver(pagination, totalArticles))
                 {
-                    articlesPreviews = (await _articleService.GetRangeFavoriteAsync(
+                    var articles = (await _articleService.GetRangeFavoriteAsync(
                         user.PreferedPositivity,
                         user.TopicsIds,
                         pagination.Page,
                         pagination.PageSize))
                         .Select(article => _articleMapper.ArticleToArticlePreviewModel(article))
                         .ToArray();
+
+                    return PartialView("_ArticlePreviewsPartial", articles);
+                }
+                else
+                {
+                    return StatusCode(204);
                 }
 
-                if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                /*if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
                 {
-                    return PartialView("_ArticlePreviewsPartial", articlesPreviews);
+                    return PartialView("_ArticlePreviewsPartial", articles);
                 }
                 else
                 {
                     return View("Index", new ArticlePreviewCollectionModel()
                     {
-                        Articles = articlesPreviews!,
+                        Articles = articles!,
                         PageInfo = new PageInfoModel()
                         {
                             Page = pagination.Page,
@@ -201,7 +257,7 @@ namespace NewsByTheMood.MVC.Controllers
                         },
                         PageTitle = "Favorites"
                     });
-                }
+                }*/
             }
             catch (Exception ex)
             {
