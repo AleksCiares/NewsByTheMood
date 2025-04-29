@@ -5,7 +5,7 @@ using NewsByTheMood.Data;
 
 namespace NewsByTheMood.CQS.QueryHandlers
 {
-    public class GetCommentsCountByArticleIdQueryHandler : IRequestHandler<GetCommentsCountByArticleIdQuery, int>
+    public class GetCommentsCountByArticleIdQueryHandler : IRequestHandler<GetCommentsCountQuery, int>
     {
         private readonly NewsByTheMoodDbContext _dbContext;
 
@@ -14,7 +14,7 @@ namespace NewsByTheMood.CQS.QueryHandlers
             _dbContext = dbContext;
         }   
 
-        public async Task<int> Handle(GetCommentsCountByArticleIdQuery request, CancellationToken cancellationToken)
+        public async Task<int> Handle(GetCommentsCountQuery request, CancellationToken cancellationToken)
         {
             return await _dbContext.Comments
                  .AsNoTracking()

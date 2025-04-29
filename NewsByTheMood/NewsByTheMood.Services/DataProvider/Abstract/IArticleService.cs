@@ -7,25 +7,25 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
     public interface IArticleService
     {
         // Get article count with certain positivity
-        public Task<int> CountAsync(short positivity, CancellationToken cancellationToken = default);
+        public Task<int> CountLatestAsync(short positivity, bool ignoreActivity = false, CancellationToken cancellationToken = default);
 
         // Get latest articles range with certain positivity
-        public Task<IEnumerable<Article>> GetRangeLatestAsync(short positivity, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+        public Task<IEnumerable<Article>> GetRangeLatestAsync(short positivity, int pageNumber, int pageSize, bool ignoreActivity = false, CancellationToken cancellationToken = default);
 
         // Get article count with certain positivity and topic
-        public Task<int> CountByTopicAsync(short positivity, long topicId, CancellationToken cancellationToken = default);
+        public Task<int> CountByTopicAsync(short positivity, long topicId, bool ignoreActivity = false, CancellationToken cancellationToken = default);
 
         // Get latest articles range with certain positivity and topic
-        public Task<IEnumerable<Article>> GetRangeByTopicAsync(short positivity, long topicId, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+        public Task<IEnumerable<Article>> GetRangeByTopicAsync(short positivity, long topicId, int pageNumber, int pageSize, bool ignoreActivity = false, CancellationToken cancellationToken = default);
 
         // Get article count with certain positivity and topics
-        public Task<int> CountFavoriteAsync(short positivity, IEnumerable<long> topicsIds, CancellationToken cancellationToken = default);
+        public Task<int> CountFavoriteAsync(short positivity, IEnumerable<long> topicsIds, bool ignoreActivity = false, CancellationToken cancellationToken = default);
 
         // Get latest articles range with certain positivity and topics
-        public Task<IEnumerable<Article>> GetRangeFavoriteAsync(short positivity, IEnumerable<long> topicsIds, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+        public Task<IEnumerable<Article>> GetRangeFavoriteAsync(short positivity, IEnumerable<long> topicsIds, int pageNumber, int pageSize, bool ignoreActivity = false, CancellationToken cancellationToken = default);
 
         // Get article by certain id
-        public Task<Article?> GetByIdAsync(long id, CancellationToken cancellationToken = default);
+        public Task<Article?> GetByIdAsync(long id, bool ignoreActivity = false, CancellationToken cancellationToken = default);
 
         // Is exist article with current url
         public Task<bool> IsExistsByUrlAsync(string articleUrl, CancellationToken cancellationToken = default);

@@ -53,9 +53,8 @@
 
         if (eventHandler) {
             button.addEventListener("click", (e) => {
-                e.preventDefault();
-                eventHandler();
                 this.#modal.hide();
+                eventHandler();
             });
         }
 

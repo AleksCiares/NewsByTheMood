@@ -12,8 +12,8 @@ using NewsByTheMood.Data;
 namespace NewsByTheMood.Data.Migrations
 {
     [DbContext(typeof(NewsByTheMoodDbContext))]
-    [Migration("20250422172331_Added_PublishDate_To_Comment")]
-    partial class Added_PublishDate_To_Comment
+    [Migration("20250427170223_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

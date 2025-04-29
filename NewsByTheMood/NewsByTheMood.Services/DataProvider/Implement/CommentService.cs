@@ -12,11 +12,16 @@ namespace NewsByTheMood.Services.DataProvider.Implement
     public class CommentService : ICommentService
     {
         private readonly IMediator _mediator;
+        private readonly IArticleService _articleService;
         private readonly ILogger<CommentService> _logger;
 
-        public CommentService(IMediator mediator, ILogger<CommentService> logger)
+        public CommentService(
+            IMediator mediator,
+            IArticleService articleService,
+            ILogger<CommentService> logger)
         {
             _mediator = mediator;
+            _articleService = articleService;
             _logger = logger;
         }
 
@@ -28,7 +33,7 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 return 0;
             }
 
-            var count = await _mediator.Send(new GetCommentsCountByArticleIdQuery()
+            var count = await _mediator.Send(new GetCommentsCountQuery()
             {
                 ArticleId = articleId,
             },
@@ -50,7 +55,8 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             var comment = await _mediator.Send(new GetCommentByIdQuery()
             {
                 CommentId = commentId
-            }, cancellationToken);
+            }, 
+            cancellationToken);
 
             if (comment != null)
             {
@@ -74,7 +80,13 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 return Array.Empty<Comment>();
             }
 
-            var comments = await _mediator.Send(new GetCommentsRangeByArticleIdQuery()
+            if (!await _articleService.IsExistsByIdAsync(articleId, cancellationToken))
+            {
+                _logger.LogWarning($"Article not found. ArticleId: {articleId}. Procces aborted.");
+                return Array.Empty<Comment>();
+            }
+
+            var comments = await _mediator.Send(new GetCommentsRangeQuery()
             {
                 ArticleId = articleId,
                 PageNumber = pageNumber,
@@ -95,8 +107,14 @@ namespace NewsByTheMood.Services.DataProvider.Implement
 
             if (userId <= 0 || articleId <= 0)
             {
-                _logger.LogWarning($"UserId/ArticleId is less than or equal to 0. UserId: {userId}, ArticleId: {articleId}. " +
+                _logger.LogError($"UserId/ArticleId is less than or equal to 0. UserId: {userId}, ArticleId: {articleId}. " +
                     $"Proccess aborted.");
+                return 0;
+            }
+
+            if (!await _articleService.IsExistsByIdAsync(articleId, cancellationToken))
+            {
+                _logger.LogError($"Article not found. ArticleId: {articleId}. Procces aborted.");
                 return 0;
             }
 
@@ -105,7 +123,8 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 ArticleId = articleId,
                 UserId = userId,
                 Text = WebUtility.HtmlEncode(addComment.Text)
-            });
+            }, 
+            cancellationToken);
 
             if (commentId > 0)
             {

@@ -1,0 +1,65 @@
+﻿@addTagHelper NewsByTheMood.MVC.TagHelpers.DynamicTextAreaTagHelper, NewsByTheMood.MVC
+@addTagHelper NewsByTheMood.MVC.TagHelpers.SelectWithSearchTagHelper, NewsByTheMood.MVC
+@addTagHelper NewsByTheMood.MVC.TagHelpers.GeneralNotifyMessageTagHelper, NewsByTheMood.MVC
+
+@model ArticleSettingsModel
+
+<div class="article-from__body row align-items-start justify-content-start mb-4">
+	<div class="article-from__warp">
+        <general-notify-message use-auto-hiding=true/>
+		<div class="is-active form-check mb-3">
+			<input asp-for="@Model.IsActive" type="checkbox" class="form-check-input" />
+			<label asp-for="@Model.IsActive" class="form-check-label">Activity</label>
+		</div>
+		<div class="name form-floating mb-3">
+			<input asp-for="@Model.Title" type="text" class="form-control" placeholder="Title" />
+			<label asp-for="@Model.Title" class="form-label">Title</label>
+			<span asp-validation-for="@Model.Title" class="error-feedback invalid-feedback"></span>
+		</div>
+		<div class="url form-floating mb-3">
+			<input asp-for="@Model.Url" type="url" class="form-control" placeholder="Url" />
+			<label asp-for="@Model.Url" class="form-label">Url</label>
+			<div class="field-tip form-text text-muted">Only http/https link formats are supported</div>
+			<span asp-validation-for="@Model.Url" class="error-feedback invalid-feedback"></span>
+		</div>
+		<div class="preview-img-url form-floating mb-3">
+			<input asp-for="@Model.PreviewImgUrl" type="url" class="form-control"
+				   placeholder="Preview image url" />
+			<label asp-for="@Model.PreviewImgUrl" class="form-label">Preview image url</label>
+			<div class="field-tip form-text text-muted">Only http/https link formats are supported</div>
+			<span asp-validation-for="@Model.PreviewImgUrl" class="error-feedback invalid-feedback"></span>
+		</div>
+		<div class="body form-floating mb-3">
+			<dynamic-text-area asp-for="@Model.Body" text-area-selector="article-form__body"
+							   rows="5" class="form-control" placeholder="Body" rows="5"></dynamic-text-area>
+			<label asp-for="@Model.Body" class="form-label">Body</label>
+			<span asp-validation-for="@Model.Body" class="error-feedback invalid-feedback"></span>
+		</div>
+		<div class="publish-date form-floating mb-3">
+			<input asp-for="@Model.PublishDate" type="datetime-local" class="form-control"
+				   placeholder="Publish date" />
+			<label asp-for="@Model.PublishDate" class="form-label">Publish date</label>
+			<span asp-validation-for="@Model.PublishDate" class="error-feedback invalid-feedback"></span>
+		</div>
+		<div class="positivity form-floating mb-3" data-mdb-input-init>
+			<input asp-for="@Model.Positivity" type="number" class="form-control" placeholder="Positivity" />
+			<label asp-for="@Model.Positivity" class="form-label">Positivity</label>
+			<span asp-validation-for="@Model.Positivity" class=" error-feedback invalid-feedback"></span>
+		</div>
+		<div class="source form-floating mb-3">
+			<select asp-for="@Model.SourceId" asp-items="@Model.Sources" class="form-select">
+			</select>
+			<label asp-for="@Model.SourceId" class="form-label">Source</label>
+			<span asp-validation-for="@Model.SourceId" class="error-feedback invalid-feedback"></span>
+		</div>
+		<div class="tags form-floating mb-3">
+			<select-with-search asp-for="@Model.ArticleTags" asp-items="@Model.Tags" select-selector="tags"
+								placeholder="search tags" title="Tags" multiple="multiple" aria-label="Tags" size="7">
+			</select-with-search>
+			<span asp-validation-for="@Model.ArticleTags" class="error-feedback invalid-feedback"></span>
+		</div>
+		<div class="id form-floating mb-3" style="display:none;">
+			<input asp-for="@Model.Id" type="text" value="@Model.Id" class="form-control" />
+		</div>
+	</div>
+</div>

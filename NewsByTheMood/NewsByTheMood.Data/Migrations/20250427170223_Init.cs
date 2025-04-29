@@ -243,13 +243,15 @@ namespace NewsByTheMood.Data.Migrations
                         column: x => x.UsersId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Cascade,
+                        onUpdate: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_TopicUser_Topics_TopicsId",
                         column: x => x.TopicsId,
                         principalTable: "Topics",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Cascade,
+                        onUpdate: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -296,14 +298,14 @@ namespace NewsByTheMood.Data.Migrations
                         column: x => x.ArticlesId,
                         principalTable: "Articles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict, 
+                        onDelete: ReferentialAction.Cascade,
                         onUpdate: ReferentialAction.Cascade);
-                    table.ForeignKey(
+            table.ForeignKey(
                         name: "FK_ArticleTag_Tags_TagsId",
                         column: x => x.TagsId,
                         principalTable: "Tags",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict,
+                        onDelete: ReferentialAction.Cascade,
                         onUpdate: ReferentialAction.Cascade);
                 });
 
@@ -315,6 +317,7 @@ namespace NewsByTheMood.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Position = table.Column<int>(type: "int", nullable: false),
+                    PublishDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ArticleId = table.Column<long>(type: "bigint", nullable: false),
                     UserId = table.Column<long>(type: "bigint", nullable: false)
                 },
@@ -326,14 +329,14 @@ namespace NewsByTheMood.Data.Migrations
                         column: x => x.ArticleId,
                         principalTable: "Articles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict, 
+                        onDelete: ReferentialAction.Cascade,
                         onUpdate: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Comments_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict, 
+                        onDelete: ReferentialAction.Cascade,
                         onUpdate: ReferentialAction.Cascade);
                 });
 

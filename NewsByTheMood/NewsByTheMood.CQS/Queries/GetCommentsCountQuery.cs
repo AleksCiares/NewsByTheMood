@@ -2,7 +2,7 @@
 
 namespace NewsByTheMood.CQS.Queries
 {
-    public class GetCommentsCountByArticleIdQuery : IRequest<int>
+    public class GetCommentsCountQuery : IRequest<int>
     {
         public long ArticleId { get; set; }
     }

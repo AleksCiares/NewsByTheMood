@@ -73,7 +73,12 @@ namespace NewsByTheMood.Services.DataProvider.Implement
 
         public async Task<IEnumerable<Topic>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            return await _mediator.Send(new GetAllTopicsQuery(), cancellationToken);
+            return await _mediator.Send(new GetTopicsRangeQuery() 
+            { 
+                Page = 0,
+                PageSize = 0,
+                GetAll = true
+            }, cancellationToken);
         }
 
         public async Task<int> CountAsync(CancellationToken cancellationToken = default)

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.TagHelpers;
+﻿using System.Text.Encodings.Web;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
@@ -21,7 +22,7 @@ namespace NewsByTheMood.MVC.TagHelpers
             var script = $@"
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {{
-                        var textarea = document.querySelector('[dynamic-textarea-selector=""{textAreaSelector}""]');
+                        var textarea = document.querySelector('[dynamic-textarea=""{textAreaSelector}""]');
                         if (textarea) {{
                             textarea.style.height = 'auto';
                             textarea.style.height = (textarea.scrollHeight) + 'px';
@@ -46,10 +47,10 @@ namespace NewsByTheMood.MVC.TagHelpers
 
             output.TagName = "textarea";
             output.TagMode = TagMode.StartTagAndEndTag;
-            output.Attributes.Add("dynamic-textarea","");
-            output.Attributes.Add("dynamic-textarea-selector", textAreaSelector);
+            output.Attributes.Add("dynamic-textarea", textAreaSelector);
             output.Attributes.Add("style", "resize: none; overflow: hidden;");
             output.Attributes.Add("rows", rows.ToString());
+            output.AddClass("dynamic-textarea", HtmlEncoder.Default);
             if (maxRows.HasValue)
             {
                 output.Attributes.Add("data-max-rows", maxRows.Value.ToString());

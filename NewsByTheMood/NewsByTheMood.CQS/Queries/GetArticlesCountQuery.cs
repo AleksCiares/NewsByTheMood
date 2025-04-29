@@ -4,6 +4,8 @@ namespace NewsByTheMood.CQS.Queries
 {
     public class GetArticlesCountQuery : IRequest<int>
     {
-        public short Positivity { get; set; } = 0;
+        public required short Positivity { get; set; }
+        public required bool IgnoreActivity { get; set; }
+        public IEnumerable<long>? TopicIds { get; set; }
     }
 }

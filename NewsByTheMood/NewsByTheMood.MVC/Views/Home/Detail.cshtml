@@ -37,7 +37,7 @@
                     <a href="@Model.Url" target="_blank" class="text-decoration-none">@Model.SourceName</a>
                 </div>
             </div>
-            @if (Model.Tags.Length > 0)
+            @if (Model.Tags.Count > 0)
             {
                 <div class="article__tags d-flex align-items-center justify-content-start mb-3">
                 @foreach (var tag in Model.Tags)
@@ -77,7 +77,7 @@
     @if (User.Identity != null && User.Identity.IsAuthenticated)
     {
         <partial name="_ValidationScriptsPartial" />
-        <script src="~/js/user-form.js" asp-append-version="true"></script>
+        <script src="~/js/comment-form.js" asp-append-version="true"></script>
     }
     <script src="~/js/async-load-items.js" asp-append-version="true"></script>
     <script>

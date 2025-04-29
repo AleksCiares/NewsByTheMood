@@ -20,7 +20,7 @@ namespace NewsByTheMood.CQS.CommandHandlers
             var tagNames = request.Article.Tags.Select(tag => tag.Name).ToList().Distinct().ToList();
             request.Article.Tags = new();
 
-            await _dbContext.Articles.AddAsync(request.Article);
+            await _dbContext.Articles.AddAsync(request.Article, cancellationToken);
             foreach (var tagName in tagNames)
             {
                 var tag = await _dbContext.Tags.SingleOrDefaultAsync(tag => tag.Name.Equals(tagName), cancellationToken);

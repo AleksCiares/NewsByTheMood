@@ -7,5 +7,6 @@ namespace NewsByTheMood.CQS.Queries
     {
         public required int Page { get; set; }
         public required int PageSize { get; set; }
+        public bool GetAll { get; set; } = false;
     }
 }

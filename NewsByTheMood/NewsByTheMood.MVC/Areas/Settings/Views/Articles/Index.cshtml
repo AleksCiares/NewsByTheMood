@@ -1,4 +1,5 @@
-﻿@model ArticleSettingsCollectionModel
+﻿@addTagHelper NewsByTheMood.MVC.TagHelpers.PaginationTagHelper, NewsByTheMood.MVC
+@model ArticleSettingsCollectionModel
 @{
     ViewData["PageTitle"] = "Articles";
 }
@@ -12,7 +13,7 @@
             method="post" id="deleteArticlesForm">
             <div class="articles__panel row align-items-start justify-content-between mb-4">
                 <div class="col-auto">
-                    <a asp-area="settings" asp-controller="articles" asp-action="create" class="btn btn-outline-primary">
+                    <a asp-area="settings" asp-controller="articles" asp-action="create" class="btn btn-primary">
                         Create
                     </a>
                 </div>

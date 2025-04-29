@@ -6,7 +6,7 @@ using NewsByTheMood.Data.Entities;
 
 namespace NewsByTheMood.CQS.QueryHandlers
 {
-    public class GetCommentsRangeByArticleIdQueryHandler : IRequestHandler<GetCommentsRangeByArticleIdQuery, IEnumerable<Comment>>
+    public class GetCommentsRangeByArticleIdQueryHandler : IRequestHandler<GetCommentsRangeQuery, IEnumerable<Comment>>
     {
         private readonly NewsByTheMoodDbContext _dbContext;
 
@@ -15,7 +15,7 @@ namespace NewsByTheMood.CQS.QueryHandlers
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<Comment>> Handle(GetCommentsRangeByArticleIdQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Comment>> Handle(GetCommentsRangeQuery request, CancellationToken cancellationToken)
         {
             return await _dbContext.Comments
                 .AsNoTracking()

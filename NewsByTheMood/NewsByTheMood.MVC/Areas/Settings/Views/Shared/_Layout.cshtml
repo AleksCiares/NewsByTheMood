@@ -2,35 +2,16 @@
 <html lang="en">
 <head>
     <partial name="_HeadPartial" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     @await Component.InvokeAsync("Header")
-    <main role="main">
+    <main role="main" class="flex-grow-1">
         <div class="container-fluid">
             <div class="row flex-nowrap">
                 @if(User.IsInRole(AccessLevels.Admininistrator))
                 {
-                    <div class="aside-bar col-auto px-sm-2 px-0">
-                        <div class="d-flex flex-column align-items-center align-items-sm-start px-3 text-white">
-                            <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
-                                <li class="nav-item">
-                                    <a class="nav-link px-0 align-middle" asp-area="settings" asp-controller="topics" asp-action="index">
-                                        <i class="fs-4 bi bi-bookmarks"></i> <span class="ms-1 d-none d-sm-inline">Topics</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link px-0 align-middle" asp-area="settings" asp-controller="sources" asp-action="index">
-                                        <i class="fs-4 bi bi-layout-text-sidebar-reverse"></i> <span class="ms-1 d-none d-sm-inline">Sources</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link px-0 align-middle" asp-area="settings" asp-controller="articles" asp-action="index">
-                                        <i class="fs-4 bi bi-newspaper"></i> <span class="ms-1 d-none d-sm-inline">Articles</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
+                    @await Component.InvokeAsync("AdminMenuPanel")
                 }
                 <div class="col mb-4">
                     @RenderBody()
@@ -39,10 +20,8 @@
         </div>
     </main>
     <partial name="_FooterPartial" />
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <partial name="_MainScriptsPartial" />
     <partial name="_ValidationScriptsPartial" />
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

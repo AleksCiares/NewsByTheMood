@@ -5,6 +5,6 @@ namespace NewsByTheMood.CQS.Commands
 {
     public class DeleteArticleCommand : IRequest
     {
-        public required Article Article { get; set; }
+        public required long ArticleId { get; set; }
     }
 }

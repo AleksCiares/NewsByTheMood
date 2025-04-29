@@ -4,20 +4,18 @@
     <partial name="_HeadPartial" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
-<body>
-    <div class="wrapper d-flex flex-column min-vh-100">
-        @await Component.InvokeAsync("Header")
-        <main role="main">
-            <div class="container-fluid">
-                <div class="row flex-nowrap align-items-start justify-content-center">
-                    <div class="col-12">
-                        @RenderBody()
-                    </div>
+<body class="d-flex flex-column min-vh-100">
+    @await Component.InvokeAsync("Header")
+    <main role="main" class="flex-grow-1">
+        <div class="container-fluid">
+            <div class="row flex-nowrap align-items-start justify-content-center">
+                <div class="col-12">
+                    @RenderBody()
                 </div>
             </div>
-        </main>
-        <partial name="_FooterPartial" />
-    </div>
+        </div>
+    </main>
+    <partial name="_FooterPartial" />
     <partial name="_MainScriptsPartial" />
     @await RenderSectionAsync("Scripts", required: false)
 </body>

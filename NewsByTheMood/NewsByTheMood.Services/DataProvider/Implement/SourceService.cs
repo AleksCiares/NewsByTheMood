@@ -55,7 +55,12 @@ namespace NewsByTheMood.Services.DataProvider.Implement
 
         public async Task<IEnumerable<Source>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            return await _mediator.Send(new GetAllSourcesQuery(), cancellationToken);
+            return await _mediator.Send(new GetSourcesRangeQuery()
+            { 
+                Page = 0,
+                PageSize = 0,
+                GetAll = true
+            }, cancellationToken);
         }
 
         public async Task<int> CountAsync(CancellationToken cancellationToken = default)

@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace NewsByTheMood.MVC.TagHelpers
 {
+    /*
+        For corrent view and work need to add positivity-icon.css on page
+     */
     public class PositivityIconTagHelper : TagHelper
     {
         public required short Positivity { get; set; }
@@ -11,7 +14,6 @@ namespace NewsByTheMood.MVC.TagHelpers
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             var icon = new TagBuilder("i");
-
             switch (Positivity)
             {
                 case 10:
@@ -67,6 +69,8 @@ namespace NewsByTheMood.MVC.TagHelpers
 
             output.TagName = "span";
             output.TagMode = TagMode.StartTagAndEndTag;
+            output.Attributes.Add("positivity-icon", Positivity.ToString());
+            output.Content.AppendHtml(icon);
 
             if (UseCssTooltip)
             {
@@ -87,12 +91,10 @@ namespace NewsByTheMood.MVC.TagHelpers
 
                 output.Attributes.SetAttribute("data-bs-toggle", "tooltip");
                 output.Attributes.SetAttribute("data-bs-placement", "top");
-                output.Attributes.SetAttribute("style", "cursor: pointer;");
                 output.Attributes.SetAttribute("title", $"Positivity: {positivityDescription}");
+                output.Attributes.SetAttribute("style", "cursor: pointer;");
                 output.Content.AppendHtml(script);
             }
-
-            output.Content.AppendHtml(icon);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 {
     // Articles controller
     [Area("Settings")]
-    [Authorize(Roles = AccessLevels.Admininistrator)]
+    [Authorize(Roles = $"{AccessLevels.Admininistrator},{AccessLevels.Editor}")]
     public class ArticlesController : Controller
     {
         private readonly IArticleService _articleService;
@@ -39,23 +39,18 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         {
             try
             {
-                var totalArticles = await _articleService.CountAsync(_defaultPositivity);
+                var totalArticles = await _articleService.CountLatestAsync(_defaultPositivity, true);
                 var articles = Array.Empty<ArticleSettingsPreviewModel>();
 
-                if (totalArticles > 0)
+                if (totalArticles > 0 && ItemsNotOver(pagination, totalArticles))
                 {
                     articles = (await _articleService.GetRangeLatestAsync(
                         _defaultPositivity,
                         pagination.Page,
-                        pagination.PageSize))
+                        pagination.PageSize,
+                        true))
                         .Select(article => _articleMapper.ArticleToArticleSettingsPreviewModel(article))
                         .ToArray();
-
-                    _logger.LogDebug($"Articles were fetch successfully");
-                }
-                else
-                { 
-                    _logger.LogDebug("No articles were found");
                 }
 
                 return View(new ArticleSettingsCollectionModel()
@@ -84,7 +79,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         {
             try
             {
-                return View(new ArticleSettingsCreateModel()
+                return View(new ArticleSettingsModel()
                 {
                     Sources = await GetSourcesAsync(),
                     Tags = await GetTagsAsync(),
@@ -99,31 +94,32 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 
         // Create article item proccessing
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] ArticleSettingsCreateModel articleCreate)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([FromForm] ArticleSettingsModel article)
         {
             try
             {
-                if (!ModelState.IsValid || articleCreate.Article == null)
+                if (!ModelState.IsValid)
                 {
-                    return View(articleCreate);
+                    return BadRequest(ModelState);
                 }
 
-                _logger.LogInformation($"Creating article \"{articleCreate.Article!.Title}\"");
-
-                if (await _articleService.AddAsync(_articleMapper.ArticleSettingsModelToArticle(articleCreate.Article)))
+                if (await _articleService.AddAsync(_articleMapper.ArticleSettingsModelToArticle(article)))
                 {
-                    _logger.LogInformation($"Article \"{articleCreate.Article!.Title}\" was created successfully");
-                    return RedirectToAction("Index");
+                    return Ok();
                 }
                 else
                 {
-                    _logger.LogError($"Article \"{articleCreate.Article!.Title}\" was not created");
-                    return BadRequest("Something gone wrong, while creating article. Watch logs to more information");
+                    return BadRequest(new
+                    {
+                        GeneralErrors = "Something gone wrong, while creating article. " +
+                        "Watch logs to more information"
+                    });
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error while creating article {articleCreate.Article!.ToJson()}");
+                _logger.LogError(ex, $"Error while creating article {article.ToJson()}");
                 return StatusCode(500);
             }
         }
@@ -136,18 +132,19 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             {
                 var article = _articleMapper.ArticleToArticleSettingsModel(
                     await  _articleService.GetByIdAsync(long.Parse(id)));
+
                 if (article == null)
                 {
-                    _logger.LogWarning($"Article id={id} was not found");
-                    return BadRequest("Something gone wrong, while getting article. Watch logs to more information");
+                    return BadRequest(new
+                    {
+                        Error = "Something gone wrong, while getting article. Watch logs to more information"
+                    });
                 }
 
-                return View(new ArticleSettingsEditModel()
-                {
-                    Article = article,
-                    Sources = await GetSourcesAsync(),
-                    Tags = await GetTagsAsync(),
-                });
+                article.Sources = await GetSourcesAsync();
+                article.Tags = await GetTagsAsync();
+
+                return View(article);
             }
             catch (Exception ex)
             {
@@ -158,31 +155,31 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 
         // Edit article item proccessing
         [HttpPost]
-        public async Task<IActionResult> Edit([FromForm] ArticleSettingsEditModel articleEdit)
+        public async Task<IActionResult> Edit([FromForm] ArticleSettingsModel article)
         {
             try
             {
                 if (!ModelState.IsValid)
                 {
-                    return View(articleEdit);
+                    return BadRequest(ModelState);
                 }
 
-                _logger.LogInformation($"Updating article id={articleEdit.Article.Id}");
-
-                if (await _articleService.UpdateAsync(_articleMapper.ArticleSettingsModelToArticle(articleEdit.Article)))
+                if (await _articleService.UpdateAsync(_articleMapper.ArticleSettingsModelToArticle(article)))
                 {
-                    _logger.LogInformation($"Article id={articleEdit.Article.Id} was updated successfully");
-                    return RedirectToAction("Index");
+                    return Ok();
                 }
                 else
                 {
-                    _logger.LogError($"Article id={articleEdit.Article.Id} was not updated");
-                    return BadRequest("Something gone wrong, while updating article. Watch logs to more information");
+                    return BadRequest(new
+                    {
+                        GeneralErrors = "Something gone wrong, while creating article. " +
+                        "Watch logs to more information"
+                    });
                 }
             }
             catch (Exception ex) 
             {
-                _logger.LogError(ex, $"Error while updating article {articleEdit.Article.ToJson()}");
+                _logger.LogError(ex, $"Error while updating article {article.ToJson()}");
                 return StatusCode(500);
             }
         }
@@ -193,17 +190,17 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         {
             try
             {
-                _logger.LogInformation($"Deleting article id={id}");
-
                 if (await _articleService.DeleteAsync(long.Parse(id)))
                 {
-                    _logger.LogInformation($"Article id={id} was deleted successfully");
-                    return RedirectToAction("Index");
+                    return Ok();
                 }
                 else
                 {
-                    _logger.LogError($"Article id={id} was not deleted");
-                    return BadRequest("Something gone wrong, while deleting. Watch logs to more information");
+                    return BadRequest(new
+                    {
+                        GeneralErrors = "Something gone wrong, while creating article. " +
+                            "Watch logs to more information"
+                    });
                 }
             }
             catch (Exception ex)
@@ -215,23 +212,25 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 
         // Delete article range
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteRange([FromForm] string[] ids)
         {
             try
             {
-                _logger.LogInformation($"Deleting articles ids=\"{string.Join(", ", ids)}\"");
-
-                var deletedIds = await _articleService.DeleteRangeAsync(ids.Select(id => long.Parse(id)).ToArray());
+                var deletedIds = await _articleService
+                    .DeleteRangeAsync(ids.Select(id => long.Parse(id)).ToArray());
 
                 if (deletedIds.Length == ids.Length)
                 {
-                    _logger.LogInformation($"Articles ids=\"{string.Join(", ", deletedIds)}\" were deleted successfully");
                     return RedirectToAction("Index");
                 }
                 else
                 {
-                    _logger.LogError($"Failed while deleting articles. Only {string.Join(", ", deletedIds)} were deleted successfully");
-                    return BadRequest("Something gone wrong, while deleting. Watch logs to more information");
+                    return BadRequest(new
+                    {
+                        GeneralErrors = "Something gone wrong, while creating article. " +
+                            "Watch logs to more information"
+                    });
                 }
             }
             catch(Exception ex)
@@ -291,12 +290,24 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             var tags = (await _tagService.GetAllAsync())
                 .Select(tag => new SelectListItem()
                 {
-                    Value = tag.Id.ToString(),
+                    Value = tag.Name,
                     Text = tag.Name,
                 })
                 .ToList();
 
             return tags;
+        }
+
+        [NonAction]
+        private bool ItemsNotOver(PaginationModel pagination, int totalItems)
+        {
+            var pageCount = (int)Math.Ceiling((double)totalItems / pagination.PageSize);
+            if (pagination.Page <= pageCount)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

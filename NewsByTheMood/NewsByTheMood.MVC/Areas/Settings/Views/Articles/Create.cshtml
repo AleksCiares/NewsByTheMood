@@ -1,4 +1,4 @@
-﻿@model ArticleSettingsCreateModel
+﻿@model ArticleSettingsModel
 @{
 	ViewData["PageTitle"] = "Create a article";
 }
@@ -7,63 +7,25 @@
 	<div class="article__header d-flex row mb-5">
 		<h4 class="mb-0">Create a article</h4>
 	</div>
-	<form asp-antiforgery="true" method="post" id="createArticleForm">
-		<div class="form__panel row align-items-start justify-content-between mb-4">
+	<form asp-antiforgery="true" asp-area="settings" asp-controller="articles" asp-action="create"
+		  method="post" id="articleForm" class="article-from">
+		<div class="article-from__panel row align-items-start justify-content-between mb-4">
 			<div class="col-auto">
-				<button asp-area="settings" asp-controller="articles" asp-action="create" type="submit" class="btn btn-outline-primary">Submit</button>
-				<a asp-area="settings" asp-controller="articles" asp-action="index" class="btn btn-outline-secondary">Cancel</a>
+				<button type="submit" class="btn btn-primary">Submit</button>
+				<a asp-area="settings" asp-controller="articles" asp-action="index" class="btn btn-secondary">Cancel</a>
 			</div>
 		</div>
-		<div class="form__body row align-items-start justify-content-start mb-4">
-			<div class="form__warp">
-				<partial name="_ArticleFormPartial" model="@Model" />
-				<div class="id form-floating mb-3" style="display:none;">
-					<input asp-for="@Model.Article!.Id" type="text" value="0" class="form-control" />
-				</div>
-			</div>
-		</div>
+        <partial name="_ArticleFormPartial" model="@Model" />
 	</form>
 </div>
 
-@section Scripts {
-	<script src="~/js/SelectItemModelCollector.js" asp-append-version="true"></script>
+@section Scripts 
+{
+	<script src="~/js/common-form.js" asp-append-version="true"></script>
 	<script>
-		document.addEventListener("DOMContentLoaded", function () {
-			var textarea = document.querySelector('#articleFormBody');
-			if (textarea) {
-				textarea.style.height = 'auto';
-				textarea.style.height = (textarea.scrollHeight) + 'px';
-
-				textarea.addEventListener('input', function () {
-					this.style.height = 'auto';
-					this.style.height = (this.scrollHeight) + 'px';
-				});
-			}
-
-			var tagSearch = document.getElementById('articleFormTagsSearch');
-			var tagSelect = document.getElementById('tags-multiple-select');
-			tagSearch.addEventListener('input', function () {
-				var filter = tagSearch.value.toLowerCase();
-				var options = tagSelect.options;
-
-				for (var i = 0; i < options.length; i++) {
-					var option = options[i];
-					var text = option.text.toLowerCase();
-
-					if (text.includes(filter)) {
-						option.style.display = '';
-					} else {
-						option.style.display = 'none';
-					}
-				}
-			});
-
-			let selectItemModelCollector = new SelectItemModelCollector('createArticleForm');
-			selectItemModelCollector.setModelItems('#tags-multiple-select option', '@(nameof(Model.Tags))');
-			selectItemModelCollector.setModelItems('#tags-multiple-select option:checked', 'Article.Tags');
-			selectItemModelCollector.setModelItems('#sources-single-select option', '@(nameof(Model.Sources))');
-			document.getElementById('createArticleForm').addEventListener('submit', function (event) {
-				selectItemModelCollector.collectModels();
-			});
+		var commonForm_formId = 'articleForm';
+		var commonForm_successMessage = 'Success create article. ';
+		var commonForm_successRedirectUrl = '/settings/articles/';
+        var commonForm_errorMessage = 'Error create article. ';
 	</script>
 }

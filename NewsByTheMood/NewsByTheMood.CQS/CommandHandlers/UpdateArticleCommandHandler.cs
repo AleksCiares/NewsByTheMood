@@ -59,8 +59,8 @@ namespace NewsByTheMood.CQS.CommandHandlers
                 }
 
                 // Обновление остальных полей статьи
-                existingArticle.Title = request.Article.Title;
                 existingArticle.Url = request.Article.Url;
+                existingArticle.Title = request.Article.Title;
                 existingArticle.PreviewImgUrl = request.Article.PreviewImgUrl;
                 existingArticle.Body = request.Article.Body;
                 existingArticle.PublishDate = request.Article.PublishDate;

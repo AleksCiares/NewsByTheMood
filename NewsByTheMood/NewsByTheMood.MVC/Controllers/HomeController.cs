@@ -69,7 +69,7 @@ namespace NewsByTheMood.MVC.Controllers
 
                 var user = await GetCurrentUserModelAsync();
                 //var articles = Array.Empty<ArticlePreviewModel>();
-                var totalArticles = await _articleService.CountAsync(user.PreferedPositivity);
+                var totalArticles = await _articleService.CountLatestAsync(user.PreferedPositivity);
 
                 if (totalArticles > 0 && ItemsNotOver(pagination, totalArticles))
                 {
@@ -303,8 +303,7 @@ namespace NewsByTheMood.MVC.Controllers
                 var articleId = HttpContext.Request.Headers["Referer"].ToString().Split('/').Last();
 
                 if (!ModelState.IsValid || 
-                    articleId.IsNullOrEmpty() ||
-                    !await _articleService.IsExistsByIdAsync(long.Parse(articleId)))
+                    articleId.IsNullOrEmpty())
                 {
                     return BadRequest();
                 }
@@ -343,8 +342,7 @@ namespace NewsByTheMood.MVC.Controllers
                 var articleId = HttpContext.Request.Headers["Referer"].ToString().Split('/').Last();
 
                 if (!ModelState.IsValid || 
-                    string.IsNullOrEmpty(articleId)|| 
-                    !await _articleService.IsExistsByIdAsync(long.Parse(articleId)))
+                    string.IsNullOrEmpty(articleId))
                 {
                     return BadRequest();
                 }

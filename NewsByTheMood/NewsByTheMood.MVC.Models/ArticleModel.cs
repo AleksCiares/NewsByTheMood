@@ -12,6 +12,6 @@
         public required int Rating { get; set; }
         public required string SourceName { get; set; }
         public required string TopicName { get; set; }
-        public required string[] Tags { get; set; }
+        public required List<string> Tags { get; set; }
     }
 }

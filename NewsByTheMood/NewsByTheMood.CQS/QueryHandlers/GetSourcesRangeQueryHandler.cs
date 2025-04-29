@@ -17,14 +17,18 @@ namespace NewsByTheMood.CQS.QueryHandlers
 
         public async Task<IEnumerable<Source>> Handle(GetSourcesRangeQuery request, CancellationToken cancellationToken)
         {
-            return await _dbContext.Sources
+            IQueryable<Source> query = _dbContext.Sources
                 .AsNoTracking()
                 .Include(source => source.Topic)
                 .Include(source => source.Articles)
-                .OrderByDescending(source => source.Id)
-                .Skip((request.Page - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToArrayAsync(cancellationToken);
+                .OrderByDescending(source => source.Id);
+
+            if (!request.GetAll)
+            {
+                query = query.Skip((request.Page - 1) * request.PageSize).Take(request.PageSize);
+            }
+
+            return await query.ToArrayAsync(cancellationToken);
         }
     }
 }

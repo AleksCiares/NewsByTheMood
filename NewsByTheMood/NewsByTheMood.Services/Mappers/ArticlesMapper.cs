@@ -22,7 +22,7 @@ namespace NewsByTheMood.Services.MVC.Mappers
         [MapProperty([nameof(Article.Source), nameof(Article.Source.Topic), nameof(Article.Source.Topic.Name)], 
             nameof(ArticleModel.TopicName))]
         [MapProperty([nameof(Article.Tags)], nameof(ArticleModel.Tags), 
-            Use = nameof(TagsListToTagsNameArray))]
+            Use = nameof(TagsListToTagsNameList))]
         [MapperIgnoreSource(nameof(Article.Id))]
         [MapperIgnoreSource(nameof(Article.IsActive))]
         [MapperIgnoreSource(nameof(Article.FailedLoaded))]
@@ -43,45 +43,36 @@ namespace NewsByTheMood.Services.MVC.Mappers
         [MapperIgnoreSource(nameof(Article.Comments))]
         public partial ArticleSettingsPreviewModel ArticleToArticleSettingsPreviewModel(Article article);
 
-        [MapProperty(nameof(ArticleSettingsModel.Tags), nameof(Article.Tags), 
-            Use = nameof(TagsSelectListToTagsList))]
+        [MapProperty(nameof(ArticleSettingsModel.ArticleTags), nameof(Article.Tags), 
+            Use = nameof(TagsNameListToTagsList))]
         [MapperIgnoreTarget(nameof(Article.Source))]
         [MapperIgnoreTarget(nameof(Article.Comments))]
+        [MapperIgnoreSource(nameof(ArticleSettingsModel.Sources))]
+        [MapperIgnoreSource(nameof(ArticleSettingsModel.Tags))]
         public partial Article ArticleSettingsModelToArticle(ArticleSettingsModel model);
 
-        [MapProperty([nameof(Article.Tags)], nameof(ArticleSettingsModel.Tags), 
-            Use = nameof(TagsListToTagsSelectList))]
+        [MapProperty([nameof(Article.Tags)], nameof(ArticleSettingsModel.ArticleTags), 
+            Use = nameof(TagsListToTagsNameList))]
         [MapperIgnoreSource(nameof(Article.Source))]
         [MapperIgnoreSource(nameof(Article.Comments))]
+        [MapperIgnoreTarget(nameof(ArticleSettingsModel.Sources))]
+        [MapperIgnoreTarget(nameof(ArticleSettingsModel.Tags))]
         public partial ArticleSettingsModel? ArticleToArticleSettingsModel(Article? article);
 
         [UserMapping]
-        private string[] TagsListToTagsNameArray(List<Tag> tags)
+        private List<Tag> TagsNameListToTagsList(List<string> tags)
         {
-            return tags.Select(t => t.Name).ToArray();
-        }
-
-        [UserMapping]
-        private List<Tag> TagsSelectListToTagsList(List<SelectListItem> tags)
-        {
-            return tags.Where(tag => tag.Selected)
-                    .Select(tag => new Tag()
+            return tags.Select(tag => new Tag()
                     {
-                        Id = Int64.Parse(tag.Value),
-                        Name = tag.Text
+                        Name = tag,
                     })
                     .ToList();
         }
 
         [UserMapping]
-        private List<SelectListItem> TagsListToTagsSelectList(List<Tag> tags)
+        private List<string> TagsListToTagsNameList(List<Tag> tags)
         {
-            return tags.Select(tag => new SelectListItem()
-                    {
-                        Value = tag.Id.ToString(),
-                        Text = tag.Name,
-                        Selected = true
-                    })
+            return tags.Select(tag => tag.Name)
                     .ToList();
         }
     }
