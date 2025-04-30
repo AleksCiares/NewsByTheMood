@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using NewsByTheMood.Core.Settings;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
+using NewsByTheMood.Services.DataProvider.Implement;
+using NewsByTheMood.Services.Mappers;
 using NewsByTheMood.Services.MVC.Mappers;
 using NuGet.Protocol;
 
@@ -17,20 +19,28 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         private readonly IArticleService _articleService;
         private readonly ISourceService _sourceService;
         private readonly ITagService _tagService;
+        private readonly ICommentService _commentService;
         private readonly ILogger<ArticlesController> _logger;
         private readonly ArticlesMapper _articleMapper;
+        private readonly CommentsMapper _commentMapper;
         private readonly short _defaultPositivity = 0;
 
-        public ArticlesController(IArticleService articleService, 
-            ISourceService sourceService, ITagService tagService, 
+        public ArticlesController(
+            IArticleService articleService, 
+            ISourceService sourceService, 
+            ITagService tagService,
+            ICommentService commentService,
             ILogger<ArticlesController> logger, 
-            ArticlesMapper articleMapper)
+            ArticlesMapper articleMapper,
+            CommentsMapper commentMapper)
         {
             _articleService = articleService;
             _sourceService = sourceService;
             _tagService = tagService;
+            _commentService = commentService;
             _logger = logger;
             _articleMapper = articleMapper;
+            _commentMapper = commentMapper;
         }
 
         // Get range of articles previews
@@ -236,6 +246,43 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             catch(Exception ex)
             {
                 _logger.LogError(ex, $"Error while deleting articles {string.Join(", ", ids)}");
+                return StatusCode(500);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetComments([FromRoute] string id, [FromBody] PaginationModel pagination)
+        {
+            try
+            {
+                if (!ModelState.IsValid ||
+                    string.IsNullOrEmpty(id))
+                {
+                    return BadRequest();
+                }
+
+                var totalComments = await _commentService.CountByArticleIdAsync(
+                    long.Parse(id));
+
+                if (totalComments > 0 && ItemsNotOver(pagination, totalComments))
+                {
+                    var comments = (await _commentService.GetRangeByArticleIdAsync(
+                        long.Parse(id),
+                    pagination.Page,
+                        pagination.PageSize))
+                        .Select(comment => _commentMapper.CommentToCommentSettingsModel(comment))
+                        .ToArray();
+
+                    return PartialView("_CommentsPartial", comments);
+                }
+                else
+                {
+                    return StatusCode(204);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error while getting comments");
                 return StatusCode(500);
             }
         }

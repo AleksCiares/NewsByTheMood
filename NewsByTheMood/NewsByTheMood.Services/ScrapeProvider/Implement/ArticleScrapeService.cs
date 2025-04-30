@@ -135,6 +135,9 @@ namespace NewsByTheMood.Services.ScrapeProvider.Implement
             // parse article
             var article = ParseArticle(source, scraper);
             article.Url = articleUrl;
+            article.IsActive = true;
+            article.FailedLoaded = false;
+
             _logger.LogDebug($"Article parsed successfully from {articleUrl}. ArticleTitle: {article.Title}, SourceName: {source.Name}, Id: {source.Id}");
 
             scraper.Dispose();

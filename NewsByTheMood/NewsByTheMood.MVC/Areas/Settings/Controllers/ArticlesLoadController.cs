@@ -71,18 +71,17 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> UpdateManually([FromQuery] string articleId)
+        [HttpPost]
+        public async Task<IActionResult> UpdateManually([FromRoute] string id)
         {
             try
             {
-                var article = await _articleService.GetByIdAsync(long.Parse(articleId));
+                var article = await _articleService.GetByIdAsync(long.Parse(id));
                 if (article == null)
                 {
-                    return NotFound(new 
+                    return NotFound(new
                     {
-                        success = false,
-                        message = "Something gone wrong. Watch logs for more information."
+                        Error = "Something gone wrong, while getting article. Watch logs to more information"
                     });
                 }
 
@@ -91,8 +90,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                 {
                     return NotFound(new
                     {
-                        success = false,
-                        message = "Something gone wrong. Watch logs for more information."
+                        Error = "Something gone wrong, while getting article. Watch logs to more information"
                     });
                 }
 
@@ -100,29 +98,20 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                 result.Id = article.Id;
                 if (await _articleService.UpdateAsync(result))
                 {
-                    return Ok(new
-                    {
-                        success = true,
-                        message = "Article was updated successfully."
-                    });
+                    return Ok();
                 }
                 else
                 {
-                    return NotFound(new
+                    return BadRequest(new
                     {
-                        success = false,
-                        message = "Something gone wrong. Watch logs for more information."
+                        Error = "Something gone wrong, while getting article. Watch logs to more information"
                     });
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error while updating article with id={articleId} from source.");
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "Something gone wrong. Watch logs for more information."
-                });
+                _logger.LogError(ex, $"Error while updating article with id={id} from source.");
+                return StatusCode(500);
             }
         }
     }

@@ -1,6 +1,11 @@
-﻿@model ArticleSettingsModel
+﻿@addTagHelper NewsByTheMood.MVC.TagHelpers.SectionDividerTagHelper, NewsByTheMood.MVC
+@model ArticleSettingsModel
 @{
 	ViewData["PageTitle"] = $"{Model.Title} - Editing";
+}
+@section Styles
+{
+	<link rel="stylesheet" href="~/css/positivity-icon.css" asp-append-version="true" />
 }
 
 <div class="article container">
@@ -13,8 +18,8 @@
 			<div class="col-auto">
 				<button id="articleFormSubmit" class="btn btn-primary">Submit</button>
 				<a asp-area="settings" asp-controller="articles" asp-action="index" class="btn btn-secondary">Cancel</a>
-				<a asp-area="settings" asp-controller="articlesload" asp-action="updatemanually" 
-					asp-route-articleId="@Model.Id" class="btn btn-primary">Reload from source</a>
+				<a asp-area="settings" asp-controller="articlesload" asp-action="updatemanually"
+				   asp-route-id="@Model.Id" id="reloadArticleButton" class="btn btn-primary">Reload from source</a>
 			</div>
 			<div class="col-auto">
 				<a asp-area="settings" asp-controller="articles" asp-action="delete" asp-route-id="@Model.Id" 
@@ -23,13 +28,24 @@
 		</div>
 		<partial name="_ArticleFormPartial" model="@Model" />
 	</form>
+    <div class="article__comments">
+        <section-divider>Comments</section-divider>
+		<div class="comments-container">
+			<partial name="_AsyncLoadItemsPartial" />
+		</div>
+    </div>
 </div>
 
 @section Scripts 
 {
-	<script src="~/js/common-form.js" asp-append-version="true"></script>
+	<script src="~/js/CommonForm.js" asp-append-version="true"></script>
 	<script src="~/js/CommonModal.js" asp-append-version="true"></script>
+	<script src="~/js/send-async-request.js" asp-append-version="true"></script>
+	<script src="~/js/async-load-items.js" asp-append-version="true"></script>
 	<script>
+		var asyncLoadUrl = "/settings/articles/getcomments/@Model.Id";
+		var asyncLoadMethod = "POST";
+
 		document.addEventListener('DOMContentLoaded', function () {
 			const commonForm = new CommonForm(
 				'articleForm',
@@ -42,48 +58,20 @@
 			const modal = new CommonModal(
 				'Delete article',
 				'Are you sure to delete this article?',
-				'deleteArticleButton');
+				'deleteArticleButton'
+			);
 			modal.setCancelButton('Cancel', 'btn-secondary');
 			modal.setConfirmButton('Confirm', 'btn-danger', async function () {
 				const href = document.getElementById('deleteArticleButton').href;
-					if (href) {
-						try {
-							const response = await fetch(href, {
-								method: 'POST',
-								body: null,
-								headers: {
-									"X-Requested-With": "XMLHttpRequest"
-								}
-							});
-
-							if (response.ok) {
-								window.location.href = "/settings/articles/";
-							}
-							else {
-								const result = await response.text();
-								const message = "Failed delete article. Http code: " + response.status + " " + result;
-								console.error(message);
-								if (typeof showGeneralNotifyMessage === "function") {
-									showGeneralNotifyMessage(message, 'error')
-								}
-							}
-						}
-						catch (error) {
-							const message = "Error while deliting article. " + error;
-							console.error(message);
-							if (typeof showGeneralNotifyMessage === "function") {
-								showGeneralNotifyMessage(message, 'error')
-							}
-						}
-					}
-					else {
-						const message = "Bad request. No found link for delete endpoint.";
-						console.error(message);
-						if (typeof showGeneralNotifyMessage === "function") {
-							showGeneralNotifyMessage(message, 'error')
-						}
-					}
+					await sendAsyncRequest(href, 'POST', '/settings/articles/', showGeneralNotifyMessage);
 				});
+
+            document.getElementById('reloadArticleButton').addEventListener('click', async function (event) {
+                event.preventDefault();
+                const href = event.target.href;
+				await sendAsyncRequest(href, 'POST', undefined, showGeneralNotifyMessage);
+                window.location.reload();
+            });
 		});
 	</script>
 }
