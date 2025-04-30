@@ -11,7 +11,7 @@
 		  method="post" id="articleForm" class="article-from">
 		<div class="form__panel row align-items-start justify-content-between mb-4">
 			<div class="col-auto">
-				<button type="submit" class="btn btn-primary">Submit</button>
+				<button id="articleFormSubmit" class="btn btn-primary">Submit</button>
 				<a asp-area="settings" asp-controller="articles" asp-action="index" class="btn btn-secondary">Cancel</a>
 				<a asp-area="settings" asp-controller="articlesload" asp-action="updatemanually" 
 					asp-route-articleId="@Model.Id" class="btn btn-primary">Reload from source</a>
@@ -30,12 +30,15 @@
 	<script src="~/js/common-form.js" asp-append-version="true"></script>
 	<script src="~/js/CommonModal.js" asp-append-version="true"></script>
 	<script>
-		var commonForm_formId = 'articleForm';
-		var commonForm_successMessage = 'Success update article. ';
-		var commonForm_successRedirectUrl = '/settings/articles/';
-		var commonForm_errorMessage = 'Error update article. ';
+		document.addEventListener('DOMContentLoaded', function () {
+			const commonForm = new CommonForm(
+				'articleForm',
+				'articleFormSubmit',
+				'Success update article. ',
+				'Error update article. ',
+				showGeneralNotifyMessage
+			);
 
-		document.addEventListener('DOMContentLoaded', async function () {
 			const modal = new CommonModal(
 				'Delete article',
 				'Are you sure to delete this article?',
@@ -43,44 +46,44 @@
 			modal.setCancelButton('Cancel', 'btn-secondary');
 			modal.setConfirmButton('Confirm', 'btn-danger', async function () {
 				const href = document.getElementById('deleteArticleButton').href;
-				if (href) {
-					try {
-						const response = await fetch(href, {
-							method: 'POST',
-							body: null,
-							headers: {
-								"X-Requested-With": "XMLHttpRequest"
-							}
-						});
+					if (href) {
+						try {
+							const response = await fetch(href, {
+								method: 'POST',
+								body: null,
+								headers: {
+									"X-Requested-With": "XMLHttpRequest"
+								}
+							});
 
-						if (response.ok) {
-							window.location.href = "/settings/articles/";
+							if (response.ok) {
+								window.location.href = "/settings/articles/";
+							}
+							else {
+								const result = await response.text();
+								const message = "Failed delete article. Http code: " + response.status + " " + result;
+								console.error(message);
+								if (typeof showGeneralNotifyMessage === "function") {
+									showGeneralNotifyMessage(message, 'error')
+								}
+							}
 						}
-						else {
-							const result = await response.text();
-							const message = "Failed delete article. Http code: " + response.status + " " + result;
+						catch (error) {
+							const message = "Error while deliting article. " + error;
 							console.error(message);
 							if (typeof showGeneralNotifyMessage === "function") {
 								showGeneralNotifyMessage(message, 'error')
 							}
 						}
 					}
-					catch (error) {
-						const message = "Error while deliting article. " + error;
+					else {
+						const message = "Bad request. No found link for delete endpoint.";
 						console.error(message);
 						if (typeof showGeneralNotifyMessage === "function") {
 							showGeneralNotifyMessage(message, 'error')
 						}
 					}
-				}
-				else {
-					const message = "Bad request. No found link for delete endpoint.";
-					console.error(message);
-					if (typeof showGeneralNotifyMessage === "function") {
-						showGeneralNotifyMessage(message, 'error')
-					}
-				}
-			});
+				});
 		});
 	</script>
 }

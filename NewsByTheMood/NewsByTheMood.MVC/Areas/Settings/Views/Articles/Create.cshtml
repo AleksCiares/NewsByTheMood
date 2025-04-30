@@ -11,7 +11,7 @@
 		  method="post" id="articleForm" class="article-from">
 		<div class="article-from__panel row align-items-start justify-content-between mb-4">
 			<div class="col-auto">
-				<button type="submit" class="btn btn-primary">Submit</button>
+				<button id="articleFormSubmit" class="btn btn-primary">Submit</button>
 				<a asp-area="settings" asp-controller="articles" asp-action="index" class="btn btn-secondary">Cancel</a>
 			</div>
 		</div>
@@ -23,9 +23,15 @@
 {
 	<script src="~/js/common-form.js" asp-append-version="true"></script>
 	<script>
-		var commonForm_formId = 'articleForm';
-		var commonForm_successMessage = 'Success create article. ';
-		var commonForm_successRedirectUrl = '/settings/articles/';
-        var commonForm_errorMessage = 'Error create article. ';
+		document.addEventListener('DOMContentLoaded', function () {
+			const commonForm = new CommonForm(
+				'articleForm',
+				'articleFormSubmit',
+				'Success create article. ',
+				'Error create article. ',
+				showGeneralNotifyMessage,
+				'/settings/articles/',
+			);
+		});
 	</script>
 }
