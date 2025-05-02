@@ -16,10 +16,13 @@
 		  method="post" id="articleForm" class="article-from">
 		<div class="form__panel row align-items-start justify-content-between mb-4">
 			<div class="col-auto">
-				<button id="articleFormSubmit" class="btn btn-primary">Submit</button>
+				<button id="articleFormSubmit" class="btn btn-primary">Save</button>
 				<a asp-area="settings" asp-controller="articles" asp-action="index" class="btn btn-secondary">Cancel</a>
 				<a asp-area="settings" asp-controller="articlesload" asp-action="updatemanually"
-				   asp-route-id="@Model.Id" id="reloadArticleButton" class="btn btn-primary">Reload from source</a>
+					asp-route-id="@Model.Id" id="reloadArticleButton" class="btn btn-primary">
+					Back to original
+					<span id="reloadSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
+				</a>
 			</div>
 			<div class="col-auto">
 				<a asp-area="settings" asp-controller="articles" asp-action="delete" asp-route-id="@Model.Id" 
@@ -28,12 +31,12 @@
 		</div>
 		<partial name="_ArticleFormPartial" model="@Model" />
 	</form>
-    <div class="article__comments">
-        <section-divider>Comments</section-divider>
-		<div class="comments-container">
-			<partial name="_AsyncLoadItemsPartial" />
-		</div>
-    </div>
+	<div class="article__comments"> 
+		<section-divider>Comments</section-divider> 
+		<div class="comments-container"> 
+		 	<partial name="_AsyncLoadItemsPartial" /> 
+		</div> 
+	</div>
 </div>
 
 @section Scripts 
@@ -43,35 +46,48 @@
 	<script src="~/js/send-async-request.js" asp-append-version="true"></script>
 	<script src="~/js/async-load-items.js" asp-append-version="true"></script>
 	<script>
-		var asyncLoadUrl = "/settings/articles/getcomments/@Model.Id";
-		var asyncLoadMethod = "POST";
-
 		document.addEventListener('DOMContentLoaded', function () {
 			const commonForm = new CommonForm(
 				'articleForm',
 				'articleFormSubmit',
 				'Success update article. ',
+                undefined,
 				'Error update article. ',
 				showGeneralNotifyMessage
 			);
 
-			const modal = new CommonModal(
+			const updateModal = new CommonModal(
+				'Update article',
+				'Are you sure to update this article? These articles will be restored to their original state.',
+				'reloadArticleButton'
+			);
+            updateModal.setCancelButton('Cancel', 'btn-secondary');
+            updateModal.setConfirmButton('Confirm', 'btn-primary', async function () {
+                const reloadButton = document.getElementById('reloadArticleButton');
+				const reloadSpinner = document.getElementById('reloadSpinner');
+
+                reloadSpinner.classList.remove('d-none');
+                reloadButton.disabled = true;
+
+				await sendAsyncRequest(reloadButton.href, 'POST', window.location.pathname, showGeneralNotifyMessage);
+
+                reloadSpinner.classList.add('d-none');
+                reloadButton.disabled = false;
+			});
+
+			const deleteModal = new CommonModal(
 				'Delete article',
 				'Are you sure to delete this article?',
 				'deleteArticleButton'
 			);
-			modal.setCancelButton('Cancel', 'btn-secondary');
-			modal.setConfirmButton('Confirm', 'btn-danger', async function () {
+			deleteModal.setCancelButton('Cancel', 'btn-secondary');
+			deleteModal.setConfirmButton('Confirm', 'btn-danger', async function () {
 				const href = document.getElementById('deleteArticleButton').href;
-					await sendAsyncRequest(href, 'POST', '/settings/articles/', showGeneralNotifyMessage);
-				});
-
-            document.getElementById('reloadArticleButton').addEventListener('click', async function (event) {
-                event.preventDefault();
-                const href = event.target.href;
-				await sendAsyncRequest(href, 'POST', undefined, showGeneralNotifyMessage);
-                window.location.reload();
-            });
+				await sendAsyncRequest(href, 'POST', '/settings/articles/', showGeneralNotifyMessage);
+			});
 		});
+
+		var asyncLoadUrl = "/settings/articles/getcomments/@Model.Id";
+		var asyncLoadMethod = "POST";
 	</script>
 }

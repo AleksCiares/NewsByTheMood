@@ -1,27 +1,34 @@
 ﻿class CommonModal{
+    #modalId;
     #modal;
     #buttonsContainer;
-    #buttons = [];
+    #buttonsCount = 0;
 
-	constructor(modalLabelText, modalBodyText, preventElementId) {
-        const modalHtml = `<div class="modal fade" id="commonModal" tabindex="-1" aria-labelledby="commonModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="commonModalLabel">${modalLabelText}</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body" id="commonModalBody">
-                                    ${modalBodyText}
-                                </div>
-                                <div class="modal-footer" id="commonModalButtonContainer">
+    constructor(modalLabelText, modalBodyText, preventElementId) {
+        const randomNumber = Math.floor(Math.random() * (1000000 - 10 + 1) + 10);
+
+        this.#modalId = "commonModal_" + randomNumber;
+        const modalLabelId = "commonModalLabel_" + randomNumber;
+
+        const modalHtml = `<div class="modal fade" id="${this.#modalId}" tabindex="-1" aria-labelledby="${modalLabelId}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="${modalLabelId}">${modalLabelText}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-message modal-body">
+                                        ${modalBodyText}
+                                    </div>
+                                    <div class="modal-buttons-container modal-footer">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>`;
+                        </div>`;
+
         document.body.insertAdjacentHTML("beforeend", modalHtml);
-        this.#modal = new bootstrap.Modal(document.getElementById("commonModal"), {});
-        this.#buttonsContainer = document.getElementById("commonModalButtonContainer");
+        this.#modal = new bootstrap.Modal(document.getElementById(this.#modalId), {});
+        this.#buttonsContainer = document.querySelector(`#${this.#modalId} .modal-buttons-container`);
 
         const preventElement = document.getElementById(preventElementId);
         if (preventElement) {
@@ -34,21 +41,20 @@
 
     setCancelButton(buttonText, buttonCssClass) {
         const cancelButton = document.createElement("button");
-        cancelButton.id = "commonModalButtonCancel";
         cancelButton.type = "button";
-        cancelButton.className = `btn ${buttonCssClass}`;
+        cancelButton.className = `cancel-button_${this.#buttonsCount} btn ${buttonCssClass}`;
         cancelButton.setAttribute("data-bs-dismiss", "modal");
         cancelButton.innerText = buttonText;
 
-        this.#buttons.push(cancelButton);
         this.#buttonsContainer.appendChild(cancelButton);
+
+        this.#buttonsCount++;
     }
 
     setConfirmButton(buttonText, buttonCssClass, eventHandler) {
         const button = document.createElement("button");
-        button.id = `commonModalButton_${this.#buttons.length}`;
         button.type = "button";
-        button.className = `btn ${buttonCssClass}`;
+        button.className = `confirm-button_${this.#buttonsCount} btn ${buttonCssClass}`;
         button.innerText = buttonText;
 
         if (eventHandler) {
@@ -58,7 +64,8 @@
             });
         }
 
-        this.#buttons.push(button);
         this.#buttonsContainer.appendChild(button);
+
+        this.#buttonsCount++;
     }
 }

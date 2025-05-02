@@ -8,7 +8,7 @@
 
     #notifySender;
 
-    constructor(formId, submitButtonId, successMessage, errorMessage, notifySender, successRedirectUrl) {
+    constructor(formId, submitButtonId, successMessage, successRedirectUrl, errorMessage, notifySender) {
         this.#form = document.getElementById(formId);
         this.#submitButton = document.getElementById(submitButtonId);
 

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using NewsByTheMood.Core.Settings;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
-using NewsByTheMood.Services.DataProvider.Implement;
 using NewsByTheMood.Services.Mappers;
 using NewsByTheMood.Services.MVC.Mappers;
 using NuGet.Protocol;
@@ -268,7 +267,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                 {
                     var comments = (await _commentService.GetRangeByArticleIdAsync(
                         long.Parse(id),
-                    pagination.Page,
+                        pagination.Page,
                         pagination.PageSize))
                         .Select(comment => _commentMapper.CommentToCommentSettingsModel(comment))
                         .ToArray();
