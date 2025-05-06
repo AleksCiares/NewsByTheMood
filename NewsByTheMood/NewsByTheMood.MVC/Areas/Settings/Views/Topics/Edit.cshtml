@@ -1,85 +1,61 @@
-﻿@model TopicSettingsEditModel
+﻿@model TopicSettingsModel
 @{
-	ViewData["PageTitle"] = $"{Model.Topic.Name} - Editing";
+	ViewData["PageTitle"] = $"{Model.Name} - Editing";
 }
 
 <div class="topic container">
 	<div class="topic__header d-flex row mb-5">
-		<h4 class="mb-0">Edit topic @Model.Topic.Name</h4>
+		<h4 class="mb-0">Edit topic @Model.Name</h4>
 	</div>
-	<form asp-antiforgery="true" method="post" id="editTopicForm">
+	<form asp-antiforgery="true" asp-area="settings" asp-controller="topics" asp-action="edit" method="post" 
+		id="topicForm" class="topic-form">
 		<div class="form__panel row align-items-start justify-content-between mb-4">
 			<div class="col-auto">
-				<button asp-area="settings" asp-controller="topics" asp-action="edit" asp-route-id="@Model.Topic.Name" type="submit" class="btn btn-outline-primary">Submit</button>
-				<a asp-area="settings" asp-controller="topics" asp-action="index" class="btn btn-outline-secondary">Cancel</a>
+				<button id="topicFormSubmit" type="submit" class="btn btn-primary">Save</button>
+				<a asp-area="settings" asp-controller="topics" asp-action="index" class="btn btn-secondary">Cancel</a>
 			</div>
 			<div class="col-auto">
-				<button formnovalidate asp-area="settings" asp-controller="topics" asp-action="delete" asp-route-id="@Model.Topic.Id" id="deleteTopicButton" class="btn btn-danger">Delete</button>
+				<a asp-area="settings" asp-controller="topics" asp-action="delete" asp-route-id="@Model.Id" 
+					id="deleteTopicButton" class="btn btn-danger">Delete</a>
 			</div>
 		</div>
-		<div class="form__body row align-items-start justify-content-start mb-4">
-			<div class="form__warp">
-				<div class="row mb-3">
-					<div class="col-auto">
-						<span class="text-muted">Topic has @(Model.RelatedSourceCount) related sources</span>
-						<input asp-for="@Model.RelatedSourceCount" type="hidden" class="invisible" />
-					</div>
-				</div>
-				<div class="name form-floating mb-3">
-					<input asp-for="@Model.Topic.Name" type="text" class="form-control" placeholder="@nameof(Model.Topic.Name)" />
-					<label asp-for="@Model.Topic.Name" class="form-label">Topic name</label>
-					<span asp-validation-for="@Model.Topic.Name" class="error-feedback invalid-feedback"></span>
-				</div>
-				<div class="icon form-floating mb-3">
-					<input asp-for="@Model.Topic.IconCssClass" type="text" class="form-control" id="TopicIconCssClass" placeholder="@nameof(Model.Topic.IconCssClass)" />
-					<label asp-for="@Model.Topic.IconCssClass" class="form-label">Icon css class</label>
-					<span asp-validation-for="@Model.Topic.IconCssClass" class="error-feedback invalid-feedback"></span>
-				</div>
-				@await Component.InvokeAsync("TopicsIcons")
-				<div class="id form-floating mb-3" style="display:none;">
-					<input asp-for="@Model.Topic.Id" type="text" value="@Model.Topic.Id" class="form-control" />
-				</div>
-			</div>
-		</div>
+		<partial name="_TopicFormPartial" model="@Model" />
 	</form>
 </div>
 
 @section Scripts
 {
+	<script src="~/js/CommonForm.js" asp-append-version="true"></script>
 	<script src="~/js/CommonModal.js" asp-append-version="true"></script>
-	<script>
-		document.addEventListener('DOMContentLoaded', function () {
-			$(document).on("click", ".icon-item", function () {
-				var clickedIconCssClass = $(this).attr("value");
-				$("#TopicIconCssClass").attr("value", clickedIconCssClass);
-			});
-		});
-	</script>
-
-	
-	@if (Model.RelatedSourceCount == 0)
+	<script src="~/js/send-async-request.js" asp-append-version="true"></script>
+	<script src="~/js/settings/topics/settings-topics-edit.js" asp-append-version="true"></script>
+	@if (Model.RelatedSources > 0)
 	{
 		<script>
-			let modal = new CommonModal(
-				'Delete topic', 
-				'Are you sure to delete this topic?', 
-				'deleteTopicButton');
-			modal.setCancelButton('Cancel', 'btn-secondary');
-			modal.setConfirmButton('Confirm', 'btn-danger', () => {
-				let form = document.getElementById('editTopicForm');
-				form.action = form.action.replace('edit', 'delete');
-				form.submit();
-			})
+			const deleteModal = new CommonModal(
+				'Delete topic',
+				'Can not delete a topic with related sources. Please delete related sources first.',
+				'deleteTopicButton'
+			);
+
+			deleteModal.setCancelButton('Cancel', 'btn-secondary');
 		</script>
 	}
 	else
 	{
 		<script>
-			let modal = new CommonModal(
-				'Delete topic', 
-				'Cannot delete Topic with related sources. Please delete related sources first', 
-				'deleteTopicButton');
-			modal.setCancelButton('Cancel', 'btn-secondary');
+			const deleteModal = new CommonModal(
+				'Delete topic',
+				'Are you sure to delete this topic?',
+				'deleteTopicButton'
+			);
+
+			deleteModal.setCancelButton('Cancel', 'btn-secondary');
+			deleteModal.setConfirmButton('Confirm', 'btn-danger', async () =>
+			{
+				const href = document.getElementById('deleteTopicButton').href;
+				await sendAsyncRequest(href, 'POST', '/settings/topics/', showGeneralNotifyMessage);
+			});
 		</script>
 	}
 }

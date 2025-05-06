@@ -32,7 +32,7 @@ namespace NewsByTheMood.MVC.Components
         {
             try
             {
-                var topics = (await this._topicService.GetAllAsync())
+                var topics = (await _topicService.GetAllAsync())
                     .Select(topic => _topicsMapper.TopicToTopicModel(topic))
                     .ToArray();
 
@@ -51,7 +51,11 @@ namespace NewsByTheMood.MVC.Components
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in HeaderViewComponent");
-                return View(false);
+                return View(new HeaderModel()
+                { 
+                    UserPreview = null,
+                    Topics = Array.Empty<TopicModel>()
+                });
             }
         }
     }

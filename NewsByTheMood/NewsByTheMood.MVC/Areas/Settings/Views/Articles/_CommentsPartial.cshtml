@@ -2,16 +2,25 @@
 
 @foreach (var comment in Model)
 {
-    <div class="comment mb-3">
+    <div class="comment mb-3" data-comment-id="@comment.Id">
         <div class="comment__header d-flex justify-content-between bg-transparent">
             <div class="d-flex justify-content-start align-items-center">
                 <img src="@comment.UserAvatar" class="user-avatar rounded-circle border" />
-                 <span >@comment.UserDisplayName</span>
+                <span >@comment.UserDisplayName</span>
+                <span class="text-muted mx-1">(@comment.UserName)</span>
             </div>
             <div>
                 <span>@comment.PublishDate.ToString("g")</span>
+                <input type="checkbox" name="ids" value="@comment.Id" class="select-comment mx-3" />
             </div>
         </div>
-        <div class="comment__body">@comment.Text</div>
+        @if (comment.Deleted)
+        {
+            <div class="comment__body text-muted">Deleted by moderator</div>
+        }
+        else
+        {
+            <div class="comment__body">@comment.Text</div>
+        }
     </div>
 }

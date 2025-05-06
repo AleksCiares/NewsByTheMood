@@ -1,4 +1,6 @@
-﻿@model TopicSettingsCollectionModel
+﻿@addTagHelper NewsByTheMood.MVC.TagHelpers.PaginationTagHelper, NewsByTheMood.MVC
+
+@model TopicSettingsCollectionModel
 @{
 	ViewData["PageTitle"] = "Topics";
 }
@@ -9,7 +11,7 @@
 	</div>
 	<div class="topics__panel row align-items-start justify-content-start mb-4">
 		<div class="col-auto">
-			<a asp-area="settings" asp-controller="topics" asp-action="create" class="btn btn-outline-primary">Create</a>
+			<a asp-area="settings" asp-controller="topics" asp-action="create" class="btn btn-primary">Create</a>
 		</div>
 	</div>
 	<div class="topics__table mb-4">

@@ -164,6 +164,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 
         // Edit article item proccessing
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit([FromForm] ArticleSettingsModel article)
         {
             try
@@ -287,6 +288,34 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> DeleteCommentsRange([FromForm] string[] ids)
+        {
+            try
+            {
+                var deletedIds = await _commentService
+                .DeleteRangeAsync(ids.Select(id => long.Parse(id)).ToArray());
+
+                if (deletedIds.Length == ids.Length)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest(new
+                    {
+                        GeneralErrors = "Something gone wrong, while creating article. " +
+                        "Watch logs to more information"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error while deleting articles {string.Join(", ", ids)}");
+                return StatusCode(500);
+            }
+        }
+
+        [HttpPost]
         public async Task<IActionResult> UrlIsAvailable(ArticleSettingsModel article)
         {
             try
@@ -323,7 +352,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 
             if (sources.Count <= 0)
             {
-                ModelState.AddModelError("Article.SourceId", "No source have been created, " +
+                ModelState.AddModelError("SourceId", "No source have been created, " +
                     "to create a article you must first create a source");
             }
 

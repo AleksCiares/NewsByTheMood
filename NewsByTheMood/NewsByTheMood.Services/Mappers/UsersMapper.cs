@@ -49,11 +49,11 @@ namespace NewsByTheMood.Services.Mappers
         public partial UserPreviewModel? UserToUserPreviewModel(User? user);
 
         [UserMapping]
-        private List<Int64> TopicsListToTopicsIdList(List<Topic>? topics)
+        private List<long> TopicsListToTopicsIdList(List<Topic>? topics)
         {
             if (topics == null)
             {
-                return new List<Int64>();
+                return new List<long>();
             }
 
             return topics.Select(t => t.Id).ToList();

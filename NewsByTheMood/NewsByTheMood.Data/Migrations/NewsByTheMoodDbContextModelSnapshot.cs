@@ -228,6 +228,9 @@ namespace NewsByTheMood.Data.Migrations
                     b.Property<long>("ArticleId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
                     b.Property<int>("Position")
                         .HasColumnType("int");
 

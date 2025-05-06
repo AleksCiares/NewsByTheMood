@@ -9,6 +9,8 @@ namespace NewsByTheMood.Services.MVC.Mappers
     {
         [MapperIgnoreTarget(nameof(Source.Topic))]
         [MapperIgnoreTarget(nameof(Source.Articles))]
+        [MapperIgnoreSource(nameof(SourceSettingsModel.RelatedArticles))]
+        [MapperIgnoreSource(nameof(SourceSettingsModel.Topics))]
         public partial Source SourceSettingsModelToSource(SourceSettingsModel source);
 
         [MapProperty([nameof(Source.Topic), nameof(Source.Name)], nameof(SourceSettingsPreviewModel.Topic))]
@@ -32,8 +34,9 @@ namespace NewsByTheMood.Services.MVC.Mappers
         [MapperIgnoreSource(nameof(Source.Articles))]
         public partial SourceSettingsPreviewModel SourceToSourceSettingPreviewModel(Source source);
 
+        [MapProperty([nameof(Source.Articles), nameof(Source.Articles.Count)], nameof(SourceSettingsModel.RelatedArticles))]
         [MapperIgnoreSource(nameof(Source.Topic))]
-        [MapperIgnoreSource(nameof(Source.Articles))]
+        [MapperIgnoreTarget(nameof(SourceSettingsModel.Topics))]
         public partial SourceSettingsModel SourceToSourceSettingsModel(Source? source);
     }
 }

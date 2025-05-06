@@ -1,72 +1,69 @@
-﻿@model SourceSettingsEditModel
+﻿@model SourceSettingsModel
 @{
-	ViewData["PageTitle"] = $"{Model.Source.Name} - Editing";
+	ViewData["PageTitle"] = $"{Model.Name} - Editing";
 }
 
 <div class="source container">
 	<div class="source__header d-flex row mb-5">
-		<h4 class="mb-0">Edit source @Model.Source.Name</h4>
+		<h4 class="mb-0">Edit source @Model.Name</h4>
 	</div>
-	<form asp-antiforgery="true" method="post" id="editSourceForm">
+	<form asp-antiforgery="true" asp-area="settings" asp-controller="sources" asp-action="edit" method="post" 
+		id="sourceForm" class="source-form">
 		<div class="form__panel row align-items-start justify-content-between mb-4">
 			<div class="col-auto">
-				<button asp-area="settings" asp-controller="sources" asp-action="edit" asp-route-id="@Model.Source.Id" class="btn btn-outline-primary" type="submit">Submit</button>
-				<a asp-area="settings" asp-controller="articlesload" asp-action="LoadBySourceManually" asp-route-sourceId="@Model.Source.Id" class="btn btn-outline-primary">Load articles</a>
-				<a asp-area="settings" asp-controller="sources" asp-action="index" class="btn btn-outline-secondary">Cancel</a>
+				<button id="sourceFormSubmit" type="submit" class="btn btn-primary">Save</button>
+				<a asp-area="settings" asp-controller="sources" asp-action="index" class="btn btn-secondary">Cancel</a>
+				<a asp-area="settings" asp-controller="articlesload" asp-action="loadbysourcemanually" 
+				asp-route-id="@Model.Id" id="loadArticlesButton" class="btn btn-primary">
+					Load articles
+					<span id="reloadSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
+				</a>
 			</div>
 			<div class="col-auto">
-				<button formnovalidate asp-area="settings" asp-controller="sources" asp-action="delete" asp-route-id="@Model.Source.Id" id="deleteSourceButton" class="btn btn-danger">Delete</button>
+				<a asp-area="settings" asp-controller="sources" asp-action="delete" asp-route-id="@Model.Id" 
+				id="deleteSourceButton" class="btn btn-danger">Delete</a>
 			</div>
 		</div>
-		<div class="form__body row align-items-start justify-content-start mb-4">
-			<div class="form__warp">
-				<div class="row mb-3">
-					<div class="col-auto">
-						<span class="text-muted">Source has @(Model.RelatedArticlesCount) related articles</span>
-						<input asp-for="@Model.RelatedArticlesCount" type="hidden" class="invisible" />
-					</div>
-				</div>
-				<partial name="_SourceFormPartial" model="new SourceSettingsCreateModel(){Source = Model.Source, Topics = Model.Topics}" />
-				<div class="id form-floating mb-3" style="display:none;">
-					<input asp-for="@Model.Source.Id" type="text" value="@Model.Source.Id" class="form-control" />
-				</div>
-			</div>
-		</div>
+		@* <div class="d-flex justify-content-start">
+			<span class="text-muted">Source has @(Model.RelatedArticles) related articles</span>
+		</div> *@
+		<partial name="_SourceFormPartial" model="@Model" />
 	</form>
 </div>
 
-@section Scripts {
-	@{
-		var message = "";
-		@if (Model.RelatedArticlesCount > 0)
-		{
-			message = $"This source has {Model.RelatedArticlesCount} related articles. All related articles will be deleted. Are you sure to delete it?";
-		}
-		else
-		{
-			message = "Are you sure to delete this source?";
-		}
-	}
+@section Scripts 
+{
+	<script src="~/js/CommonForm.js" asp-append-version="true"></script>
 	<script src="~/js/CommonModal.js" asp-append-version="true"></script>
-	<script src="~/js/SelectItemModelCollector.js" asp-append-version="true"></script>
-	<script>
-		document.addEventListener('DOMContentLoaded', function () {
-			let selectItemModelCollector = new SelectItemModelCollector('editSourceForm');
-			selectItemModelCollector.setModelItems('#topics-single-select option', '@(nameof(Model.Topics))');
-			document.getElementById('editSourceForm').addEventListener('submit', function (event) {
-				selectItemModelCollector.collectModels();
-			});
+	<script src="~/js/send-async-request.js" asp-append-version="true"></script>
+	<script src="~/js/settings/sources/settings-sources-edit.js" asp-append-version="true"></script>
+	@if (Model.RelatedArticles > 0)
+	{
+		<script>
+			const deleteModal = new CommonModal(
+				'Delete source',
+				'Can not delete a source with related articles. Please delete related articles first.',
+				'deleteSourceButton'
+			);
 
-			let modal = new CommonModal(
-				'Confirm Deletion',
-				'@(message)',
-				'deleteSourceButton');
-			modal.setCancelButton('Cancel', 'btn-secondary');
-			modal.setConfirmButton('Confirm', 'btn-danger', () => {
-				let form = document.getElementById('editSourceForm');
-				form.action = form.action.replace('edit', 'delete');
-				form.submit();
-			});
+			deleteModal.setCancelButton('Cancel', 'btn-secondary');
+		</script>
+	}
+	else
+	{
+	<script>
+		const deleteModal = new CommonModal(
+			'Delete source',
+			'Are you sure to delete this source?',
+			'deleteSourceButton'
+		);
+
+		deleteModal.setCancelButton('Cancel', 'btn-secondary');
+		deleteModal.setConfirmButton('Confirm', 'btn-danger', async () =>
+		{
+			const href = document.getElementById('deleteSourceButton').href;
+			await sendAsyncRequest(href, 'POST', '/settings/sources/', showGeneralNotifyMessage);
 		});
 	</script>
+	}
 }

@@ -32,9 +32,7 @@
                                     <li>
                                         <a asp-area="" asp-controller="home" asp-action="topic" asp-route-id="@topic.Name" class="dropdown-item">
                                             <i class="fs-4 @topic.IconCssClass"></i>
-                                            <span class="ms-1 d-none d-xl-inline">
-                                                @topic.Name
-                                            </span>
+                                            <span class="ms-1 d-none d-xl-inline">@topic.Name</span>
                                         </a>
                                     </li>
                                 }
@@ -108,5 +106,22 @@
             </div>
         </div>
     </nav>
-    <script src="~/js/header.js" asp-append-version="true"></script>
+    @if (Model.UserPreview != null)
+    {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const avatar = document.getElementById('userAvatar');
+            const settingsMenu = document.getElementById('userSettingsMenu');
+            const closeMenuButton = document.getElementById('closeSettingsMenu');
+
+            avatar?.addEventListener('click', function () {
+                settingsMenu.style.transform = 'translateX(0)';
+            });
+
+            closeMenuButton?.addEventListener('click', function () {
+                settingsMenu.style.transform = 'translateX(100%)';
+            });
+        });
+    </script>
+    }
 </header>

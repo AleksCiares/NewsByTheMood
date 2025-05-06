@@ -68,7 +68,6 @@ namespace NewsByTheMood.MVC.Controllers
                 }
 
                 var user = await GetCurrentUserModelAsync();
-                //var articles = Array.Empty<ArticlePreviewModel>();
                 var totalArticles = await _articleService.CountLatestAsync(user.PreferedPositivity);
 
                 if (totalArticles > 0 && ItemsNotOver(pagination, totalArticles))
@@ -86,25 +85,6 @@ namespace NewsByTheMood.MVC.Controllers
                 {
                     return StatusCode(204);
                 }
-
-                /*if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-                {
-                    return PartialView("_ArticlePreviewsPartial", articles);
-                }
-                else
-                {
-                    return View(new ArticlePreviewCollectionModel()
-                    {
-                        Articles = articles,
-                        PageInfo = new PageInfoModel()
-                        {
-                            Page = pagination.Page,
-                            PageSize = pagination.PageSize,
-                            TotalItems = totalArticles,
-                        },
-                        PageTitle = "Home"
-                    });
-                }*/
             }
             catch (Exception ex)
             {
@@ -143,7 +123,6 @@ namespace NewsByTheMood.MVC.Controllers
                 }
 
                 var user = await GetCurrentUserModelAsync();
-                //var articles = Array.Empty<ArticlePreviewModel>();
                 var totalArticles = await _articleService.CountByTopicAsync(
                     user.PreferedPositivity, 
                     topic.Id);
@@ -164,25 +143,6 @@ namespace NewsByTheMood.MVC.Controllers
                 {
                     return StatusCode(204);
                 }
-
-                /*if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-                {
-                    return PartialView("_ArticlePreviewsPartial", articles);
-                }
-                else
-                {
-                    return View("Index", new ArticlePreviewCollectionModel()
-                    {
-                        Articles = articles!,
-                        PageInfo = new PageInfoModel()
-                        {
-                            Page = pagination.Page,
-                            PageSize = pagination.PageSize,
-                            TotalItems = totalArticles,
-                        },
-                        PageTitle = topic.Name,
-                    });
-                }*/
             }
             catch (Exception ex)
             {
@@ -218,7 +178,6 @@ namespace NewsByTheMood.MVC.Controllers
                 }
 
                 var user = await GetCurrentUserModelAsync();
-                //var articles = Array.Empty<ArticlePreviewModel>();
                 var totalArticles = await _articleService.CountFavoriteAsync(
                     user.PreferedPositivity, 
                     user.TopicsIds);
@@ -239,25 +198,6 @@ namespace NewsByTheMood.MVC.Controllers
                 {
                     return StatusCode(204);
                 }
-
-                /*if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-                {
-                    return PartialView("_ArticlePreviewsPartial", articles);
-                }
-                else
-                {
-                    return View("Index", new ArticlePreviewCollectionModel()
-                    {
-                        Articles = articles!,
-                        PageInfo = new PageInfoModel()
-                        {
-                            Page = pagination.Page,
-                            PageSize = pagination.PageSize,
-                            TotalItems = totalArticles,
-                        },
-                        PageTitle = "Favorites"
-                    });
-                }*/
             }
             catch (Exception ex)
             {
@@ -310,8 +250,8 @@ namespace NewsByTheMood.MVC.Controllers
 
                 var result = await _commentService.AddAsync( 
                     addComment,
-                    Int64.Parse((await GetCurrentUserModelAsync()).Id),
-                    Int64.Parse(articleId));
+                    long.Parse((await GetCurrentUserModelAsync()).Id),
+                    long.Parse(articleId));
 
                 if (result > 0)
                 {
@@ -384,9 +324,15 @@ namespace NewsByTheMood.MVC.Controllers
         {
             if (HttpContext.User.Identity?.IsAuthenticated == true)
             {
-                return _usersMapper.UserToUserModel(
-                    await _userService.GetUserAsync(HttpContext.User)) ?? 
-                    new UserModel();
+                var user = _usersMapper.UserToUserModel(
+                    await _userService.GetUserAsync(HttpContext.User));
+
+                if (user == null)
+                {
+                    throw new SecurityTokenException("User not found");
+                }
+
+                return user;
             }
 
             return new UserModel();

@@ -5,6 +5,7 @@ using NewsByTheMood.CQS.Commands;
 using NewsByTheMood.CQS.Queries;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.DataProvider.Abstract;
+using OpenQA.Selenium.BiDi.Modules.Script;
 
 namespace NewsByTheMood.Services.DataProvider.Implement
 {
@@ -19,19 +20,27 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             _logger = logger;
         }
 
-        public async Task<Topic?> GetByIdAsync(Int64 id, CancellationToken cancellationToken =default)
+        public async Task<Topic?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
         {
             if (id <= 0)
             {
-                _logger.LogWarning($"Topic id is less than or equal to 0. Id: {id}");
+                _logger.LogWarning($"Topic id is less than or equal to 0. Id: {id}. Proccess aborted.");
                 return null;
             }
 
-            var result = await _mediator.Send(new GetTopicByIdQuery() { Id = id }, cancellationToken);
-            if (result == null)
+            var result = await _mediator.Send(new GetTopicByIdQuery() 
+            { 
+                Id = id 
+            }, 
+            cancellationToken);
+
+            if (result != null)
             {
-                _logger.LogWarning($"Topic with id {id} does not exist.");
-                return null;
+                _logger.LogDebug($"Topic was fetched successfully. TopicId: {id}");
+            }
+            else
+            {
+                _logger.LogWarning($"No topic was found. TopicId: {id}");
             }
 
             return result;
@@ -41,107 +50,184 @@ namespace NewsByTheMood.Services.DataProvider.Implement
         {
             if (topicName.IsNullOrEmpty())
             {
-                _logger.LogWarning($"Topic name is null or empty. TopicName: {topicName}");
+                _logger.LogWarning($"Topic name is null or empty. TopicName: {topicName}. Proccess aborted.");
                 return null;
             }
 
-            var result = await _mediator.Send(new GetTopicByNameQuery() { TopicName = topicName }, cancellationToken);
+            var result = await _mediator.Send(new GetTopicByNameQuery() 
+            { 
+                TopicName = topicName 
+            }, 
+            cancellationToken);
 
-            if (result == null)
+            if (result != null)
             {
-                _logger.LogWarning($"Topic with name {topicName} does not exist.");
-                return null;
+                _logger.LogDebug($"Topic was fetched successfully. TopicName: {topicName}");
+            }
+            else
+            {
+                _logger.LogWarning($"No topic was found. TopicName: {topicName}");
             }
 
             return result;
         }
 
-        public async Task<IEnumerable<Topic>> GetRangeAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Topic>> GetRangeAsync(
+            int pageNumber, 
+            int pageSize, 
+            CancellationToken cancellationToken = default)
         {
             if (pageSize <= 0 || pageNumber <= 0)
             {
-                _logger.LogWarning($"Page size or page number is less than or equal to 0. PageSize: {pageSize}, PageNumber: {pageNumber}");
+                _logger.LogWarning($"Page/PageSize is less than or equal to 0. " +
+                     $"Page: {pageNumber}, PageSize: {pageSize}. Proccess will be aborted.");
                 return Array.Empty<Topic>();
             }
 
-            return await _mediator.Send(new GetTopicsRangeQuery()
+            var topics = await _mediator.Send(new GetTopicsRangeQuery()
             {
                 Page = pageNumber,
                 PageSize = pageSize
-            }, cancellationToken);
+            }, 
+            cancellationToken);
+
+            _logger.LogDebug($"{topics.Count()} sources were fetch successfully. {{ " +
+                $"Page: {pageNumber}; " +
+                $"PageSize: {pageSize}; }}");
+
+            return topics;
         }
 
         public async Task<IEnumerable<Topic>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            return await _mediator.Send(new GetTopicsRangeQuery() 
+            var topics = await _mediator.Send(new GetTopicsRangeQuery() 
             { 
                 Page = 0,
                 PageSize = 0,
                 GetAll = true
-            }, cancellationToken);
+            }, 
+            cancellationToken);
+
+            _logger.LogDebug($"{topics.Count()} sources were fetch successfully. {{ " +
+                $"Page: {0}; " +
+                $"PageSize: {0}; +" +
+                $"GetAll: true; }}");
+
+            return topics;
         }
 
         public async Task<int> CountAsync(CancellationToken cancellationToken = default)
         {
-            return await _mediator.Send(new GetTopicsCountQuery(), cancellationToken);
+            var count = await _mediator.Send(new GetTopicsCountQuery(), cancellationToken);
+
+            _logger.LogDebug($"{count} topics were found.");
+
+            return count;
         }
 
         public async Task<bool> IsExistsByNameAsync(string topicName, CancellationToken cancellationToken = default)
         {
             if (topicName.IsNullOrEmpty())
             {
-                _logger.LogWarning($"Topic name is null or empty. TopicName: {topicName}");
+                _logger.LogWarning($"Topic name is null or empty. TopicName: {topicName}. Proccess aborted.");
                 return false;
             }
 
-            return await _mediator.Send(new IsExistsTopicByNameQuery() { TopicName = topicName }, cancellationToken);
+            var isExists = await _mediator.Send(new IsExistsTopicByNameQuery() 
+            { 
+                TopicName = topicName
+            }, 
+            cancellationToken);
+
+            _logger.LogDebug($"Topic with name {topicName} exists: {isExists}");
+
+            return isExists;
         }
 
         public async Task<bool> AddAsync(Topic topic, CancellationToken cancellationToken = default)
         {
-            if(await IsExistsByNameAsync(topic.Name))
+            _logger.LogInformation($"Adding topic... TopicName: {topic.Name}.");
+
+            if (await IsExistsByNameAsync(topic.Name))
             {
-                _logger.LogWarning($"Topic with name {topic.Name} already exists.");
+                _logger.LogError($"Topic with name {topic.Name} already exists. Proccess aborted.");
                 return false;
             }
 
-            await _mediator.Send(new AddTopicCommand() { Topic = topic }, cancellationToken);
+            await _mediator.Send(new AddTopicCommand() 
+            { 
+                Topic = topic 
+            }, 
+            cancellationToken);
+
+            _logger.LogInformation($"Topic was added successfully. TopicName: {topic.Name}.");
+
             return true;
         }
 
         public async Task<bool> UpdateAsync(Topic topic, CancellationToken cancellationToken = default)
         {
+            _logger.LogInformation($"Updating topic... TopicId: {topic.Id}.");
+
             var existingTopic = await GetByIdAsync(topic.Id, cancellationToken);
+
             if (existingTopic == null)
             {
-                _logger.LogWarning($"Topic with id {topic.Id} does not exist.");
-                return false;
-            }
-            if (await IsExistsByNameAsync(topic.Name, cancellationToken) && !existingTopic.Name.Equals(topic.Name))
-            {
-                _logger.LogWarning($"Topic with name {topic.Name} already exists.");
+                _logger.LogError($"Topic not found. TopicId: {topic.Id}. Proccess aborted.");
                 return false;
             }
 
-            await _mediator.Send(new UpdateTopicCommand() { Topic = topic }, cancellationToken);
+            if (await IsExistsByNameAsync(topic.Name, cancellationToken) && !existingTopic.Name.Equals(topic.Name))
+            {
+                _logger.LogError($"Topic with same name already exists. TopicName: {topic.Name}. Proccess aborted.");
+                return false;
+            }
+
+            await _mediator.Send(new UpdateTopicCommand() 
+            { 
+                Topic = topic 
+            }, 
+            cancellationToken);
+
+            _logger.LogInformation($"Topic was updated successfully. TopicId: {topic.Id}");
+
             return true;
         }
 
         public async Task<bool> DeleteAsync(long id, CancellationToken cancellationToken = default)
         {
-            var existingTopic = await GetByIdAsync(id, cancellationToken);
-            if (existingTopic == null)
+            _logger.LogInformation($"Deleting topic... TopicId: {id}.");
+
+            if (id <= 0)
             {
-                _logger.LogWarning($"Topic with id {id} does not exist.");
-                return false;
-            }
-            if(existingTopic.Sources.Count > 0)
-            {
-                _logger.LogWarning($"Topic with id {id} has sources. Cannot delete.");
+                _logger.LogError($"Topic id is less than or equal to 0. Id: {id}. Proccess aborted.");
                 return false;
             }
 
-            await _mediator.Send(new DeleteTopicCommand() { Topic = existingTopic }, cancellationToken);
+            var existingTopic = await GetByIdAsync(id, cancellationToken);
+
+            if (existingTopic == null)
+            {
+                _logger.LogError($"Topic not found. TopicId: {id}. Procces aborted.");
+                return false;
+            }
+
+            if(existingTopic.Sources.Count > 0)
+            {
+                _logger.LogError($"Can not delete topic with related sources. " +
+                    $"First of all delete all related sources. TopicId: {id}; SourceCount {existingTopic.Sources.Count}. " +
+                    $"Procces aborted.");
+                return false;
+            }
+
+            await _mediator.Send(new DeleteTopicCommand() 
+            { 
+                Topic = existingTopic 
+            }, 
+            cancellationToken);
+
+            _logger.LogInformation($"Topic was deleted successfully. TopicId: {id}");
+
             return true;
         }
     }

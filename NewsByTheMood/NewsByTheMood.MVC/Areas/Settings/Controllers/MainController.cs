@@ -9,9 +9,24 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
     [Authorize(Roles = AccessLevels.Admininistrator)]
     public class MainController : Controller
     {
+        private readonly ILogger<MainController> _logger;
+
+        public MainController(ILogger<MainController> logger)
+        {
+            _logger = logger;
+        }
+
         public IActionResult Index()
         {
-            return View();
+            try
+            {
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while getting index settings page.");
+                return StatusCode(500);
+            }
         }
     }
 }

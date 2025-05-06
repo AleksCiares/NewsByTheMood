@@ -162,7 +162,7 @@ namespace NewsByTheMood.MVC.Areas.Identity.Pages.Account
             {
                 var user = Activator.CreateInstance<User>();
                 user.DisplayedName = Input.UserName;
-                user.RegDate = DateTime.Now;
+                user.RegDate = DateTime.UtcNow;
                 user.PreferedPositivity = 0;
                 user.AvatarUrl = "/storage/usericons/default/default.webp";
                 return user;

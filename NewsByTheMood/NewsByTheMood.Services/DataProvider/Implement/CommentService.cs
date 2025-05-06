@@ -138,5 +138,27 @@ namespace NewsByTheMood.Services.DataProvider.Implement
 
             return commentId;
         }
+
+        public async Task<long[]> DeleteRangeAsync(long[] ids, CancellationToken cancellationToken = default)
+        {
+            _logger.LogInformation($"Deleting {ids.Length} comments... CommentsIds: {{ " +
+               $"{string.Join(", ", ids)} }}.");
+
+            if (ids.Length == 0)
+            {
+                _logger.LogError($"CommentsIds collection is empty. Proccess aborted.");
+                return Array.Empty<long>();
+            }
+
+            var result = await _mediator.Send(new DeleteCommentsRangeCommand()
+            {
+                Ids = ids
+            },
+            cancellationToken);
+
+            _logger.LogInformation($"{result.Length} comments were deleted successfully.");
+
+            return result;
+        }
     }
 }

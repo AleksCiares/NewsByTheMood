@@ -7,6 +7,7 @@
         public string Text { get; set; }
         public int Position { get; set; }
         public DateTime PublishDate { get; set; }
+        public bool Deleted { get; set; }
         // FK
         public Int64 ArticleId { get; set; }
         // FK

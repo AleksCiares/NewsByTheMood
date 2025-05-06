@@ -19,6 +19,7 @@ namespace NewsByTheMood.CQS.QueryHandlers
         {
             IQueryable<Topic> query = _dbContext.Topics
                 .AsNoTracking()
+                .Include(topic => topic.Sources)
                 .OrderByDescending(topic => topic.Id);
 
             if (!request.GetAll)

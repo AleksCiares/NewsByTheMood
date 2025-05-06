@@ -38,8 +38,8 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             var topics = user.Topics.ToList();
 
             var existingUser = await _dbContext.Users
-            .Include(u => u.Topics)
-            .FirstOrDefaultAsync(u => u.Id == user.Id);
+                .Include(u => u.Topics)
+                .FirstOrDefaultAsync(u => u.Id == user.Id);
 
             if (existingUser != null)
             {

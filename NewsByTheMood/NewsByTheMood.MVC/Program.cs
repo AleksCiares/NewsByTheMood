@@ -40,7 +40,7 @@ namespace NewsByTheMood.MVC
 
                 // Db provider service
                 builder.Services.AddDbContext<NewsByTheMoodDbContext>(
-                    opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default1")));
+                    opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
                 // Identity provider service
                 builder.Services.AddIdentity<User, IdentityRole<Int64>>(options => 
@@ -63,14 +63,6 @@ namespace NewsByTheMood.MVC
                     options.SlidingExpiration = true;
                     options.ExpireTimeSpan = TimeSpan.FromDays(30);
                 });
-
-                // Auth service
-                /*builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                    .AddCookie("NewsByTheMood", options =>
-                    {
-                        options.LoginPath = "/Identity/Account/Login";
-                        options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-                    });*/
 
                 // Data provider services
                 // Article service
@@ -125,10 +117,6 @@ namespace NewsByTheMood.MVC
                 builder.Services.Configure<WebScrapeOptions>(
                     builder.Configuration.GetSection(WebScrapeOptions.Position));
                 builder.Services.AddScoped<IArticleScrapeService, ArticleScrapeService>();
-
-                // Spoof provider services
-                /*builder.Services.Configure<SpoofOptions>(
-                    builder.Configuration.GetSection(SpoofOptions.Position));*/
 
                 // Routing service
                 builder.Services.AddRouting(options => options.LowercaseUrls = true);

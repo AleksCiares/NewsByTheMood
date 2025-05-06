@@ -34,19 +34,13 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                 var totalTopics = await _topicService.CountAsync();
                 var topics = Array.Empty<TopicSettingsModel>();
 
-                if (totalTopics > 0)
+                if (totalTopics > 0 && ItemsNotOver(pagination, totalTopics))
                 {
                     topics = (await _topicService.GetRangeAsync(
                         pagination.Page,
                         pagination.PageSize))
                         .Select(topic => _topicMapper.TopicToTopicSettingsModel(topic))
                         .ToArray();
-
-                    _logger.LogDebug($"Topics were fetch successfully");
-                }
-                else
-                {
-                    _logger.LogDebug("No topics were found");
                 }
 
                 return View(new TopicSettingsCollectionModel()
@@ -75,7 +69,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         {
             try
             {
-                return View();
+                return View(new TopicSettingsModel());
             }
             catch(Exception ex)
             {
@@ -86,26 +80,27 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 
         // Create topic item processing
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([FromForm] TopicSettingsModel topic)
         {
             try
             {
                 if (!ModelState.IsValid)
                 {
-                    return View(topic);
+                    return BadRequest(ModelState);
                 }
-                
-                _logger.LogInformation($"Creating topic \"{topic.Name}\"");
 
                 if (await _topicService.AddAsync(_topicMapper.TopicSettingsModelToTopic(topic)))
                 {
-                    _logger.LogInformation($"Topic \"{topic.Name}\" was created successfully");
-                    return RedirectToAction("Index");
+                    return Ok();
                 }
                 else
                 {
-                    _logger.LogError($"Topic \"{topic.Name}\" was not created");
-                    return BadRequest("Something gone wrong, while creating source. Watch logs to more information");
+                    return BadRequest(new
+                    {
+                        GeneralErrors = "Something gone wrong, while creating article. " +
+                        "Watch logs to more information"
+                    });
                 }
             }
             catch (Exception ex)
@@ -121,18 +116,18 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         {
             try
             {
-                var topic = await _topicService.GetByIdAsync(long.Parse(id));
+                var topic = _topicMapper.TopicToTopicSettingsModel(
+                    await _topicService.GetByIdAsync(long.Parse(id)));
+
                 if (topic == null)
                 {
-                    _logger.LogWarning($"Topic id={id} was not found");
-                    return BadRequest("Something gone wrong, while getting source. Watch logs to more information");
+                    return BadRequest(new
+                    {
+                        Error = "Something gone wrong, while getting article. Watch logs to more information"
+                    });
                 }
 
-                return View(new TopicSettingsEditModel()
-                {
-                    Topic = _topicMapper.TopicToTopicSettingsModel(topic),
-                    RelatedSourceCount = topic.Sources.Count
-                });
+                return View(topic);
             }
             catch (Exception ex)
             {
@@ -143,31 +138,32 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 
         // Edit topic item proccessing
         [HttpPost]
-        public async Task<IActionResult> Edit([FromForm] TopicSettingsEditModel topicEdit)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit([FromForm] TopicSettingsModel topic)
         {
             try
             {
                 if (!ModelState.IsValid)
                 {
-                    return View(topicEdit);
+                    return BadRequest(ModelState);
                 }
-                
-                _logger.LogInformation($"Updating topic id={topicEdit.Topic.Id}");
 
-                if (await _topicService.UpdateAsync(_topicMapper.TopicSettingsModelToTopic(topicEdit.Topic)))
+                if (await _topicService.UpdateAsync(_topicMapper.TopicSettingsModelToTopic(topic)))
                 {
-                    _logger.LogInformation($"Topic id={topicEdit.Topic.Id} was updated successfully");
-                    return RedirectToAction("Index");
+                    return Ok();
                 }
                 else
                 {
-                    _logger.LogError($"Topic id={topicEdit.Topic.Id} was not updated");
-                    return BadRequest("Something gone wrong, while updating topic. Watch logs to more information");
+                    return BadRequest(new
+                    {
+                        GeneralErrors = "Something gone wrong, while creating article. " +
+                        "Watch logs to more information"
+                    });
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error while updating topic {topicEdit.Topic.ToJson()}");
+                _logger.LogError(ex, $"Error while updating topic {topic.ToJson()}");
                 return StatusCode(500);
             }
         }
@@ -178,17 +174,17 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         {
             try
             {
-               _logger.LogInformation($"Deleting topic id={id}");
-
                 if (await _topicService.DeleteAsync(long.Parse(id)))
                 {
-                    _logger.LogInformation($"Topic id={id} was deleted successfully");
-                    return RedirectToAction("Index");
+                    return Ok();
                 }
                 else
                 {
-                    _logger.LogError($"Topic id={id} was not deleted");
-                    return BadRequest("Something gone wrong, while deleting topic. Watch logs to more information");
+                    return BadRequest(new
+                    {
+                        GeneralErrors = "Something gone wrong, while creating article. " +
+                            "Watch logs to more information"
+                    });
                 }
             }
             catch (Exception ex)
@@ -219,6 +215,18 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                 _logger.LogError(ex, $"Error while checking topic name \"{topic.Name}\" availability");
                 return StatusCode(500);
             }
+        }
+
+        [NonAction]
+        private bool ItemsNotOver(PaginationModel pagination, int totalItems)
+        {
+            var pageCount = (int)Math.Ceiling((double)totalItems / pagination.PageSize);
+            if (pagination.Page <= pageCount)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

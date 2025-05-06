@@ -64,7 +64,7 @@ namespace NewsByTheMood.Data
                     Email = user.Email,
                     EmailConfirmed = true,
                     DisplayedName = user.DisplayedName,
-                    RegDate = DateTime.Now,
+                    RegDate = DateTime.UtcNow,
                     PreferedPositivity = 0,
                     AvatarUrl = "/storage/usericons/default/default.webp",
                 };

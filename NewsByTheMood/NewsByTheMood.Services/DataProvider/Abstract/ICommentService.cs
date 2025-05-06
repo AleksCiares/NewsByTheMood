@@ -17,5 +17,8 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
 
         // Add comment to article
         public Task<long> AddAsync(CommentCreateModel addComment, Int64 userId, Int64 articleId, CancellationToken cancellationToken = default);
+
+        // Delete range
+        public Task<long[]> DeleteRangeAsync(long[] ids, CancellationToken cancellationToken = default);
     }
 }

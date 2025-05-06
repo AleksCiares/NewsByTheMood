@@ -420,7 +420,6 @@ namespace NewsByTheMood.Services.DataProvider.Implement
                 var isExists = await IsExistsByIdAsync(id, cancellationToken);
                 if (isExists)
                 {
-                    // TODO: Check if article is created successfully
                     await _mediator.Send(new DeleteArticleCommand() 
                     { 
                         ArticleId = id

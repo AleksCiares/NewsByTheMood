@@ -65,6 +65,7 @@ namespace NewsByTheMood.MVC.Areas.Identity.Pages.Account.Manage
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
+
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
@@ -73,24 +74,32 @@ namespace NewsByTheMood.MVC.Areas.Identity.Pages.Account.Manage
             [Display(Name = "Prefered positivity")]
             public short PreferedPositivity { get; set; }
 
-            public List<SelectListItem> Topics { get; set; }
+            [StringLength(100, MinimumLength = 5)]
+            [Display(Name = "Displayed name")]
+            public string DisplayedName { get; set; }
+
+            public List<string> UserTopics { get; set; } = new List<string>();
+
+            public List<SelectListItem> Topics { get; set; } = new List<SelectListItem>();
         }
 
         private async Task LoadAsync(User user)
         {
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            user.Topics = (await _userManager.Users
+            var userTopics = await _userManager.Users
+                .AsNoTracking()
                 .Include(u => u.Topics)
-                .FirstAsync(u => u.Id == user.Id))
-                .Topics;
+                .Where(u => u.Id == user.Id)
+                .Select(u => u.Topics)
+                .FirstOrDefaultAsync();
 
             var topics = (await _topicService.GetAllAsync())
                 .Select(topic => new SelectListItem
                 {
                     Value = topic.Id.ToString(),
                     Text = topic.Name,
-                    Selected = user.Topics.Any(t => t.Id == topic.Id)
+                    Selected = userTopics.Any(t => t.Id == topic.Id)
                 })
                 .ToList();
 
@@ -99,7 +108,9 @@ namespace NewsByTheMood.MVC.Areas.Identity.Pages.Account.Manage
             Input = new InputModel
             {
                 PhoneNumber = phoneNumber,
+                DisplayedName = user.DisplayedName,
                 PreferedPositivity = user.PreferedPositivity,
+                UserTopics = userTopics.Select(t => t.Id.ToString()).ToList(),
                 Topics = topics
             };
         }
@@ -141,13 +152,13 @@ namespace NewsByTheMood.MVC.Areas.Identity.Pages.Account.Manage
                 }
             }
 
-            user.Topics = Input.Topics.Where(t => t.Selected == true).Select(t => new Topic()
+            user.Topics = Input.UserTopics.Select(t => new Topic()
                 {
-                    Id = Int64.Parse(t.Value),
-                    Name = t.Text,
+                    Id = long.Parse(t),
                 })
                 .ToList();
             user.PreferedPositivity = Input.PreferedPositivity;
+            user.DisplayedName = Input.DisplayedName;
 
             var result = await _userService.UpdateAsync(user);
             if (!result)

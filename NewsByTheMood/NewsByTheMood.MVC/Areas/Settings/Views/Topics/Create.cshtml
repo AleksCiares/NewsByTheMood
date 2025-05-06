@@ -7,42 +7,20 @@
 	<div class="topic__header d-flex row mb-5">
 		<h4 class="mb-0">Create a topic</h4>
 	</div>
-	<form asp-antiforgery="true" method="post">
+	<form asp-antiforgery="true" asp-area="settings" asp-controller="topics" asp-action="create" method="post" 
+		id="topicForm" class="topic-form">
 		<div class="form__panel row align-items-start justify-content-between mb-4">
 			<div class="col-auto">
-				<button asp-area="settings" asp-controller="topics" asp-action="create" class="btn btn-outline-primary" type="submit">Submit</button>
-				<a asp-area="settings" asp-controller="topics" asp-action="index" class="btn btn-outline-secondary">Cancel</a>
+				<button id="topicFormSubmit" type="submit" class="btn btn-primary">Save</button>
+				<a asp-area="settings" asp-controller="topics" asp-action="index" class="btn btn-secondary">Cancel</a>
 			</div>
 		</div>
-		<div class="form__body row align-items-start justify-content-start mb-4">
-			<div class="form__warp">
-				<div class="name form-floating mb-3">
-					<input asp-for="@Model.Name" type="text" class="form-control" placeholder="@nameof(Model.Name)" />
-					<label asp-for="@Model.Name" class="form-label">Topic name</label>
-					<span asp-validation-for="@Model.Name" class="error-feedback invalid-feedback"></span>
-				</div>
-				<div class="icon form-floating mb-3">
-					<input asp-for="@Model.IconCssClass" type="text" class="form-control" id="TopicIconCssClass" placeholder="@nameof(Model.IconCssClass)" />
-					<label asp-for="@Model.IconCssClass" class="form-label">Icon css class</label>
-					<span asp-validation-for="@Model.IconCssClass" class="error-feedback invalid-feedback"></span>
-				</div>
-				@await Component.InvokeAsync("TopicsIcons")
-				<div class="id form-floating mb-3" style="display:none;">
-					<input asp-for="@Model.Id" type="text" value="0" class="form-control" />
-				</div>
-			</div>
-		</div>
+		<partial name="_TopicFormPartial" model="@Model" />
 	</form>
 </div>
 
 @section Scripts
 {
-	<script>
-		document.addEventListener('DOMContentLoaded', function () {
-			$(document).on("click", ".icon-item", function () {
-				var clickedIconCssClass = $(this).attr("value");
-				$("#TopicIconCssClass").attr("value", clickedIconCssClass);
-			});
-		});
-	</script>
+	<script src="~/js/CommonForm.js" asp-append-version="true"></script>
+	<script src="~/js/settings/topics/settings-topics-create.js" asp-append-version="true"></script>
 }

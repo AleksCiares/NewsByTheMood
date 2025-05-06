@@ -19,7 +19,11 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         private readonly ILogger<SourcesController> _logger;
         private readonly SourcesMapper _sourceMapper;
 
-        public SourcesController(ISourceService sourceService, ITopicService topicService, ILogger<SourcesController> logger, SourcesMapper sourceMapper)
+        public SourcesController(
+            ISourceService sourceService, 
+            ITopicService topicService, 
+            ILogger<SourcesController> logger, 
+            SourcesMapper sourceMapper)
         {
             _sourceService = sourceService;
             _topicService = topicService;
@@ -36,19 +40,13 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                 var totalSources = await _sourceService.CountAsync();
                 var sources = Array.Empty<SourceSettingsPreviewModel>();
 
-                if (totalSources > 0)
+                if (totalSources > 0 && ItemsNotOver(pagination, totalSources))
                 {
                     sources = (await _sourceService.GetRangeAsync(
                         pagination.Page,
                         pagination.PageSize))
                         .Select(source => _sourceMapper.SourceToSourceSettingPreviewModel(source))
                         .ToArray();
-
-                    _logger.LogDebug($"Sources were fetch successfully");
-                }
-                else
-                {
-                    _logger.LogDebug("No sources were found");
                 }
 
                 return View(new SourceSettingsCollectionModel()
@@ -77,7 +75,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         {
             try
             {
-                return View(new SourceSettingsCreateModel()
+                return View(new SourceSettingsModel()
                 {
                     Topics = await GetTopicsAsync(),
                 });
@@ -91,31 +89,32 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 
         // Create source item proccessing
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] SourceSettingsCreateModel sourceCreate)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([FromForm] SourceSettingsModel source)
         {
             try
             {
-                if (!ModelState.IsValid || sourceCreate.Source == null)
+                if (!ModelState.IsValid)
                 {
-                    return View(sourceCreate);
+                    return BadRequest(ModelState);
                 }
 
-                _logger.LogInformation($"Creating source \"{sourceCreate.Source.Name}\"");
-
-                if (await _sourceService.AddAsync(_sourceMapper.SourceSettingsModelToSource(sourceCreate.Source)))
+                if (await _sourceService.AddAsync(_sourceMapper.SourceSettingsModelToSource(source)))
                 {
-                    _logger.LogInformation($"Source \"{sourceCreate.Source.Name}\" was created successfully");
-                    return RedirectToAction("Index");
+                    return Ok();
                 }
                 else
                 {
-                    _logger.LogError($"Source \"{sourceCreate.Source.Name}\" was not created");
-                    return BadRequest("Something gone wrong, while creating source. Watch logs to more information");
+                    return BadRequest(new
+                    {
+                        GeneralErrors = "Something gone wrong, while creating article. " +
+                        "Watch logs to more information"
+                    });
                 }
             }
             catch (Exception ex)
             {
-               _logger.LogError(ex, $"Error while creating source {sourceCreate.Source!.ToJson()}");
+               _logger.LogError(ex, $"Error while creating source {source.ToJson()}");
                 return StatusCode(500);
             }
         }
@@ -126,19 +125,20 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         {
             try
             {
-                var source = await _sourceService.GetByIdAsync(long.Parse(id));
+                var source = _sourceMapper.SourceToSourceSettingsModel(
+                    await _sourceService.GetByIdAsync(long.Parse(id)));
+
                 if (source == null)
                 {
-                    _logger.LogWarning($"Source id={id} was not found");
-                    return BadRequest("Something gone wrong, while getting source. Watch logs to more information");
+                    return BadRequest(new
+                    {
+                        Error = "Something gone wrong, while getting article. Watch logs to more information"
+                    });
                 }
 
-                return View(new SourceSettingsEditModel()
-                {
-                    Source = _sourceMapper.SourceToSourceSettingsModel(source),
-                    Topics = await GetTopicsAsync(),
-                    RelatedArticlesCount = source.Articles.Count,
-                });
+                source.Topics = await GetTopicsAsync();
+
+                return View(source);
             }
             catch(Exception ex)
             {
@@ -149,31 +149,32 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 
         // Edit source item proccessing
         [HttpPost]
-        public async Task<IActionResult> Edit([FromForm] SourceSettingsEditModel sourceEdit)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit([FromForm] SourceSettingsModel source)
         {
             try
             {
                 if (!ModelState.IsValid)
                 {
-                    return View(sourceEdit);
+                    return BadRequest(ModelState);
                 }
-                
-                _logger.LogInformation($"Updating source id={sourceEdit.Source.Id}");
 
-                if (await _sourceService.UpdateAsync(_sourceMapper.SourceSettingsModelToSource(sourceEdit.Source)))
+                if (await _sourceService.UpdateAsync(_sourceMapper.SourceSettingsModelToSource(source)))
                 {
-                    _logger.LogInformation($"Source id={sourceEdit.Source.Id} was updated successfully");
-                    return RedirectToAction("Index");
+                    return Ok();
                 }
                 else
                 {
-                    _logger.LogError($"Source id={sourceEdit.Source.Id} was not updated");
-                    return BadRequest("Something gone wrong, while updating source. Watch logs to more information");
+                    return BadRequest(new
+                    {
+                        GeneralErrors = "Something gone wrong, while creating article. " +
+                        "Watch logs to more information"
+                    });
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error while updating source {sourceEdit.Source.ToJson()}");
+                _logger.LogError(ex, $"Error while updating source {source.ToJson()}");
                 return StatusCode(500);
             }
         }
@@ -184,17 +185,17 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         {
             try
             {
-                _logger.LogInformation($"Deleting source id={id}");
-
                 if (await _sourceService.DeleteAsync(long.Parse(id)))
                 {
-                    _logger.LogInformation($"Source id={id} was deleted successfully");
-                    return RedirectToAction("Index");
+                    return Ok();
                 }
                 else
                 {
-                    _logger.LogError($"Source id={id} was not deleted");
-                    return BadRequest("Something gone wrong, while deleting source. Watch logs to more information");
+                    return BadRequest(new
+                    {
+                        GeneralErrors = "Something gone wrong, while creating article. " +
+                            "Watch logs to more information"
+                    });
                 }
             }
             catch (Exception ex)
@@ -240,10 +241,22 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 
             if (topics.Count <= 0)
             {
-                ModelState.AddModelError("Source.TopicId", "No topics have been created, to create a source you must first create a topic");
+                ModelState.AddModelError("TopicId", "No topics have been created, to create a source you must first create a topic");
             }
            
             return topics;
+        }
+
+        [NonAction]
+        private bool ItemsNotOver(PaginationModel pagination, int totalItems)
+        {
+            var pageCount = (int)Math.Ceiling((double)totalItems / pagination.PageSize);
+            if (pagination.Page <= pageCount)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

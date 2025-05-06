@@ -1,0 +1,23 @@
+﻿@addTagHelper NewsByTheMood.MVC.TagHelpers.GeneralNotifyMessageTagHelper, NewsByTheMood.MVC
+
+@model TopicSettingsModel
+
+<div class="form__body row align-items-start justify-content-start mb-4">
+	<div class="form__warp">
+		<general-notify-message use-auto-hiding=false />
+		<div class="name form-floating mb-3">
+			<input asp-for="@Model.Name" type="text" class="form-control" placeholder="@nameof(Model.Name)" />
+			<label asp-for="@Model.Name" class="form-label">Topic name</label>
+			<span asp-validation-for="@Model.Name" class="error-feedback invalid-feedback"></span>
+		</div>
+		<div class="icon form-floating mb-3">
+			<input asp-for="@Model.IconCssClass" type="text" class="form-control" id="TopicIconCssClass" placeholder="@nameof(Model.IconCssClass)" readonly />
+			<label asp-for="@Model.IconCssClass" class="form-label">Icon css class</label>
+			<span asp-validation-for="@Model.IconCssClass" class="error-feedback invalid-feedback"></span>
+		</div>
+		@await Component.InvokeAsync("TopicsIcons")
+		<div class="id form-floating mb-3" style="display:none;">
+			<input asp-for="@Model.Id" type="text" value="@Model.Id" class="form-control" />
+		</div>
+	</div>
+</div>

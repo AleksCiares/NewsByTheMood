@@ -1,4 +1,6 @@
-﻿@model SourceSettingsCollectionModel
+﻿@addTagHelper NewsByTheMood.MVC.TagHelpers.PaginationTagHelper, NewsByTheMood.MVC
+
+@model SourceSettingsCollectionModel
 @{
 	ViewData["PageTitle"] = "Sources";
 }
@@ -9,7 +11,7 @@
     </div>
     <div class="sources__panel row align-items-start justify-content-start mb-4">
         <div class="col-auto">
-            <a asp-area="settings" asp-controller="sources" asp-action="create" class="btn btn-outline-primary">Create</a>
+            <a asp-area="settings" asp-controller="sources" asp-action="create" class="btn btn-primary">Create</a>
         </div>
     </div>
     <div class="sources__table mb-4">
@@ -20,6 +22,7 @@
                     <th scope="col">Name</th>
                     <th scope="col">Url</th>
                     <th scope="col">Topic</th>
+                    <th scope="col">Is active</th>
                 </tr>
             </thead>
             <tbody>
@@ -32,6 +35,12 @@
                         <td>@sourcePreview.Name</td>
                         <td>@sourcePreview.Url</td>
                         <td>@sourcePreview.Topic</td>
+                        <td>
+                            @if (sourcePreview.IsActive)
+                            {
+                                <div style="color: green"><i class="bi bi-check"></i></div>
+                            }
+                        </td>
                     </tr>
                 }
             </tbody>

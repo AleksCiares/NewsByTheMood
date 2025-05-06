@@ -23,7 +23,8 @@ namespace NewsByTheMood.CQS.CommandHandlers
                 Position = 0,
                 PublishDate = DateTime.UtcNow,
                 ArticleId = request.ArticleId,
-                UserId = request.UserId
+                UserId = request.UserId,
+                Deleted = false
             };
 
             await _dbContext.Comments.AddAsync(comment);

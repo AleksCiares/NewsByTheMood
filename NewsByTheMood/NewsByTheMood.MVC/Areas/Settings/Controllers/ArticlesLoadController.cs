@@ -7,7 +7,7 @@ using NewsByTheMood.Services.ScrapeProvider.Abstract;
 namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 {
     [Area("Settings")]
-    [Authorize(Roles = $"{AccessLevels.Admininistrator},{AccessLevels.Editor}")]
+    [Authorize(Roles = $"{AccessLevels.Admininistrator}")]
     public class ArticlesLoadController : Controller
     {
         private readonly IArticleScrapeService _articleScrapeService;
@@ -27,51 +27,42 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             _logger = logger;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> LoadBySourceManually([FromQuery] string sourceId)
+        [HttpPost]
+        public async Task<IActionResult> LoadBySourceManually([FromRoute] string id)
         {
             try
             {
-                var source = await _sourceService.GetByIdAsync(long.Parse(sourceId));
+                var source = await _sourceService.GetByIdAsync(long.Parse(id));
                 if (source == null)
                 {
                     return NotFound(new 
                     {
-                        success = false,
-                        message = "Something gone wrong. Watch logs for more information."
+                        GeneralErrors = "Something gone wrong. Watch logs for more information."
                     });
                 }
 
                 var result = await _articleScrapeService.ScrapeLatestBySourceAsync(source);
                 if (await _articleService.AddRangeAsync(result))
                 {
-                    return Ok(new
-                    {
-                        success = true,
-                        message = "Article was updated successfully."
-                    });
+                    return Ok();
                 }
                 else
                 {
                     return NotFound(new
                     {
-                        success = false,
-                        message = "Something gone wrong. Watch logs for more information."
+                        GeneralErrors = "Something gone wrong. Watch logs for more information."
                     });
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error while loading articles from source. SourceId: {sourceId}");
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "Something gone wrong. Watch logs for more information."
-                });
+                _logger.LogError(ex, $"Error while loading articles from source. SourceId: {id}");
+                return StatusCode(500);
             }
         }
 
         [HttpPost]
+        [Authorize(Roles = $"{AccessLevels.Admininistrator},{AccessLevels.Editor}")]
         public async Task<IActionResult> UpdateManually([FromRoute] string id)
         {
             try
@@ -81,7 +72,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                 {
                     return NotFound(new
                     {
-                        Error = "Something gone wrong, while getting article. Watch logs to more information"
+                        GeneralErrors = "Something gone wrong, while getting article. Watch logs to more information"
                     });
                 }
 
@@ -90,12 +81,13 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                 {
                     return NotFound(new
                     {
-                        Error = "Something gone wrong, while getting article. Watch logs to more information"
+                        GeneralErrors = "Something gone wrong, while getting article. Watch logs to more information"
                     });
                 }
 
                 var result = await _articleScrapeService.ScrapeAsync(source, article.Url);
                 result.Id = article.Id;
+
                 if (await _articleService.UpdateAsync(result))
                 {
                     return Ok();
@@ -104,7 +96,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                 {
                     return BadRequest(new
                     {
-                        Error = "Something gone wrong, while getting article. Watch logs to more information"
+                        GeneralErrors = "Something gone wrong, while getting article. Watch logs to more information"
                     });
                 }
             }

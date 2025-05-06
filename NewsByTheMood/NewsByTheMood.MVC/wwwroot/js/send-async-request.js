@@ -1,18 +1,21 @@
-﻿async function sendAsyncRequest(link, method, redirectUrl, notifySender) {
+﻿async function sendAsyncRequest(link, method, redirectUrl, notifySender, body, headers) {
 	if (link) {
 		try {
 			const response = await fetch(link, {
 				method: method,
-				body: null,
+				body: body,
 				headers: {
-					"X-Requested-With": "XMLHttpRequest"
-				}
+					"X-Requested-With": "XMLHttpRequest",
+					...headers
+				},
 			});
 
 			if (response.ok) {
-				if (typeof redirectUrl === "string") {
+				if (typeof redirectUrl === "string") {	
 					window.location.href = redirectUrl;
 				}
+
+                return true;
 			}
 			else {
 				const result = await response.text();
@@ -21,6 +24,8 @@
 				if (typeof notifySender === "function") {
 					notifySender(message, 'error')
 				}
+
+				return false;
 			}
 		}
 		catch (error) {
@@ -29,6 +34,8 @@
 			if (typeof notifySender === "function") {
 				notifySender(message, 'error')
 			}
+
+            return false;
 		}
 	}
 	else {
@@ -37,5 +44,7 @@
 		if (typeof notifySender === "function") {
 			notifySender(message, 'error')
 		}
+
+        return false;
 	}
 }
