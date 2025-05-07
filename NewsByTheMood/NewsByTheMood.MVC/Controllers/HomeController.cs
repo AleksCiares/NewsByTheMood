@@ -55,6 +55,7 @@ namespace NewsByTheMood.MVC.Controllers
             });
         }
 
+        // TODO: change to HTTP GET
         // Get range of articles previews
         [HttpPost]
         [Route("getlatest")]
@@ -106,6 +107,7 @@ namespace NewsByTheMood.MVC.Controllers
             });
         }
 
+        // TODO: change to HTTP GET
         // Get range of articles privew by topic
         [HttpPost]
         [Route("getbytopic/{id:required}")]
@@ -164,6 +166,7 @@ namespace NewsByTheMood.MVC.Controllers
             });
         }
 
+        // TODO: change to HTTP GET
         // Get favorite articles
         [HttpPost]
         [Route("getfavorites")]
@@ -273,6 +276,7 @@ namespace NewsByTheMood.MVC.Controllers
             }
         }
 
+        // TODO: change to HTTP GET
         [HttpPost]
         [Route("getcomments")]
         public async Task<IActionResult> GetComments([FromBody] PaginationModel pagination)
