@@ -1,5 +1,4 @@
 ﻿using NewsByTheMood.Data.Entities;
-using NewsByTheMood.MVC.Models;
 
 namespace NewsByTheMood.Services.DataProvider.Abstract
 {

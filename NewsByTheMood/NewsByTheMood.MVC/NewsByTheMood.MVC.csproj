@@ -26,7 +26,11 @@
   <ItemGroup>
     <ProjectReference Include="..\NewsByTheMood.Core\NewsByTheMood.Core.csproj" />
     <ProjectReference Include="..\NewsByTheMood.MVC.Models\NewsByTheMood.MVC.Models.csproj" />
-    <ProjectReference Include="..\NewsByTheMood.Services\NewsByTheMood.Services.csproj" />
+    <ProjectReference Include="..\NewsByTheMood.Services.DataProvider\NewsByTheMood.Services.DataProvider.csproj" />
+    <ProjectReference Include="..\NewsByTheMood.Services.EmailProvider\NewsByTheMood.Services.EmailProvider.csproj" />
+    <ProjectReference Include="..\NewsByTheMood.Services.FileProvider\NewsByTheMood.Services.FileProvider.csproj" />
+    <ProjectReference Include="..\NewsByTheMood.Services.Mappers\NewsByTheMood.Services.Mappers.csproj" />
+    <ProjectReference Include="..\NewsByTheMood.Services.ScrapeProvider\NewsByTheMood.Services.ScrapeProvider.csproj" />
   </ItemGroup>
 
   <ItemGroup>

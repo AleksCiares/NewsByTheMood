@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using NewsByTheMood.Data;
 using NewsByTheMood.Services.DataProvider.Abstract;
 using NewsByTheMood.Services.DataProvider.Implement;
-using NewsByTheMood.Services.MVC.Mappers;
+using NewsByTheMood.Services.Mappers;
 using Serilog;
 
 namespace NewsByTheMood.WebAPI

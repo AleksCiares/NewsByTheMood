@@ -5,7 +5,6 @@ using NewsByTheMood.CQS.Commands;
 using NewsByTheMood.CQS.Queries;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.DataProvider.Abstract;
-using static OpenQA.Selenium.PrintOptions;
 
 namespace NewsByTheMood.Services.DataProvider.Implement
 {

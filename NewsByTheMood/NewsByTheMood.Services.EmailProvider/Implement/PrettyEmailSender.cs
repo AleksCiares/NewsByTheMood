@@ -3,9 +3,9 @@ using System.Net.Mail;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NewsByTheMood.Services.Options;
+using NewsByTheMood.Services.EmailProvider.Options;
 
-namespace NewsByTheMood.Services.EmailProvider
+namespace NewsByTheMood.Services.EmailProvider.Implement
 {
     public class PrettyEmailSender : IEmailSender
     {

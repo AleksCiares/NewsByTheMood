@@ -5,7 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
 using NewsByTheMood.Services.Mappers;
-using NewsByTheMood.Services.MVC.Mappers;
 
 namespace NewsByTheMood.MVC.Controllers
 {

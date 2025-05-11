@@ -14,7 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NewsByTheMood.Services\NewsByTheMood.Services.csproj" />
+    <ProjectReference Include="..\NewsByTheMood.Services.DataProvider\NewsByTheMood.Services.DataProvider.csproj" />
+    <ProjectReference Include="..\NewsByTheMood.Services.Mappers\NewsByTheMood.Services.Mappers.csproj" />
   </ItemGroup>
 
 </Project>

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Update.Internal;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.MVC.Models;
 using NewsByTheMood.Services.DataProvider.Abstract;
-using NewsByTheMood.Services.MVC.Mappers;
+using NewsByTheMood.Services.Mappers;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace NewsByTheMood.WebAPI.Controllers
@@ -22,6 +22,12 @@ namespace NewsByTheMood.WebAPI.Controllers
         private readonly ArticlesMapper _articlesMapper;
         private readonly ILogger<ArticlesController> _logger;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="articleService"></param>
+        /// <param name="articlesMapper"></param>
+        /// <param name="logger"></param>
         public ArticlesController(
             IArticleService articleService,
             ArticlesMapper articlesMapper,

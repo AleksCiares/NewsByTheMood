@@ -1,4 +1,4 @@
-﻿namespace NewsByTheMood.MVC.Options
+﻿namespace NewsByTheMood.Services.FileProvider.Options
 {
     public class UserIconsOptions
     {

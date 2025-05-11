@@ -9,6 +9,5 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
     {
         public Task<User?> GetUserAsync(ClaimsPrincipal userPrincipal);
         public Task<bool> UpdateAsync(User user);
-
     }
 }

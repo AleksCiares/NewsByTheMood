@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Options;
-using NewsByTheMood.MVC.Options;
+using NewsByTheMood.Services.FileProvider.Options;
 using NewsByTheMood.Services.FileProvider.Abstract;
 
 namespace NewsByTheMood.Services.FileProvider.Implement

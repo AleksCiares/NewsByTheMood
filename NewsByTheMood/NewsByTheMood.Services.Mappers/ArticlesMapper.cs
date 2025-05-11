@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using NewsByTheMood.Data.Entities;
+﻿using NewsByTheMood.Data.Entities;
 using NewsByTheMood.MVC.Models;
 using Riok.Mapperly.Abstractions;
 
-namespace NewsByTheMood.Services.MVC.Mappers
+namespace NewsByTheMood.Services.Mappers
 {
     [Mapper(AutoUserMappings = false)]
     public partial class ArticlesMapper

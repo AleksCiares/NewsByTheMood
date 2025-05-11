@@ -1,5 +1,4 @@
-﻿
-namespace NewsByTheMood.Services.Options
+﻿namespace NewsByTheMood.Services.EmailProvider.Options
 {
     public class EmailOptions
     {

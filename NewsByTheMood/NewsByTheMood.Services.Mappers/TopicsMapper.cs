@@ -2,7 +2,7 @@
 using NewsByTheMood.MVC.Models;
 using Riok.Mapperly.Abstractions;
 
-namespace NewsByTheMood.Services.MVC.Mappers
+namespace NewsByTheMood.Services.Mappers
 {
     [Mapper(AutoUserMappings = false)]
     public partial class TopicsMapper

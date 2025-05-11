@@ -4,18 +4,19 @@ using NewsByTheMood.Data;
 using NewsByTheMood.MVC.Options;
 using NewsByTheMood.Services.DataProvider.Abstract;
 using NewsByTheMood.Services.DataProvider.Implement;
-using NewsByTheMood.Services.FileProvider.Abstract;
-using NewsByTheMood.Services.FileProvider.Implement;
-using NewsByTheMood.Services.MVC.Mappers;
 using NewsByTheMood.Services.Options;
 using NewsByTheMood.Services.ScrapeProvider.Abstract;
 using NewsByTheMood.Services.ScrapeProvider.Implement;
-using NewsByTheMood.Services.EmailProvider;
 using Serilog;
 using Microsoft.AspNetCore.Identity;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.Mappers;
 using Hangfire;
+using NewsByTheMood.Services.FileProvider.Options;
+using NewsByTheMood.Services.FileProvider.Abstract;
+using NewsByTheMood.Services.FileProvider.Implement;
+using NewsByTheMood.Services.EmailProvider.Options;
+using NewsByTheMood.Services.EmailProvider.Implement;
 
 namespace NewsByTheMood.MVC
 {

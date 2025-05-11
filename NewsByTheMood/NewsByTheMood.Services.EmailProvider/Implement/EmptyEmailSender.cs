@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.UI.Services;
 
-namespace NewsByTheMood.Services.EmailProvider
+namespace NewsByTheMood.Services.EmailProvider.Implement
 {
     public class EmptyEmailSender : IEmailSender
     {

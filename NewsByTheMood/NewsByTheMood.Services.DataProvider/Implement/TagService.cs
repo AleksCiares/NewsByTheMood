@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using NewsByTheMood.CQS.Commands;
 using NewsByTheMood.CQS.Queries;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.DataProvider.Abstract;

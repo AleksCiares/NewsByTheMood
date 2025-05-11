@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NewsByTheMood.Services.DataProvider\NewsByTheMood.Services.DataProvider.csproj" />
     <ProjectReference Include="..\NewsByTheMood.Services\NewsByTheMood.Services.csproj" />
   </ItemGroup>
 

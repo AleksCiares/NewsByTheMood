@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewsByTheMood.MVC", "NewsBy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewsByTheMood.Data", "NewsByTheMood.Data\NewsByTheMood.Data.csproj", "{097CD4FA-B462-4BAC-9C05-724C8F263CCD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewsByTheMood.Services", "NewsByTheMood.Services\NewsByTheMood.Services.csproj", "{27441A8D-C8EF-4D83-8492-FA7D593B5C1D}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewsByTheMood.Core", "NewsByTheMood.Core\NewsByTheMood.Core.csproj", "{0B7EE277-460E-4936-8353-2114939E7E44}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebScraper", "WebScraper\WebScraper.csproj", "{B65DC308-845F-D3FD-D19F-7C062B684087}"
@@ -22,6 +20,16 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewsByTheMood.Services.Tests", "NewsByTheMood.Services.Tests\NewsByTheMood.Services.Tests.csproj", "{3DB3C1A5-0EC7-49BF-8A80-2AE185E31543}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewsByTheMood.WebAPI", "NewsByTheMood.WebAPI\NewsByTheMood.WebAPI.csproj", "{2F0CC5F0-2FBE-4597-A5E4-2CA9EEE6CB8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewsByTheMood.Services.DataProvider", "NewsByTheMood.Services.DataProvider\NewsByTheMood.Services.DataProvider.csproj", "{AD03BA8B-B1DD-43B2-9038-6F60F244964C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewsByTheMood.Services.EmailProvider", "NewsByTheMood.Services.EmailProvider\NewsByTheMood.Services.EmailProvider.csproj", "{1120F5E3-D969-4F6F-863D-8B4535DCDB22}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewsByTheMood.Services.FileProvider", "NewsByTheMood.Services.FileProvider\NewsByTheMood.Services.FileProvider.csproj", "{F8118483-6F85-4E29-A3A7-A97E2CCC0F15}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewsByTheMood.Services.Mappers", "NewsByTheMood.Services.Mappers\NewsByTheMood.Services.Mappers.csproj", "{E90DD894-E82D-455F-AE6F-BB9DA84BBA61}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewsByTheMood.Services.ScrapeProvider", "NewsByTheMood.Services.ScrapeProvider\NewsByTheMood.Services.ScrapeProvider.csproj", "{328BDAF0-55AF-4951-8FDC-C883C7EB94A8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,10 +45,6 @@ Global
 		{097CD4FA-B462-4BAC-9C05-724C8F263CCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{097CD4FA-B462-4BAC-9C05-724C8F263CCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{097CD4FA-B462-4BAC-9C05-724C8F263CCD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{27441A8D-C8EF-4D83-8492-FA7D593B5C1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{27441A8D-C8EF-4D83-8492-FA7D593B5C1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{27441A8D-C8EF-4D83-8492-FA7D593B5C1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{27441A8D-C8EF-4D83-8492-FA7D593B5C1D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0B7EE277-460E-4936-8353-2114939E7E44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0B7EE277-460E-4936-8353-2114939E7E44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B7EE277-460E-4936-8353-2114939E7E44}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -65,6 +69,26 @@ Global
 		{2F0CC5F0-2FBE-4597-A5E4-2CA9EEE6CB8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F0CC5F0-2FBE-4597-A5E4-2CA9EEE6CB8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F0CC5F0-2FBE-4597-A5E4-2CA9EEE6CB8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD03BA8B-B1DD-43B2-9038-6F60F244964C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD03BA8B-B1DD-43B2-9038-6F60F244964C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD03BA8B-B1DD-43B2-9038-6F60F244964C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD03BA8B-B1DD-43B2-9038-6F60F244964C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1120F5E3-D969-4F6F-863D-8B4535DCDB22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1120F5E3-D969-4F6F-863D-8B4535DCDB22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1120F5E3-D969-4F6F-863D-8B4535DCDB22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1120F5E3-D969-4F6F-863D-8B4535DCDB22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8118483-6F85-4E29-A3A7-A97E2CCC0F15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8118483-6F85-4E29-A3A7-A97E2CCC0F15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8118483-6F85-4E29-A3A7-A97E2CCC0F15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8118483-6F85-4E29-A3A7-A97E2CCC0F15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E90DD894-E82D-455F-AE6F-BB9DA84BBA61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E90DD894-E82D-455F-AE6F-BB9DA84BBA61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E90DD894-E82D-455F-AE6F-BB9DA84BBA61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E90DD894-E82D-455F-AE6F-BB9DA84BBA61}.Release|Any CPU.Build.0 = Release|Any CPU
+		{328BDAF0-55AF-4951-8FDC-C883C7EB94A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{328BDAF0-55AF-4951-8FDC-C883C7EB94A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{328BDAF0-55AF-4951-8FDC-C883C7EB94A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{328BDAF0-55AF-4951-8FDC-C883C7EB94A8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
