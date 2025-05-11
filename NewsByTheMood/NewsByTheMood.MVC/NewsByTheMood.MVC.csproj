@@ -9,13 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Views\News\**" />
-    <Content Remove="Views\News\**" />
-    <EmbeddedResource Remove="Views\News\**" />
-    <None Remove="Views\News\**" />
-  </ItemGroup> 
-
-  <ItemGroup>
+    <PackageReference Include="Hangfire" Version="1.8.18" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.15">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -39,6 +33,10 @@
     <Folder Include="wwwroot\storage\usericons\" />
   </ItemGroup>
 
-  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties appsettings_1json__JsonSchema="" />
+    </VisualStudio>
+  </ProjectExtensions>
 
 </Project>

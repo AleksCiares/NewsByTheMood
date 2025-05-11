@@ -7,7 +7,7 @@ using NewsByTheMood.Data.Entities;
 
 namespace NewsByTheMood.Data
 {
-    public class NewsByTheMoodDbContext : IdentityDbContext<User, IdentityRole<Int64>, Int64>
+    public class NewsByTheMoodDbContext : IdentityDbContext<User, IdentityRole<long>, long>
     {
         public DbSet<Article> Articles { get; set; }
         public DbSet<Comment> Comments { get; set; }
@@ -39,6 +39,7 @@ namespace NewsByTheMood.Data
         private async Task SeedRoles(IServiceProvider serviceProvider)
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole<long>>>();
+
             foreach (var roleName in AccessLevels.AllRoles)
             {
                 if (!await roleManager.RoleExistsAsync(roleName))

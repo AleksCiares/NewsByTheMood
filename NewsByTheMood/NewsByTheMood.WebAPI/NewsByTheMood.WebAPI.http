@@ -1,0 +1,6 @@
+@NewsByTheMood.WebAPI_HostAddress = http://localhost:5079
+
+GET {{NewsByTheMood.WebAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

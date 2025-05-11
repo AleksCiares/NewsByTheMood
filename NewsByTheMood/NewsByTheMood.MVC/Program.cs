@@ -15,6 +15,7 @@ using Serilog;
 using Microsoft.AspNetCore.Identity;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.Mappers;
+using Hangfire;
 
 namespace NewsByTheMood.MVC
 {
@@ -118,6 +119,16 @@ namespace NewsByTheMood.MVC
                     builder.Configuration.GetSection(WebScrapeOptions.Position));
                 builder.Services.AddScoped<IArticleScrapeService, ArticleScrapeService>();
 
+                // Add Hangfire services.
+                builder.Services.AddHangfire(configuration => configuration
+                    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                    .UseSimpleAssemblyNameTypeSerializer()
+                    .UseRecommendedSerializerSettings()
+                    .UseSqlServerStorage(builder.Configuration.GetConnectionString("Hangfire")));
+
+                // Add the processing server as IHostedService
+                builder.Services.AddHangfireServer();
+
                 // Routing service
                 builder.Services.AddRouting(options => options.LowercaseUrls = true);
                 
@@ -138,6 +149,8 @@ namespace NewsByTheMood.MVC
 
                 app.UseAuthentication();
                 app.UseAuthorization();
+
+                app.UseHangfireDashboard();
 
                 // Map settings for application
                 app.MapAreaControllerRoute(
