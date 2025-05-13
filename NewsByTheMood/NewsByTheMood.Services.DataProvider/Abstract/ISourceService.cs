@@ -21,7 +21,7 @@ namespace NewsByTheMood.Services.DataProvider.Abstract
         public Task<bool> IsExistsByNameAsync(string sourceName, CancellationToken cancellationToken =default);
 
         // Add source item
-        public Task<bool> AddAsync(Source source, CancellationToken cancellationToken = default);
+        public Task<long> AddAsync(Source source, CancellationToken cancellationToken = default);
 
         // Update source item
         public Task<bool> UpdateAsync(Source source, CancellationToken cancellationToken = default);

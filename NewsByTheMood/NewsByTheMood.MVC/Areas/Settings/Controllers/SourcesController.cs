@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NewsByTheMood.Core.Settings;
 using NewsByTheMood.MVC.Models;
+using NewsByTheMood.Services.ArticleProccessingService;
 using NewsByTheMood.Services.DataProvider.Abstract;
 using NewsByTheMood.Services.Mappers;
 using NuGet.Protocol;
@@ -18,17 +20,20 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         private readonly ITopicService _topicService;
         private readonly ILogger<SourcesController> _logger;
         private readonly SourcesMapper _sourceMapper;
+        private readonly ArticleProccessingService _articleProccessingService;
 
         public SourcesController(
             ISourceService sourceService, 
             ITopicService topicService, 
             ILogger<SourcesController> logger, 
-            SourcesMapper sourceMapper)
+            SourcesMapper sourceMapper,
+            ArticleProccessingService articleProccessingService)
         {
             _sourceService = sourceService;
             _topicService = topicService;
             _logger = logger;
             _sourceMapper = sourceMapper;
+            _articleProccessingService = articleProccessingService;
         }
 
         // Get range of sources previews
@@ -99,8 +104,13 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
                     return BadRequest(ModelState);
                 }
 
-                if (await _sourceService.AddAsync(_sourceMapper.SourceSettingsModelToSource(source)))
+                var sourceId = await _sourceService.AddAsync(_sourceMapper.SourceSettingsModelToSource(source));
+                if (sourceId > 0)
                 {
+                    if (source.IsActive)
+                    {
+                        CreateBackgroundjob(sourceId, source.SurveyPeriod);
+                    }
                     return Ok();
                 }
                 else
@@ -161,6 +171,10 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 
                 if (await _sourceService.UpdateAsync(_sourceMapper.SourceSettingsModelToSource(source)))
                 {
+                    if (source.IsActive)
+                    {
+                        CreateBackgroundjob(long.Parse(source.Id), source.SurveyPeriod);
+                    }
                     return Ok();
                 }
                 else
@@ -187,6 +201,7 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             {
                 if (await _sourceService.DeleteAsync(long.Parse(id)))
                 {
+                    DeleteBackgroundJob(long.Parse(id));
                     return Ok();
                 }
                 else
@@ -257,6 +272,94 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
             }
 
             return false;
+        }
+
+        [NonAction]
+        private void CreateBackgroundjob(long sourceId, int period, bool randomizePeriod = false)
+        {
+
+            RecurringJob.AddOrUpdate<ArticleProccessingService>(
+                $"ProcessArticlesBySource-{sourceId}",
+                x => x.ProcessArticlesBySource(sourceId),
+                GetCronExpressionForMinutes(period));
+        }
+
+        [NonAction]
+        private void DeleteBackgroundJob(long sourceId)
+        {
+            RecurringJob.RemoveIfExists($"ProcessArticlesBySource-{sourceId}");
+        }
+
+        [NonAction]
+        private string GetCronExpressionForMinutes(int minutes)
+        {
+            if (minutes <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(minutes), "Minutes must be greater than 0.");
+            }
+
+            if (minutes < 60)
+            {
+                // Если минуты меньше 60, возвращаем Cron-строку для минут
+                return $"*/{minutes} * * * *";
+            }
+
+            int hours = minutes / 60;
+            int remainingMinutes = minutes % 60;
+
+            if (minutes < 1440) // 1440 минут = 24 часа
+            {
+                // Если минуты больше 60, но меньше 1440, преобразуем в часы и минуты
+                if (remainingMinutes == 0)
+                {
+                    return $"0 */{hours} * * *"; // Только часы
+                }
+                else
+                {
+                    return $"*/{remainingMinutes} */{hours} * * *"; // Часы и минуты
+                }
+            }
+
+            int days = minutes / 1440;
+            int remainingHours = (minutes % 1440) / 60;
+
+            if (minutes < 10080) // 10080 минут = 7 дней
+            {
+                // Если минуты больше 1440, но меньше 10080, преобразуем в дни, часы и минуты
+                if (remainingHours == 0 && remainingMinutes == 0)
+                {
+                    return $"0 0 */{days} * *"; // Только дни
+                }
+                else if (remainingMinutes == 0)
+                {
+                    return $"0 */{remainingHours} */{days} * *"; // Дни и часы
+                }
+                else
+                {
+                    return $"*/{remainingMinutes} */{remainingHours} */{days} * *"; // Дни, часы и минуты
+                }
+            }
+
+            int weeks = minutes / 10080;
+            int remainingDays = (minutes % 10080) / 1440;
+
+            // Если минуты больше 10080, преобразуем в недели, дни, часы и минуты
+            if (remainingDays == 0 && remainingHours == 0 && remainingMinutes == 0)
+            {
+                return $"0 0 * * {weeks}"; // Только недели
+            }
+            else if (remainingHours == 0 && remainingMinutes == 0)
+            {
+                return $"0 0 */{remainingDays} * {weeks}"; // Недели и дни
+            }
+            else if (remainingMinutes == 0)
+            {
+                return $"0 */{remainingHours} */{remainingDays} * {weeks}"; // Недели, дни и часы
+            }
+            else
+            {
+                return $"*/{remainingMinutes} */{remainingHours} */{remainingDays} * {weeks}"; // Недели, дни, часы и минуты
+            }
         }
     }
 }

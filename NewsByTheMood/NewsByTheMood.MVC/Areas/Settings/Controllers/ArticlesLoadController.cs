@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NewsByTheMood.Core.Settings;
-using NewsByTheMood.Services.DataProvider.Abstract;
-using NewsByTheMood.Services.ScrapeProvider.Abstract;
+using NewsByTheMood.Services.ArticleProccessingService;
 
 namespace NewsByTheMood.MVC.Areas.Settings.Controllers
 {
@@ -10,20 +9,14 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
     [Authorize(Roles = $"{AccessLevels.Admininistrator}")]
     public class ArticlesLoadController : Controller
     {
-        private readonly IArticleScrapeService _articleScrapeService;
-        private readonly ISourceService _sourceService;
-        private readonly IArticleService _articleService;
+        private readonly ArticleProccessingService _articleProccessingService;
         private readonly ILogger<ArticlesLoadController> _logger;
 
         public ArticlesLoadController(
-            IArticleScrapeService articleLoadService, 
-            ISourceService sourceService, 
-            IArticleService articleService,
+            ArticleProccessingService articleProccessingService, 
             ILogger<ArticlesLoadController> logger)
         {
-            _articleScrapeService = articleLoadService;
-            _sourceService = sourceService;
-            _articleService = articleService;
+            _articleProccessingService = articleProccessingService;
             _logger = logger;
         }
 
@@ -32,17 +25,8 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         {
             try
             {
-                var source = await _sourceService.GetByIdAsync(long.Parse(id));
-                if (source == null)
-                {
-                    return NotFound(new 
-                    {
-                        GeneralErrors = "Something gone wrong. Watch logs for more information."
-                    });
-                }
-
-                var result = await _articleScrapeService.ScrapeLatestBySourceAsync(source);
-                if (await _articleService.AddRangeAsync(result))
+                var result = await _articleProccessingService.ProcessArticlesBySourceAsync(long.Parse(id));
+                if (result)
                 {
                     return Ok();
                 }
@@ -67,28 +51,8 @@ namespace NewsByTheMood.MVC.Areas.Settings.Controllers
         {
             try
             {
-                var article = await _articleService.GetByIdAsync(long.Parse(id));
-                if (article == null)
-                {
-                    return NotFound(new
-                    {
-                        GeneralErrors = "Something gone wrong, while getting article. Watch logs to more information"
-                    });
-                }
-
-                var source = await _sourceService.GetByIdAsync(article.SourceId);
-                if (source == null)
-                {
-                    return NotFound(new
-                    {
-                        GeneralErrors = "Something gone wrong, while getting article. Watch logs to more information"
-                    });
-                }
-
-                var result = await _articleScrapeService.ScrapeAsync(source, article.Url);
-                result.Id = article.Id;
-
-                if (await _articleService.UpdateAsync(result))
+                var result = await _articleProccessingService.ProccessCertainArticleAsync(long.Parse(id));
+                if (result)
                 {
                     return Ok();
                 }

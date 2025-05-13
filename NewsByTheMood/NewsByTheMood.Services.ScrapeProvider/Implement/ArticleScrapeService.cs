@@ -3,28 +3,23 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NewsByTheMood.Data.Entities;
-using NewsByTheMood.Services.DataProvider.Abstract;
 using NewsByTheMood.Services.Options;
 using NewsByTheMood.Services.ScrapeProvider.Abstract;
 using WebScraper;
 using WebScraper.Settings;
-using Source = NewsByTheMood.Data.Entities.Source;
 
 namespace NewsByTheMood.Services.ScrapeProvider.Implement
 {
     public class ArticleScrapeService : IArticleScrapeService
     {
         private readonly WebScrapeOptions _options;
-        private readonly IArticleService _articleService;
         private readonly ILogger<ArticleScrapeService> _logger;
 
         public ArticleScrapeService(
             IOptions<WebScrapeOptions> options, 
-            IArticleService articleService,
             ILogger<ArticleScrapeService> logger)
         {
             _options = options.Value;
-            _articleService = articleService;
             _logger = logger;
         }
 
@@ -62,11 +57,6 @@ namespace NewsByTheMood.Services.ScrapeProvider.Implement
                 if (!Uri.IsWellFormedUriString(articlesUrls[i], uriKind: UriKind.Absolute))
                 {
                     articlesUrls[i] = new Uri(new Uri(source.Url), articlesUrls[i]).ToString();
-                }
-
-                if (await _articleService.IsExistsByUrlAsync(articlesUrls[i]))
-                {
-                    articlesUrls.RemoveAt(i);
                 }
             }
             _logger.LogDebug($"Removed duplicates. {articlesUrls.Count} articles urls left from page. SourceName: {source.Name}, Id: {source.Id}.\n" +

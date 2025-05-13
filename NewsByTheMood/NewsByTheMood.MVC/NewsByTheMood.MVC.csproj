@@ -30,7 +30,7 @@
     <ProjectReference Include="..\NewsByTheMood.Services.EmailProvider\NewsByTheMood.Services.EmailProvider.csproj" />
     <ProjectReference Include="..\NewsByTheMood.Services.FileProvider\NewsByTheMood.Services.FileProvider.csproj" />
     <ProjectReference Include="..\NewsByTheMood.Services.Mappers\NewsByTheMood.Services.Mappers.csproj" />
-    <ProjectReference Include="..\NewsByTheMood.Services.ScrapeProvider\NewsByTheMood.Services.ScrapeProvider.csproj" />
+    <ProjectReference Include="..\NewsByTheMood.Services.ArticleProccessingService\NewsByTheMood.Services.ArticleProccessingService.csproj" />
   </ItemGroup>
 
   <ItemGroup>

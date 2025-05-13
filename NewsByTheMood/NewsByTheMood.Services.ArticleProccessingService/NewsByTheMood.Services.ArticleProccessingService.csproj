@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NewsByTheMood.Data\NewsByTheMood.Data.csproj" />
+    <ProjectReference Include="..\NewsByTheMood.Services.DataProvider\NewsByTheMood.Services.DataProvider.csproj" />
+    <ProjectReference Include="..\NewsByTheMood.Services.ScrapeProvider\NewsByTheMood.Services.ScrapeProvider.csproj" />
+  </ItemGroup>
+
+</Project>

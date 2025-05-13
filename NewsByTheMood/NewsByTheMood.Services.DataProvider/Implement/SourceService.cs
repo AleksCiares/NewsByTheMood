@@ -117,25 +117,31 @@ namespace NewsByTheMood.Services.DataProvider.Implement
             return isExists;
         }
 
-        public async Task<bool> AddAsync(Source source, CancellationToken cancellationToken = default)
+        public async Task<long> AddAsync(Source source, CancellationToken cancellationToken = default)
         {
             _logger.LogInformation($"Adding source... SourceName: {source.Name}.");
 
             if (await IsExistsByNameAsync(source.Name))
             {
                 _logger.LogError($"Source with name {source.Name} already exists. Proccess aborted.");
-                return false;
+                return 0;
             }
 
-            await _mediator.Send(new AddSourceCommand() 
+            var result = await _mediator.Send(new AddSourceCommand() 
             { 
                 Source = source 
             }, 
             cancellationToken);
 
+            if(result <= 0)
+            {
+                _logger.LogError($"Source was not added. SourceName: {source.Name}. Proccess aborted.");
+                return 0;
+            }
+
             _logger.LogInformation($"Source was added successfully. SourceName: {source.Name}.");
 
-            return true;
+            return result;
         }
 
         public async Task<bool> UpdateAsync(Source source, CancellationToken cancellationToken = default)

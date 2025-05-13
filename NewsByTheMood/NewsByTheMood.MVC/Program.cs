@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using NewsByTheMood.Data;
-using NewsByTheMood.MVC.Options;
 using NewsByTheMood.Services.DataProvider.Abstract;
 using NewsByTheMood.Services.DataProvider.Implement;
 using NewsByTheMood.Services.Options;
@@ -17,6 +16,7 @@ using NewsByTheMood.Services.FileProvider.Abstract;
 using NewsByTheMood.Services.FileProvider.Implement;
 using NewsByTheMood.Services.EmailProvider.Options;
 using NewsByTheMood.Services.EmailProvider.Implement;
+using NewsByTheMood.Services.ArticleProccessingService;
 
 namespace NewsByTheMood.MVC
 {
@@ -118,7 +118,10 @@ namespace NewsByTheMood.MVC
                 // Scrape provider services
                 builder.Services.Configure<WebScrapeOptions>(
                     builder.Configuration.GetSection(WebScrapeOptions.Position));
-                builder.Services.AddScoped<IArticleScrapeService, ArticleScrapeService>();
+                builder.Services.AddTransient<IArticleScrapeService, ArticleScrapeService>();
+
+                // Article processing service
+                builder.Services.AddTransient<ArticleProccessingService>();
 
                 // Add Hangfire services.
                 builder.Services.AddHangfire(configuration => configuration
@@ -151,7 +154,10 @@ namespace NewsByTheMood.MVC
                 app.UseAuthentication();
                 app.UseAuthorization();
 
-                app.UseHangfireDashboard();
+                app.UseHangfireDashboard("/hangfire", new DashboardOptions
+                {
+                    Authorization = new[] { new HangfireAdminAuthorizationFilter() }
+                });
 
                 // Map settings for application
                 app.MapAreaControllerRoute(
