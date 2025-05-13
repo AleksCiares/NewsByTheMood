@@ -31,6 +31,7 @@
     <ProjectReference Include="..\NewsByTheMood.Services.FileProvider\NewsByTheMood.Services.FileProvider.csproj" />
     <ProjectReference Include="..\NewsByTheMood.Services.Mappers\NewsByTheMood.Services.Mappers.csproj" />
     <ProjectReference Include="..\NewsByTheMood.Services.ArticleProccessingService\NewsByTheMood.Services.ArticleProccessingService.csproj" />
+    <ProjectReference Include="..\NewsByTheMood.Services.PositifityRater\NewsByTheMood.Services.PositivityRater.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewsByTheMood.Services.Scra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewsByTheMood.Services.ArticleProccessingService", "NewsByTheMood.Services.ArticleProccessingService\NewsByTheMood.Services.ArticleProccessingService.csproj", "{560E1FE9-CE54-4605-9763-D85311641DE9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewsByTheMood.Services.PositivityRater", "NewsByTheMood.Services.PositifityRater\NewsByTheMood.Services.PositivityRater.csproj", "{72799A2C-EBDE-4777-AA44-C05B0AB39AFE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -95,6 +97,10 @@ Global
 		{560E1FE9-CE54-4605-9763-D85311641DE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{560E1FE9-CE54-4605-9763-D85311641DE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{560E1FE9-CE54-4605-9763-D85311641DE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72799A2C-EBDE-4777-AA44-C05B0AB39AFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72799A2C-EBDE-4777-AA44-C05B0AB39AFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72799A2C-EBDE-4777-AA44-C05B0AB39AFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72799A2C-EBDE-4777-AA44-C05B0AB39AFE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

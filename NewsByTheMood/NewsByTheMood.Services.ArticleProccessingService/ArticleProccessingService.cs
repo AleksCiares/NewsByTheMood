@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using NewsByTheMood.Data.Entities;
 using NewsByTheMood.Services.DataProvider.Abstract;
+using NewsByTheMood.Services.PositifityRater.Abstract;
+using NewsByTheMood.Services.PositifityRater.Implement;
 using NewsByTheMood.Services.ScrapeProvider.Abstract;
 
 namespace NewsByTheMood.Services.ArticleProccessingService
@@ -37,13 +39,18 @@ namespace NewsByTheMood.Services.ArticleProccessingService
 
                 var articles = new List<Article>(await _articleScrapeService.ScrapeLatestBySourceAsync(source));
 
-                foreach(var article in articles)
+                for(int i = articles.Count - 1; i >= 0; i--)
                 {
-                    if(await _articleService.IsExistsByUrlAsync(article.Url))
+                    if(await _articleService.IsExistsByUrlAsync(articles[i].Url))
                     {
-                        _logger.LogInformation($"Article with URL {article.Url} already exists.");
-                        articles.Remove(article);
+                        _logger.LogInformation($"Article with URL {articles[i].Url} already exists.");
+                        articles.RemoveAt(i);
                         continue;
+                    }
+
+                    if (articles[i].Body != null)
+                    {
+                        articles[i].Positivity = RussianPositivityService.GetPositivity(articles[i].Body);
                     }
                 }
 

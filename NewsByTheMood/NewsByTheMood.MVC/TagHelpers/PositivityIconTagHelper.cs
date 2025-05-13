@@ -17,33 +17,41 @@ namespace NewsByTheMood.MVC.TagHelpers
             switch (Positivity)
             {
                 case 10:
-                case 9:
-                    icon.AddCssClass("bi bi-emoji-smile");
-                    icon.Attributes["style"] = "color: limegreen;";
+                    icon.AddCssClass("bi bi-emoji-surprise");
+                    icon.Attributes["style"] = "color: #37f221;";
                     break;
-
+                case 9:
+                    icon.AddCssClass("bi bi-emoji-laughing");
+                    icon.Attributes["style"] = "color: #37f221;";
+                    break;
                 case 8:
+                    icon.AddCssClass("bi bi-emoji-laughing");
+                    icon.Attributes["style"] = "color: #34a30a;";
+                    break;
                 case 7:
                     icon.AddCssClass("bi bi-emoji-smile");
-                    icon.Attributes["style"] = "color: yellowgreen;";
+                    icon.Attributes["style"] = "color: #257a06;";
                     break;
-
                 case 6:
-                case 5:
                     icon.AddCssClass("bi bi-emoji-neutral");
-                    icon.Attributes["style"] = "color: orange;";
+                    icon.Attributes["style"] = "color: #f3ca35;";
                     break;
-
-                case 4:
-                case 3:
+                case 5:
                     icon.AddCssClass("bi bi-emoji-frown");
-                    icon.Attributes["style"] = "color: orangered;";
+                    icon.Attributes["style"] = "color: #f4a30b;";
                     break;
-
+                case 4:
+                    icon.AddCssClass("bi bi-emoji-astonished");
+                    icon.Attributes["style"] = "color: #f46d0b;";
+                    break;
+                case 3:
+                    icon.AddCssClass("bi bi-emoji-grimace");
+                    icon.Attributes["style"] = "color: #f4560b;";
+                    break;
                 case 2:
                 case 1:
-                    icon.AddCssClass("bi bi-emoji-frown");
-                    icon.Attributes["style"] = "color: red;";
+                    icon.AddCssClass("bi bi-emoji-angry");
+                    icon.Attributes["style"] = "color: #c20000;";
                     break;
 
                 default:
