@@ -1,22 +1,7 @@
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.EntityFrameworkCore;
 using NewsByTheMood.Data;
-using NewsByTheMood.Services.DataProvider.Abstract;
-using NewsByTheMood.Services.DataProvider.Implement;
-using NewsByTheMood.Services.Options;
-using NewsByTheMood.Services.ScrapeProvider.Abstract;
-using NewsByTheMood.Services.ScrapeProvider.Implement;
 using Serilog;
-using Microsoft.AspNetCore.Identity;
-using NewsByTheMood.Data.Entities;
-using NewsByTheMood.Services.Mappers;
 using Hangfire;
-using NewsByTheMood.Services.FileProvider.Options;
-using NewsByTheMood.Services.FileProvider.Abstract;
-using NewsByTheMood.Services.FileProvider.Implement;
-using NewsByTheMood.Services.EmailProvider.Options;
-using NewsByTheMood.Services.EmailProvider.Implement;
-using NewsByTheMood.Services.ArticleProccessingService;
+using NewsByTheMood.MVC.Infrastructure;
 
 namespace NewsByTheMood.MVC
 {
@@ -28,112 +13,27 @@ namespace NewsByTheMood.MVC
             {
                 var builder = WebApplication.CreateBuilder(args);
 
-                // Logging service
-                Log.Logger = new LoggerConfiguration()
-                    .WriteTo.Console()
-                    .ReadFrom.Configuration(builder.Configuration)
-                    .CreateLogger();
-                builder.Services.AddSerilog();
+                builder.Services.RegisterLogger(builder.Configuration);
                 Log.Information("Starting host...");
 
-                // Add services to the container.
+                builder.Services.RegisterDbContext(builder.Configuration);
+                builder.Services.RegisterIdentity();
+                builder.Services.ConfigureCookie();
+
+                builder.Services.RegisterDataProvider();
+                builder.Services.RegisterMediatR();
+                builder.Services.RegisterMappers();
+
+                builder.Services.RegisterScrapeProvider(builder.Configuration);
+                builder.Services.RegisterArticleProccesing();
+
+                builder.Services.RegisterFileProvider(builder.Configuration);
+                builder.Services.RegisterEmailProvider(builder.Configuration);
+
+                builder.Services.RegisterHangfire(builder.Configuration);
+
                 builder.Services.AddControllersWithViews();
                 builder.Services.AddRazorPages();
-
-                // Db provider service
-                builder.Services.AddDbContext<NewsByTheMoodDbContext>(
-                    opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
-
-                // Identity provider service
-                builder.Services.AddIdentity<User, IdentityRole<Int64>>(options => 
-                    {
-                        options.SignIn.RequireConfirmedAccount = true;
-                        options.User.RequireUniqueEmail = true;
-                        options.Password.RequiredLength = 12;
-                        options.Password.RequireDigit = true;
-                        options.Password.RequireLowercase = true;
-                        options.Password.RequireUppercase = true;
-                        options.Password.RequireNonAlphanumeric = true;
-                    })
-                    .AddEntityFrameworkStores<NewsByTheMoodDbContext>()
-                    .AddDefaultTokenProviders();
-
-                builder.Services.ConfigureApplicationCookie(options =>
-                {
-                    options.LoginPath = "/identity/account/login";
-                    options.AccessDeniedPath = "/identity/account/accessdenied";
-                    options.SlidingExpiration = true;
-                    options.ExpireTimeSpan = TimeSpan.FromDays(30);
-                });
-
-                // Data provider services
-                // Article service
-                builder.Services.AddScoped<IArticleService, ArticleService>();
-                // Comment service
-                builder.Services.AddScoped<ICommentService, CommentService>();
-                // Source service
-                builder.Services.AddScoped<ISourceService, SourceService>();
-                // Tag service
-                builder.Services.AddScoped<ITagService, TagService>();
-                // Topic service
-                builder.Services.AddScoped<ITopicService, TopicService>();
-                // User service
-                builder.Services.AddScoped<IUserService, UserService>();
-
-                //CQS services
-                builder.Services.AddMediatR(sc => sc.RegisterServicesFromAssembly(typeof(CQS.Commands.AddArticleCommand).Assembly));
-
-                //Mapper services
-                builder.Services.AddTransient<ArticlesMapper>();
-                builder.Services.AddTransient<CommentsMapper>();
-                builder.Services.AddTransient<SourcesMapper>();
-                builder.Services.AddTransient<TopicsMapper>();
-                builder.Services.AddTransient<UsersMapper>();
-
-                // File provider services
-                // Icons service
-                if (builder.Configuration.GetValue<bool>("UseUserIcons"))
-                {
-                    builder.Services.Configure<UserIconsOptions>(
-                        builder.Configuration.GetSection(UserIconsOptions.Position));
-                    builder.Services.AddSingleton<IiconService, LocalIconService>();
-                }
-                else
-                {
-                    builder.Services.AddSingleton<IiconService, EmptyIconService>();
-                }
-
-                // Email provider services
-                if (builder.Configuration.GetValue<bool>("UseEmailSender"))
-                {
-                    builder.Services.Configure<EmailOptions>(
-                        builder.Configuration.GetSection(EmailOptions.Position));
-                    builder.Services.AddTransient<IEmailSender, PrettyEmailSender>();
-                }
-                else
-                {
-                    builder.Services.AddTransient<IEmailSender, EmptyEmailSender>();
-                }
-
-                // Scrape provider services
-                builder.Services.Configure<WebScrapeOptions>(
-                    builder.Configuration.GetSection(WebScrapeOptions.Position));
-                builder.Services.AddTransient<IArticleScrapeService, ArticleScrapeService>();
-
-                // Article processing service
-                builder.Services.AddTransient<ArticleProccessingService>();
-
-                // Add Hangfire services.
-                builder.Services.AddHangfire(configuration => configuration
-                    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
-                    .UseSimpleAssemblyNameTypeSerializer()
-                    .UseRecommendedSerializerSettings()
-                    .UseSqlServerStorage(builder.Configuration.GetConnectionString("Hangfire")));
-
-                // Add the processing server as IHostedService
-                builder.Services.AddHangfireServer();
-
-                // Routing service
                 builder.Services.AddRouting(options => options.LowercaseUrls = true);
                 
                 var app = builder.Build();
